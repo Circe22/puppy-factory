@@ -2,7 +2,7 @@
 
 A buildless, responsive kaomoji studio. Deploy `dist/` as static assets. No application login, backend, analytics, or external runtime dependency. Favorites stay in `localStorage` in the current browser, and clearing browser data removes them.
 
-Features: two dog families, 12 ear pairs, 30 eye pairs, 24 mouths, 14 decorations (120,960 base combinations), plus independently layered horns, tails, and wings, editable Unicode components, random generation, mood/family galleries, copy with fallback and manual copy dialog, persistent favorites, direct eye/mouth buttons, one-click looks, undo, sticky mobile preview, reduced-motion support.
+Features: two dog families, 16 ear pairs, 37 eye pairs, 29 mouths, 15 decorations (257,520 base combinations), plus independently layered horns, tails, and wings, editable Unicode components, random generation, mood/family galleries, copy with fallback and manual copy dialog, persistent favorites, direct eye/mouth buttons, one-click looks, undo, sticky mobile preview, reduced-motion support.
 
 ## Validation
 
@@ -15,3 +15,7 @@ Checkpoint commits are retained in the source repository.
 ## Version 2 validation
 
 The three requested sad/devil/angel strings match exactly. All 210 horn/tail/wing combinations pass Unicode and state validation; old favorites preserve their original strings. Twelve tests pass, including clipboard copying of layered accessories. Preset font coverage is bundled locally. Real browser visual and OS clipboard QA remains unavailable in this environment.
+
+## Version 3 validation
+
+All nine new user-provided faces match exact Unicode code points, including doubled combining dots, three internal spaces, and the supplementary-plane tongue character. New search inputs filter eye/mouth components; new components appear first. Face spacing is adjustable and persists in favorites. Fourteen tests pass. All 129 preset characters have bundled font glyphs, including Tibetan, Kannada, Linear B, Canadian Aboriginal, and technical symbols. Font assets use versioned cache keys. Browser visual/OS clipboard verification remains unavailable.

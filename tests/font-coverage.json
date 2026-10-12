@@ -47,6 +47,7 @@
       730,
       768,
       769,
+      803,
       805,
       811,
       820,
@@ -59,6 +60,8 @@
       1374,
       1697,
       4304,
+      5149,
+      5154,
       5196,
       5312,
       7443,
@@ -70,15 +73,18 @@
       8211,
       8212,
       8226,
+      8248,
       8317,
       8318,
       8330,
       8333,
       8334,
       8605,
+      8790,
       8857,
       8902,
       8961,
+      9685,
       9702,
       9733,
       9825,
@@ -110,13 +116,27 @@
   },
   {
     "file": "puppy-unicode-3.woff",
+    "source": "NotoSansLinearB.ttf",
+    "codepoints": [
+      65783
+    ]
+  },
+  {
+    "file": "puppy-unicode-4.woff",
     "source": "NotoSansBatak.ttf",
     "codepoints": [
       7109
     ]
   },
   {
-    "file": "puppy-unicode-4.woff",
+    "file": "puppy-unicode-5.woff",
+    "source": "NotoSansKannada.ttf",
+    "codepoints": [
+      3235
+    ]
+  },
+  {
+    "file": "puppy-unicode-6.woff",
     "source": "NotoSansYi.ttf",
     "codepoints": [
       12539,
@@ -127,14 +147,21 @@
     ]
   },
   {
-    "file": "puppy-unicode-5.woff",
+    "file": "puppy-unicode-7.woff",
+    "source": "NotoSansCanadianAboriginal.ttf",
+    "codepoints": [
+      5596
+    ]
+  },
+  {
+    "file": "puppy-unicode-8.woff",
     "source": "NotoSansGujarati.ttf",
     "codepoints": [
       2798
     ]
   },
   {
-    "file": "puppy-unicode-6.woff",
+    "file": "puppy-unicode-9.woff",
     "source": "NotoSansCJKkr.ttf",
     "codepoints": [
       8978,
@@ -143,6 +170,7 @@
       12388,
       12613,
       12615,
+      12640,
       65087,
       65103,
       65288,
@@ -151,7 +179,7 @@
     ]
   },
   {
-    "file": "puppy-unicode-7.woff",
+    "file": "puppy-unicode-10.woff",
     "source": "NotoSansOriya.ttf",
     "codepoints": [
       2835,
@@ -161,24 +189,39 @@
     ]
   },
   {
-    "file": "puppy-unicode-8.woff",
+    "file": "puppy-unicode-11.woff",
+    "source": "NotoSansSymbols.ttf",
+    "codepoints": [
+      9007
+    ]
+  },
+  {
+    "file": "puppy-unicode-12.woff",
     "source": "NotoSansGlagolitic.ttf",
     "codepoints": [
       11289
     ]
   },
   {
-    "file": "puppy-unicode-9.woff",
+    "file": "puppy-unicode-13.woff",
     "source": "NotoSansThai.ttf",
     "codepoints": [
       3589
     ]
   },
   {
-    "file": "puppy-unicode-10.woff",
+    "file": "puppy-unicode-14.woff",
+    "source": "NotoSerifTibetan.ttf",
+    "codepoints": [
+      3869
+    ]
+  },
+  {
+    "file": "puppy-unicode-15.woff",
     "source": "NotoSansMath.ttf",
     "codepoints": [
-      10826
+      10826,
+      10828
     ]
   }
 ]
