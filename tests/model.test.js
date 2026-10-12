@@ -8,3 +8,23 @@ function fakeDocument(copyResult=true){let input,removed=false,focused=false;ret
 test('Clipboard API receives exact rendered Unicode',async()=>{for(const s of [DEFAULT,{...DEFAULT,eyes:7},{...DEFAULT,custom:{suffix:' 🐾'}}]){const text=compose(s);let written;assert.equal(await copyText(text,{clipboard:{writeText:async x=>{written=x}}},{}),'clipboard');assert.equal(written,text)}});
 test('denied or missing Clipboard API falls back with identical text and restores focus',async()=>{for(const nav of [{},{clipboard:{writeText:async()=>{throw Error('denied')}}}]){const doc=fakeDocument();const text=compose({...DEFAULT,eyes:7});assert.equal(await copyText(text,nav,doc),'fallback');assert.equal(doc.input.value,text);assert(doc.removed);assert(doc.focused)}});
 test('failed fallback offers manual copy, never a false success',async()=>{const doc=fakeDocument(false);assert.equal(await copyText(compose(DEFAULT),{},doc),'manual');assert(doc.removed)});
+test('requested sad puppy, devil horns, and flapping angel are exact',()=>{
+ assert.equal(compose({...cloneState(DEFAULT),eyes:12,mouth:6}),'૮₍ ˶- ᯅ -˶ ₎ა');
+ assert.equal(compose({...cloneState(DEFAULT),accessories:{horns:1,tail:0,wings:0}}),'૮₍^ ˶• ﻌ •˶^ ₎ა');
+ assert.equal(compose({...cloneState(DEFAULT),ears:8,eyes:13,mouth:9,decor:0,accessories:{horns:0,tail:0,wings:1}}),'⁽⁽ଘ( ˊᵕˋ )ଓ⁾⁾');
+});
+test('all accessory layers combine independently and preserve Unicode',()=>{
+ for(let horns=0;horns<ACCESSORIES.horns.length;horns++)for(let tail=0;tail<ACCESSORIES.tail.length;tail++)for(let wings=0;wings<ACCESSORIES.wings.length;wings++){
+  const s={...cloneState(DEFAULT),accessories:{horns,tail,wings}},text=compose(s);assert(validState(s));assert.equal(Buffer.from(text).toString(),text);assert.equal(compose(cloneState(s)),text);
+ }
+ const s={...cloneState(DEFAULT),accessories:{horns:1,tail:1,wings:1}};
+ assert.equal(compose(s),'⁽⁽ଘ૮₍^ ˶• ﻌ •˶^ ₎აଓ⁾⁾ ↝');
+ const t=cloneState(s);t.accessories.tail=0;assert.equal(s.accessories.tail,1);assert(!compose(t).includes('↝'));assert(compose(t).includes('^'));assert(compose(t).includes('ଘ'));
+});
+test('version 1 favorites retain exact face and upgrade accessory defaults',()=>{
+ const old={ears:1,eyes:7,mouth:0,decor:2,custom:{}};const storage={getItem:()=>JSON.stringify([old])};const list=readFavorites(storage);assert.equal(list.length,1);assert.equal(compose(list[0]),compose(old));assert.deepEqual(list[0].accessories,{horns:0,tail:0,wings:0});
+ assert(!validState({...old,accessories:{horns:99}}));assert(!validState({...old,accessories:{wings:-1}}));assert(!validState({...old,accessories:{unknown:1}}));
+});
+test('layered accessories and old favorites survive storage and exact clipboard copying',async()=>{
+ const s={...cloneState(DEFAULT),accessories:{horns:2,tail:2,wings:2}};let serialized,written;const storage={setItem:(_,v)=>serialized=v,getItem:()=>serialized};assert(writeFavorites(storage,[s]));assert.equal(compose(readFavorites(storage)[0]),compose(s));assert.equal(await copyText(compose(s),{clipboard:{writeText:async x=>written=x}},{}),'clipboard');assert.equal(written,compose(s));
+});
