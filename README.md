@@ -19,3 +19,7 @@ The three requested sad/devil/angel strings match exactly. All 210 horn/tail/win
 ## Version 3 validation
 
 All nine new user-provided faces match exact Unicode code points, including doubled combining dots, three internal spaces, and the supplementary-plane tongue character. New search inputs filter eye/mouth components; new components appear first. Face spacing is adjustable and persists in favorites. Fourteen tests pass. All 129 preset characters have bundled font glyphs, including Tibetan, Kannada, Linear B, Canadian Aboriginal, and technical symbols. Font assets use versioned cache keys. Browser visual/OS clipboard verification remains unavailable.
+
+## Version 4 validation
+
+The mobile editing dock contains copy/save and a single undo/random/clear row. It collapses past the editor boundary and keeps the section links directly beneath it. Mobile uses block layout so the sticky dock shares the entire editor as its containing block. Jumps account for the dock height and open the ear/decor group. Every tray starts with up to eight choices and expands reversibly. Eye moods each provide six options; search can find all eyes across moods. Recent indices are validated, deduplicated, bounded, and stored separately from favorites. Clear removes the current face/accessories and undo restores its prior snapshot. All 22 model/picker tests pass, HTML nesting/IDs/action placement and CSS parse pass. The required browser-control skill remains unavailable; real mobile visual and OS clipboard tests were not performed.

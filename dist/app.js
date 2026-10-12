@@ -33,7 +33,7 @@ function render(){
  const text=compose(state);$('#puppy').textContent=text;$('#puppy').classList.toggle('long-puppy',Array.from(text).length>27);
  const recipe=['ears','eyes','mouth','decor'].map(k=>PARTS[k][state[k]].name);
  Object.entries(state.accessories||{}).forEach(([k,v])=>{if(v)recipe.push(ACCESSORIES[k][v].name)});
- $('#recipe').textContent=recipe.join(' / ')+(Object.keys(state.custom).length?' · 自定义':'');
+ $('#recipe').textContent=state.custom.eyeLeft===''&&state.custom.eyeRight===''&&state.custom.mouth===''?'空脸小狗 · 等待你选零件':recipe.join(' / ')+(Object.keys(state.custom).length?' · 自定义':'');
  $('#puppy-caption').textContent=state.custom.eyeLeft===''&&state.custom.eyeRight===''&&state.custom.mouth===''?'空空的小狗脸，重新捏一只吧':state.accessories.wings?'天使小狗正在扑扇翅膀':state.accessories.horns?'今天也是可爱的小恶魔':PARTS.eyes[state.eyes].mood==='困困'?'小狗困困，陪你慢慢休息':'这一只，是你的独家小狗';
  $('#puppy-number').textContent=String(counter).padStart(3,'0');$('#undo').disabled=!history.length;
  $$('[data-family]').forEach(b=>b.setAttribute('aria-pressed',String(PARTS.ears[state.ears].family===b.dataset.family)));
