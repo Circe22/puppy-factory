@@ -16,12 +16,31 @@ export const ACCESSORIES={
  tail:[{name:'不加尾巴',v:''},{name:'恶魔箭尾',v:' ↝'},{name:'爱心恶魔尾',v:' ⤳♥'},{name:'空心爱心尾',v:' ⤳♡'},{name:'卷卷尾巴',v:' ʚ'},{name:'翘翘小尾巴',v:' ⤴'},{name:'长长小尾巴',v:' 〜'}],
  wings:[{name:'不戴翅膀',v:['','']},{name:'扑扇天使翼',v:['⁽⁽ଘ','ଓ⁾⁾']},{name:'小天使翅膀',v:['ଘ','ଓ']},{name:'圆圆天使翼',v:['ʚ','ɞ']},{name:'展开小翅膀',v:['ଘ ',' ଓ']},{name:'星星天使翼',v:['✧ଘ','ଓ✧']}]
 };
+// Version 3: user-provided faces; indexes are append-only for old favorites.
+export const NEW_PARTS={ears:[],eyes:[],mouth:[],decor:[]};
+function addPart(key,item){const index=PARTS[key].push(item)-1;NEW_PARTS[key].push(index);return index}
+const freshEyes=[['半眯审视','≖','≖','日常'],['圆圆亮眼','◕','◕','开心'],['眼泪汪汪','˃̣̣̥','˂̣̣̥','委屈'],['懒懒半睁','⩌','⩌','困困'],['瀑布眼泪','ㅠ','ㅠ','委屈'],['咧嘴笑眼','ᗜ','ᗜ','开心'],['趴着睡觉','_','_','困困']].map(([name,l,r,mood])=>addPart('eyes',{name,v:[l,r],mood}));
+const freshMouths=[['小小猫鼻','༝'],['委屈小尖嘴','‸'],['困困小嘴','⌯'],['调皮小舌头','𐃷'],['趴睡小鼻子','   ̫ ']].map(([name,v])=>addPart('mouth',{name,v}));
+const freshEars=[['猫猫尖耳',['ᐢ','ᐢ']],['细细猫耳',['՞','՞']],['无框小脸',['','']],['趴睡圆脸',['(՞','՞)']]].map(([name,v])=>addPart('ears',{name,v,family:'soft',spacing:''}));
+const sleepingDecor=addPart('decor',{name:'小小呼噜泡',v:['','','','ᐝ']});
+const curlyTail=ACCESSORIES.tail.push({name:'小卷尾',v:'ಣ'})-1;
+export const FRESH_LOOKS=[
+ {name:'半眯眼小狗',expected:'૮₍ ˶≖ ﻌ ≖˶ ₎ა',state:{ears:1,eyes:freshEyes[0],mouth:0,decor:1}},
+ {name:'圆眼开心狗',expected:'૮₍ ˶◕ ᴗ ◕˶ ₎ა',state:{ears:1,eyes:freshEyes[1],mouth:2,decor:1}},
+ {name:'泪汪汪小狗',expected:'૮₍ ˃̣̣̥ ᯅ ˂̣̣̥ ₎ა',state:{ears:1,eyes:freshEyes[2],mouth:6,decor:0}},
+ {name:'害羞小猫',expected:'ᐢ⸝⸝•༝•⸝⸝ᐢ',state:{ears:freshEars[0],eyes:0,mouth:freshMouths[0],decor:9}},
+ {name:'小猫委屈了',expected:'՞⩌ ‸ ⩌՞',state:{ears:freshEars[1],eyes:freshEyes[3],mouth:freshMouths[1],decor:0,spacing:' '}},
+ {name:'懒懒小猫',expected:'՞⩌⌯⩌՞',state:{ears:freshEars[1],eyes:freshEyes[3],mouth:freshMouths[2],decor:0}},
+ {name:'眼泪面条',expected:'ㅠ⩊ㅠ',state:{ears:freshEars[2],eyes:freshEyes[4],mouth:15,decor:0}},
+ {name:'调皮卷尾',expected:'˶ᗜ𐃷ᗜ˶ಣ',state:{ears:freshEars[2],eyes:freshEyes[5],mouth:freshMouths[3],decor:1,accessories:{horns:0,tail:curlyTail,wings:0}}},
+ {name:'趴着呼噜',expected:'(՞_   ̫ _՞)ᐝ',state:{ears:freshEars[3],eyes:freshEyes[6],mouth:freshMouths[4],decor:sleepingDecor}}
+];
 export const DEFAULT={ears:1,eyes:0,mouth:0,decor:1,custom:{},accessories:{horns:0,tail:0,wings:0}};
 export function cloneState(s){return {...s,custom:{...s.custom},accessories:{horns:0,tail:0,wings:0,...s.accessories}}}
 export function values(s){const c=s.custom||{};return {left:c.left??PARTS.ears[s.ears].v[0],right:c.right??PARTS.ears[s.ears].v[1],eyeLeft:c.eyeLeft??PARTS.eyes[s.eyes].v[0],eyeRight:c.eyeRight??PARTS.eyes[s.eyes].v[1],mouth:c.mouth??PARTS.mouth[s.mouth].v,prefix:c.prefix??PARTS.decor[s.decor].v[0],blushLeft:PARTS.decor[s.decor].v[1],blushRight:PARTS.decor[s.decor].v[2],suffix:c.suffix??PARTS.decor[s.decor].v[3]}}
-export function compose(s){const v=values(s),a=s.accessories||{};const horns=ACCESSORIES.horns[a.horns||0].v,tail=ACCESSORIES.tail[a.tail||0].v,wings=ACCESSORIES.wings[a.wings||0].v;const ear=PARTS.ears[s.ears];const sep=ear.spacing??(ear.family==='classic'?'':' ');const left=a.horns?v.left.trimEnd()+horns[0]:v.left;const right=a.horns?horns[1]+v.right.trimStart():v.right;return v.prefix+wings[0]+left+v.blushLeft+v.eyeLeft+sep+v.mouth+sep+v.eyeRight+v.blushRight+right+wings[1]+tail+v.suffix}
+export function compose(s){const v=values(s),a=s.accessories||{};const horns=ACCESSORIES.horns[a.horns||0].v,tail=ACCESSORIES.tail[a.tail||0].v,wings=ACCESSORIES.wings[a.wings||0].v;const ear=PARTS.ears[s.ears];const sep=s.spacing??ear.spacing??(ear.family==='classic'?'':' ');const left=a.horns?v.left.trimEnd()+horns[0]:v.left;const right=a.horns?horns[1]+v.right.trimStart():v.right;return v.prefix+wings[0]+left+v.blushLeft+v.eyeLeft+sep+v.mouth+sep+v.eyeRight+v.blushRight+right+wings[1]+tail+v.suffix}
 export function randomState(family=null,mood=null,rng=Math.random){const pick=a=>a[Math.floor(rng()*a.length)];const indexes=(key,fn)=>PARTS[key].map((v,i)=>({v,i})).filter(x=>!fn||fn(x.v)).map(x=>x.i);return {ears:pick(indexes('ears',family?v=>v.family===family:null)),eyes:pick(indexes('eyes',mood?v=>v.mood===mood:null)),mouth:pick(indexes('mouth')),decor:pick(indexes('decor')),custom:{}}}
-export function validState(s){return !!s&&['ears','eyes','mouth','decor'].every(k=>Number.isInteger(s[k])&&s[k]>=0&&s[k]<PARTS[k].length)&&(!s.accessories||(typeof s.accessories==='object'&&Object.entries(s.accessories).every(([k,v])=>Object.hasOwn(ACCESSORIES,k)&&Number.isInteger(v)&&v>=0&&v<ACCESSORIES[k].length)))&&(!s.custom||Object.entries(s.custom).every(([k,v])=>['left','right','eyeLeft','eyeRight','mouth','prefix','suffix'].includes(k)&&typeof v==='string'&&Array.from(v).length<=16&&!/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(v)))}
+export function validState(s){return !!s&&(s.spacing===undefined||s.spacing===''||s.spacing===' ')&&['ears','eyes','mouth','decor'].every(k=>Number.isInteger(s[k])&&s[k]>=0&&s[k]<PARTS[k].length)&&(!s.accessories||(typeof s.accessories==='object'&&Object.entries(s.accessories).every(([k,v])=>Object.hasOwn(ACCESSORIES,k)&&Number.isInteger(v)&&v>=0&&v<ACCESSORIES[k].length)))&&(!s.custom||Object.entries(s.custom).every(([k,v])=>['left','right','eyeLeft','eyeRight','mouth','prefix','suffix'].includes(k)&&typeof v==='string'&&Array.from(v).length<=16&&!/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(v)))}
 export function readFavorites(storage){try{const data=JSON.parse(storage.getItem('puppy-factory:favorites')||'[]');return Array.isArray(data)?data.filter(validState).slice(0,500).map(cloneState):[]}catch{return []}}
 export function writeFavorites(storage,list){try{storage.setItem('puppy-factory:favorites',JSON.stringify(list));return true}catch{return false}}
 export async function copyText(text,nav,doc){try{if(nav.clipboard?.writeText){await nav.clipboard.writeText(text);return 'clipboard'}}catch{}const active=doc.activeElement;const input=doc.createElement('textarea');input.value=text;input.setAttribute('readonly','');input.setAttribute('dir','ltr');input.style.cssText='position:fixed;top:0;left:0;opacity:0;font-size:16px';doc.body.append(input);input.focus();input.select();input.setSelectionRange(0,text.length);let copied=false;try{copied=doc.execCommand('copy')}catch{}finally{input.remove();active?.focus?.()}return copied?'fallback':'manual'}

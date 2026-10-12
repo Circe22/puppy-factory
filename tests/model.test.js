@@ -1,4 +1,4 @@
-import{test}from'node:test';import assert from'node:assert/strict';import{PARTS,ACCESSORIES,DEFAULT,cloneState,compose,randomState,validState,readFavorites,writeFavorites,copyText}from'../dist/model.js';
+import{test}from'node:test';import assert from'node:assert/strict';import{PARTS,ACCESSORIES,FRESH_LOOKS,DEFAULT,cloneState,compose,randomState,validState,readFavorites,writeFavorites,copyText}from'../dist/model.js';
 test('two requested dogs are preserved byte for byte',()=>{assert.equal(compose(DEFAULT),'૮₍ ˶• ﻌ •˶ ₎ა');assert.equal(compose({ears:0,eyes:1,mouth:0,decor:0,custom:{}}),'U・ﻌ・U')});
 test('every combination remains valid Unicode and survives UTF-8 and JSON',()=>{let count=0;for(let ears=0;ears<PARTS.ears.length;ears++)for(let eyes=0;eyes<PARTS.eyes.length;eyes++)for(let mouth=0;mouth<PARTS.mouth.length;mouth++)for(let decor=0;decor<PARTS.decor.length;decor++){const s={ears,eyes,mouth,decor,custom:{}};const text=compose(s);assert(validState(s));assert(!text.includes('undefined'));assert.equal(Buffer.from(text).toString('utf8'),text);assert.equal(compose(JSON.parse(JSON.stringify(s))),text);count++}assert.equal(count,Object.values(PARTS).reduce((n,items)=>n*items.length,1))});
 test('combining diacritics and emoji are copied without normalization',()=>{const s={...DEFAULT,eyes:7,custom:{suffix:' 🐾'}};const t=compose(s);assert(t.includes('o̴̶̷᷄'));assert(t.includes('o̴̶̷̥᷅'));assert(t.endsWith(' 🐾'));assert.equal(compose(cloneState(s)),t)});
@@ -27,4 +27,18 @@ test('version 1 favorites retain exact face and upgrade accessory defaults',()=>
 });
 test('layered accessories and old favorites survive storage and exact clipboard copying',async()=>{
  const s={...cloneState(DEFAULT),accessories:{horns:2,tail:2,wings:2}};let serialized,written;const storage={setItem:(_,v)=>serialized=v,getItem:()=>serialized};assert(writeFavorites(storage,[s]));assert.equal(compose(readFavorites(storage)[0]),compose(s));assert.equal(await copyText(compose(s),{clipboard:{writeText:async x=>written=x}},{}),'clipboard');assert.equal(written,compose(s));
+});
+test('all nine user-provided faces are exact, editable, savable and copied unchanged',async()=>{
+ for(const look of FRESH_LOOKS){
+  const s=cloneState(look.state);assert(validState(s));assert.equal(compose(s),look.expected);
+  let serialized,written;const storage={getItem:()=>serialized,setItem:(_,v)=>serialized=v};assert(writeFavorites(storage,[s]));assert.equal(compose(readFavorites(storage)[0]),look.expected);
+  await copyText(compose(s),{clipboard:{writeText:async x=>written=x}},{});assert.equal(written,look.expected);
+  const edited=cloneState(s);edited.mouth=(edited.mouth+1)%PARTS.mouth.length;assert.notEqual(compose(edited),look.expected);assert.equal(compose(s),look.expected);
+ }
+});
+test('spacing choice persists and does not strip the sleeping nose or tears',()=>{
+ const sleep=cloneState(FRESH_LOOKS[8].state);assert.equal(compose(sleep),'(՞_   ̫ _՞)ᐝ');assert.equal(compose({...sleep,spacing:' '}),'(՞_    ̫  _՞)ᐝ');
+ assert.equal(compose({...cloneState(FRESH_LOOKS[4].state),spacing:''}),'՞⩌‸⩌՞');
+ const tears=compose(FRESH_LOOKS[2].state);assert(tears.includes('˃̣̣̥'));assert.equal([...tears].filter(c=>c==='̣').length,4);
+ assert(!validState({...sleep,spacing:'invalid'}));assert(validState({...sleep,spacing:''}));
 });
