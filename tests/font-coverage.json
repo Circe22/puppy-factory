@@ -1,0 +1,114 @@
+[
+  {
+    "file": "puppy-unicode-0.woff",
+    "source": "DejaVuSans.ttf",
+    "codepoints": [
+      32,
+      40,
+      41,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      64,
+      85,
+      90,
+      111,
+      122,
+      183,
+      706,
+      707,
+      728,
+      730,
+      768,
+      769,
+      805,
+      811,
+      820,
+      822,
+      823,
+      969,
+      1697,
+      4304,
+      5196,
+      7447,
+      7508,
+      7509,
+      7620,
+      7621,
+      8212,
+      8226,
+      8330,
+      8333,
+      8334,
+      9702,
+      9825,
+      10023,
+      65228
+    ]
+  },
+  {
+    "file": "puppy-unicode-1.woff",
+    "source": "NotoSans-Regular.ttf",
+    "codepoints": [
+      758,
+      7461
+    ]
+  },
+  {
+    "file": "puppy-unicode-2.woff",
+    "source": "DejaVuSerif.ttf",
+    "codepoints": [
+      10521,
+      10522
+    ]
+  },
+  {
+    "file": "puppy-unicode-3.woff",
+    "source": "NotoSansBatak.ttf",
+    "codepoints": [
+      7109
+    ]
+  },
+  {
+    "file": "puppy-unicode-4.woff",
+    "source": "NotoSansYi.ttf",
+    "codepoints": [
+      12539,
+      42160,
+      42161,
+      42163,
+      65381
+    ]
+  },
+  {
+    "file": "puppy-unicode-5.woff",
+    "source": "NotoSansGujarati.ttf",
+    "codepoints": [
+      2798
+    ]
+  },
+  {
+    "file": "puppy-unicode-6.woff",
+    "source": "NotoSansCJKkr.ttf",
+    "codepoints": [
+      12387,
+      12613,
+      12615
+    ]
+  },
+  {
+    "file": "puppy-unicode-7.woff",
+    "source": "NotoSansOriya.ttf",
+    "codepoints": [
+      2919,
+      2920
+    ]
+  }
+]
