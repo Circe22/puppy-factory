@@ -34,3 +34,9 @@ All nine new user-provided faces match exact Unicode code points, including doub
 ## Version 4 validation
 
 The mobile editing dock contains copy/save and a single undo/random/clear row. It collapses past the editor boundary and keeps the section links directly beneath it. Mobile uses block layout so the sticky dock shares the entire editor as its containing block. Jumps account for the dock height and open the ear/decor group. Every tray starts with up to eight choices and expands reversibly. Eye moods each provide six options; search can find all eyes across moods. Recent indices are validated, deduplicated, bounded, and stored separately from favorites. Clear removes the current face/accessories and undo restores its prior snapshot. All 22 model/picker tests pass, HTML nesting/IDs/action placement and CSS parse pass. The required browser-control skill remains unavailable; real mobile visual and OS clipboard tests were not performed.
+
+## 2026-11-23 双语更新
+
+顶部新增中文 / EN 即时切换，并在本机记住语言。页面、零件名称、分类、提示与无障碍标签一起切换；搜索同时支持中英文。切换保留当前小狗、筛选、自定义输入、撤回历史和收藏。
+
+已保留原有卡片描边和收缩补位，并补齐分类跳转时的高度计算。CSS、应用与依赖模块缓存键统一为 v8。新增 `dist/i18n.js` 与翻译覆盖测试，当前 27 项测试全部通过。浏览器已验证语言切换、刷新后记忆、状态保留与实际剪贴板复制；手机宽度的收缩补位仍待实机验证。
