@@ -1,6 +1,11 @@
 // Display text only: saved puppy states and Unicode faces stay language-neutral.
 export const LANGUAGE_KEY = 'puppy-factory:language';
 export const EN = {
+  '好了': 'Done', '✂ 拆零件': '✂ Edit parts', '点一下，拆开零件': 'Tap to edit parts',
+  '点 × 删掉不想要的那一块，点格子可以自己改字。删掉、改过的零件会一直保持，直到你在下面重新选这个部件。': 'Tap × to remove a piece, or tap a box to type your own. Removed and edited pieces stay until you pick that part again below.',
+  '拆好啦，删掉的零件会一直保持': 'Done! Removed pieces will stay removed.', '↺ 恢复': '↺ Restore',
+  '前装饰': 'Front deco', '后装饰': 'Back deco', '左翅膀': 'Left wing', '右翅膀': 'Right wing', '左耳': 'Left ear', '右耳': 'Right ear',
+  '左角': 'Left horn', '右角': 'Right horn', '左腮红': 'Left blush', '右腮红': 'Right blush', '左眼': 'Left eye', '右眼': 'Right eye', '嘴巴': 'Mouth', '尾巴': 'Tail',
   'Puppy Factory · 小狗颜文字工厂': 'Puppy Factory · Kaomoji Studio',
   '小狗颜文字工厂': 'Little Kaomoji Studio',
   '捏一只属于你的小狗。自由组合耳朵、眼睛、嘴巴和装饰，一键复制可爱颜文字。': 'Make a puppy of your own. Mix ears, eyes, mouths and accessories, then copy your cute kaomoji.',

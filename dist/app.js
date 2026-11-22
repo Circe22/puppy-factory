@@ -1,6 +1,6 @@
-import {PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,compose,readFavorites,writeFavorites,copyText} from './model.js?v=9';
-import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=9';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=9';
+import {PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,compose,readFavorites,writeFavorites,copyText} from './model.js?v=10';
+import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=10';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=10';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -25,8 +25,9 @@ let favorites=readFavorites(storage);
 let recent=readRecent(storage);
 const trays=new Map();
 const categories=['全部团子',...ANIMALS.map(x=>x.name),'新到表情','小恶魔','小天使','开心','撒娇','困困','委屈'];
-const customKeys={ears:['left','right'],eyes:['eyeLeft','eyeRight'],mouth:['mouth'],decor:['prefix','suffix']};
-const names={left:'左耳',right:'右耳',eyeLeft:'左眼',eyeRight:'右眼',mouth:'嘴巴',prefix:'前面的小装饰',suffix:'后面的小装饰'};
+const customKeys={ears:['left','right'],eyes:['eyeLeft','eyeRight'],mouth:['mouth'],decor:['prefix','suffix','blushLeft','blushRight']};
+const accessorySlots={horns:['hornLeft','hornRight'],wings:['wingLeft','wingRight'],tail:['tail']};
+const names={left:'左耳',right:'右耳',eyeLeft:'左眼',eyeRight:'右眼',mouth:'嘴巴',prefix:'前面的小装饰',suffix:'后面的小装饰',blushLeft:'左腮红',blushRight:'右腮红',hornLeft:'左角',hornRight:'右角',wingLeft:'左翅膀',wingRight:'右翅膀',tail:'尾巴'};
 const labels={eyes:'选择眼睛',mouth:'选择嘴巴',ears:'换一对小耳朵',decor:'腮红与小装饰'};
 const looks=[
  {name:'委屈小狗',state:{...cloneState(DEFAULT),eyes:12,mouth:6}},
@@ -54,7 +55,7 @@ function render(){
  setText($('#recipe'),state.custom.eyeLeft===''&&state.custom.eyeRight===''&&state.custom.mouth===''?'空脸团子 · 等待你选零件':recipe.join(' / ')+(Object.keys(state.custom).length?' · 自定义':''));
  setText($('#puppy-caption'),state.custom.eyeLeft===''&&state.custom.eyeRight===''&&state.custom.mouth===''?'空空的小脸，重新捏一只吧':state.accessories.wings?'小天使正在扑扇翅膀':state.accessories.horns?'今天也是可爱的小恶魔':PARTS.eyes[state.eyes].mood==='困困'?'团子困困，陪你慢慢休息':'这一只，是你的独家字字兽');
  $('#puppy-number').textContent=String(counter).padStart(3,'0');$('#undo').disabled=!history.length;
- $('[data-animal]').forEach(b=>b.setAttribute('aria-pressed',String(animalForEar(state.ears)===b.dataset.animal)));
+ $$('[data-animal]').forEach(b=>b.setAttribute('aria-pressed',String(animalForEar(state.ears)===b.dataset.animal)));
  $$('[data-choice]').forEach(b=>{const k=b.dataset.choice;b.setAttribute('aria-pressed',String(state[k]===Number(b.dataset.index)&&!customKeys[k].some(x=>Object.hasOwn(state.custom,x))))});
  $$('[data-accessory]').forEach(b=>b.setAttribute('aria-pressed',String((state.accessories[b.dataset.accessory]||0)===Number(b.dataset.index))));
  updateTrays();renderSaved();
@@ -103,7 +104,7 @@ function buildAccessories(){
   const row=el('fieldset','accessory-row'),legend=el('legend','',label),count=el('span','accessory-count');legend.append(count);row.append(legend);
   const grid=el('div','accessory-choices');grid.id='choices-'+key;const empty=el('p','part-empty');empty.hidden=true;
   const tray={key,grid,count,empty,expanded:false,query:'',mood:'常用',buttons:new Map(),items:ACCESSORIES[key]};
-  ACCESSORIES[key].forEach((x,i)=>{const b=button('choice accessory-choice','',()=>change(()=>{const selected=state.accessories[key]===i?0:i;state.accessories[key]=selected;rememberPart(key,selected)}));b.dataset.accessory=key;b.dataset.index=i;localizedAttr(b,'aria-label',x.name);b.append(el('span','kaomoji',i===0?'—':Array.isArray(x.v)?x.v.join(' ◦ '):x.v.trim()),el('small','',x.name));tray.buttons.set(i,b)});
+  ACCESSORIES[key].forEach((x,i)=>{const b=button('choice accessory-choice','',()=>change(()=>{const selected=state.accessories[key]===i?0:i;state.accessories[key]=selected;accessorySlots[key].forEach(slot=>delete state.custom[slot]);rememberPart(key,selected)}));b.dataset.accessory=key;b.dataset.index=i;localizedAttr(b,'aria-label',x.name);b.append(el('span','kaomoji',i===0?'—':Array.isArray(x.v)?x.v.join(' ◦ '):x.v.trim()),el('small','',x.name));tray.buttons.set(i,b)});
   tray.toggle=button('expand-parts','展开全部 ▾',()=>{tray.expanded=!tray.expanded;updateTray(tray)});tray.toggle.setAttribute('aria-controls',grid.id);trays.set(key,tray);row.append(grid,tray.toggle);section.append(row);
  }
  return section;
@@ -163,3 +164,33 @@ function setupDock(){
 
 bindStaticText();buildControls();render();syncCustom();renderFilters();refreshGallery();showView('studio');setupDock();applyLanguage();
 $$('[data-language]').forEach(b=>b.addEventListener('click',()=>{language=b.dataset.language;writeLanguage(storage,language);applyLanguage()}));
+
+// 2026-11-23 界（拾提，照 Live2D 的思路）：「拆零件」。点颜文字，把它拆成一块块零件：
+// × 删掉这一块，点进去可以改字。删掉、改过的零件会一直保持，
+// 直到在下面重新选这个部件，才会被新部件覆盖。撤回照常可用。
+const slotOrder=[['prefix','前装饰'],['wingLeft','左翅膀','wings'],['left','左耳'],['hornLeft','左角','horns'],['blushLeft','左腮红'],['eyeLeft','左眼'],['mouth','嘴巴'],['eyeRight','右眼'],['blushRight','右腮红'],['hornRight','右角','horns'],['right','右耳'],['wingRight','右翅膀','wings'],['tail','尾巴','tail'],['suffix','后装饰']];
+function slotDefault(key){const v=values({...state,custom:{}}),a=state.accessories||{};
+ if(key==='hornLeft')return ACCESSORIES.horns[a.horns||0].v[0];if(key==='hornRight')return ACCESSORIES.horns[a.horns||0].v[1];
+ if(key==='wingLeft')return ACCESSORIES.wings[a.wings||0].v[0];if(key==='wingRight')return ACCESSORIES.wings[a.wings||0].v[1];
+ if(key==='tail')return ACCESSORIES.tail[a.tail||0].v;return v[key]??''}
+function slotValue(key){return Object.hasOwn(state.custom,key)?state.custom[key]:slotDefault(key)}
+const cleanSlot=v=>Array.from(v.replace(/[\u0000-\u001f\u007f‪-‮⁦-⁩]/gu,'')).slice(0,16).join('');
+function renderSlots(){
+ const box=$('#slot-list');box.replaceChildren();$('#slot-preview').textContent=compose(state);
+ for(const [key,label,needs] of slotOrder){
+  if(needs&&!state.accessories[needs])continue;
+  const has=Object.hasOwn(state.custom,key),deleted=has&&state.custom[key]==='';
+  if(!deleted&&!has&&slotDefault(key)==='')continue;
+  const chip=el('div','slot-chip'+(deleted?' is-deleted':''));chip.append(el('small','',label));
+  if(deleted){chip.append(button('slot-restore','↺ 恢复',()=>{delete state.custom[key];render();syncCustom();renderSlots()}))}
+  else{const input=el('input');input.type='text';input.dir='ltr';input.value=slotValue(key);input.spellcheck=false;input.autocomplete='off';localizedAttr(input,'aria-label',label);
+   input.addEventListener('input',()=>{state.custom[key]=cleanSlot(input.value);render();syncCustom();$('#slot-preview').textContent=compose(state)});
+   const del=button('slot-delete','×',()=>{state.custom[key]='';render();syncCustom();renderSlots()});localizedAttr(del,'aria-label','删掉'+label);
+   chip.append(input,del)}
+  box.append(chip)}
+}
+function openSlots(){checkpoint();render();renderSlots();$('#slot-edit').showModal()}
+$('#puppy').addEventListener('click',openSlots);
+$('#puppy').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSlots()}});
+$('#slot-open').addEventListener('click',openSlots);
+$('#slot-done').addEventListener('click',()=>{$('#slot-edit').close();render();toast('拆好啦，删掉的零件会一直保持')});
