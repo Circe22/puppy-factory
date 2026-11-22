@@ -1,7 +1,7 @@
 import {earPieces,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,compose,readFavorites,writeFavorites,copyText} from './model.js?v=14';
 import {drawShareCard,SHARE_URL} from './share.js?v=4';
 import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=14';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=14';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=15';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -46,11 +46,22 @@ function rememberPart(key,index){recent=usePart(recent,key,index);writeRecent(st
 function change(fn,{remember=true}={}){const previous=cloneState(state);checkpoint();fn();if(remember){for(const k of Object.keys(PARTS))if(previous[k]!==state[k])rememberPart(k,state[k]);for(const k of Object.keys(ACCESSORIES))if(previous.accessories[k]!==state.accessories[k])rememberPart(k,state.accessories[k])}render();syncCustom()}
 const hasSaved=s=>favorites.some(x=>compose(x)===compose(s));
 function save(s){const t=compose(s),next=hasSaved(s)?favorites.filter(x=>compose(x)!==t):[cloneState(s),...favorites];if(next.length>500){toast('团子小窝已经住满 500 只啦');return}if(!writeFavorites(storage,next)){toast('浏览器无法保存收藏，请允许本地存储后再试');return}const added=next.length>favorites.length;favorites=next;renderSaved();renderGallery();renderFavorites();toast(added?'♡ 团子住进收藏夹啦':'已从收藏中移出')}
-async function copy(s){const text=compose(s);const method=await copyText(text,navigator,document);if(method==='manual'){$('#copy-text').value=text;$('#manual-copy').showModal();$('#copy-text').focus();$('#copy-text').select()}else toast('复制好啦！把团子带去聊天吧 ♡')}
+async function copy(s){
+ const text=compose(s);
+ const method=await copyText(text,navigator,document);
+ if(method==='manual'){
+  const input=$('#copy-text');
+  input.value=text;
+  $('#manual-copy').showModal();
+  input.focus();
+  input.select();
+ }else toast('复制好啦！把团子带去聊天吧 ♡');
+ return method;
+}
 function renderSaved(){$('#favorite-count').textContent=favorites.length;$('#save').setAttribute('aria-pressed',String(hasSaved(state)));setText($('#save'),hasSaved(state)?'♥ 已收藏':'♡ 收藏');$$('.nav-item').forEach(b=>{if(b.dataset.view==='favorites')localizedAttr(b,'aria-label',`我的收藏，${favorites.length}只团子`)})}
 function render(){
  const currentSpace=state.spacing??PARTS.ears[state.ears].spacing??(PARTS.ears[state.ears].family==='classic'?'':' ');$$('[data-spacing]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.spacing===currentSpace)));
- const text=compose(state);$('#puppy').textContent=text;$('#puppy').classList.toggle('long-puppy',Array.from(text).length>27);
+ const text=compose(state);$('#puppy-text').textContent=text;$('#puppy').classList.toggle('long-puppy',Array.from(text).length>27);
  const recipe=['ears','eyes','mouth','decor'].map(k=>PARTS[k][state[k]].name);
  Object.entries(state.accessories||{}).forEach(([k,v])=>{if(v)recipe.push(ACCESSORIES[k][v].name)});
  setText($('#recipe'),state.custom.eyeLeft===''&&state.custom.eyeRight===''&&state.custom.mouth===''?'空脸团子 · 等待你选零件':recipe.join(' / ')+(Object.keys(state.custom).length?' · 自定义':''));
@@ -123,6 +134,14 @@ $$('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.v
 $('.brand').addEventListener('click',e=>{e.preventDefault();showView('studio');window.scrollTo({top:0,behavior:'smooth'})});
 $$('[data-jump]').forEach(b=>b.addEventListener('click',()=>jumpToPart(b.dataset.jump)));
 $('#copy').addEventListener('click',()=>copy(state));$('#save').addEventListener('click',()=>save(state));
+const compactCopy=$('#copy-compact');
+let copyFeedbackTimer;
+compactCopy.addEventListener('click',async()=>{
+ const method=await copy(state);
+ clearTimeout(copyFeedbackTimer);
+ compactCopy.classList.toggle('is-copied',method!=='manual');
+ if(method!=='manual')copyFeedbackTimer=setTimeout(()=>compactCopy.classList.remove('is-copied'),1400);
+});
 $('#random').addEventListener('click',()=>{change(()=>{state=newRandom();counter++});toast('噗叽！一只字字兽诞生啦')});
 $('#reset').addEventListener('click',()=>{change(()=>state=clearFace(state),{remember:false});toast('搭配已清空，点一下撤回就能找回来')});
 $('#undo').addEventListener('click',()=>{if(history.length){state=history.pop();render();syncCustom()}});
@@ -198,6 +217,7 @@ function openSlots(){checkpoint();render();renderSlots();$('#slot-edit').showMod
 $('#puppy').addEventListener('click',openSlots);
 $('#puppy').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSlots()}});
 $('#slot-open').addEventListener('click',openSlots);
+$('#slot-open-compact').addEventListener('click',openSlots);
 $('#slot-done').addEventListener('click',()=>{$('#slot-edit').close();render();toast('拆好啦，删掉的零件会一直保持')});
 
 // 2026-11-23 界（拾提）：分享卡片，底下带网址和二维码。
