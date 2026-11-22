@@ -1,6 +1,6 @@
-import {PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,DEFAULT,cloneState,values,compose,randomState,readFavorites,writeFavorites,copyText} from './model.js?v=5';
-import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=5';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=5';
+import {PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,DEFAULT,cloneState,values,compose,randomState,readFavorites,writeFavorites,copyText} from './model.js?v=6';
+import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=6';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=6';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部小狗',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -129,10 +129,13 @@ window.addEventListener('storage',e=>{if(e.key===LANGUAGE_KEY||e.key===null){lan
 
 
 const mobileScreen=matchMedia('(max-width: 720px)');
-let dockFrame=0;
+let dockFrame=0;let dockFullHeight=0;
 function updateDock(){
  const dock=$('#preview-dock'),workbench=$('.workbench');
  dock.classList.toggle('is-compact',compactDock({mobile:mobileScreen.matches,workbenchTop:workbench.getBoundingClientRect().top,wasCompact:dock.classList.contains('is-compact')}));
+ const compactNow=dock.classList.contains('is-compact');
+ if(!compactNow){dock.style.marginBottom='';dockFullHeight=dock.getBoundingClientRect().height}
+ else if(dockFullHeight){dock.style.marginBottom=Math.max(0,dockFullHeight-dock.getBoundingClientRect().height)+'px'}
  const height=dock.getBoundingClientRect().height;document.documentElement.style.setProperty('--puppy-dock-height',height+'px');
  const limit=mobileScreen.matches?height+18:36;let active=null;
  for(const id of ['eyes','mouth','accessories','ears-and-decor']){if($('#picker-'+id).getBoundingClientRect().top<=limit)active=id}

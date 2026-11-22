@@ -49,7 +49,7 @@ export const EN = {
   '搜名字或符号：小舌头、猫鼻…': 'Search names or symbols: tongue, nose…',
   '收起，只看常用 ▴': 'Show fewer ▴', '展开全部 ▾': 'Show all ▾', '最近使用': 'Recently used',
   '角、尾巴与翅膀': 'Horns, tails & wings', '三种可以一起戴': 'Mix all three!',
-  '小尾巴': 'Tails', '新到表情': 'New faces', '全部小狗': 'All puppies', '垂耳小狗': 'Floppy puppies',
+  '天使翅膀': 'Angel wings', '小尾巴': 'Tails', '新到表情': 'New faces', '全部小狗': 'All puppies', '垂耳小狗': 'Floppy puppies',
   '软团小狗': 'Fluffy puppies', '小恶魔': 'Little devil', '小天使': 'Little angel',
   '日常': 'Everyday', '撒娇': 'Sweet', '困困': 'Sleepy', '委屈': 'Teary',
   '日常小狗': 'Everyday puppy', '开心小狗': 'Happy puppy', '撒娇小狗': 'Sweet puppy', '困困小狗': 'Sleepy puppy',
@@ -105,7 +105,7 @@ export function translate(value, language = 'zh') {
     else if ((match = core.match(/^(取消收藏|收藏) ([\s\S]+)$/))) result = `${match[1] === '收藏' ? 'Save' : 'Unsave'} ${match[2]}`;
     else if ((match = core.match(/^(选择眼睛|选择嘴巴|换一对小耳朵|腮红与小装饰)：([\s\S]+)$/))) result = `${translate(match[1], 'en')}: ${translate(match[2], 'en')}`;
     else if ((match = core.match(/^搜索([\s\S]+)$/))) result = `Search: ${translate(match[1], 'en')}`;
-    else if ((match = core.match(/^([\s\S]+)自定义$/))) result = `Custom: ${translate(match[1], 'en')}`;
+    else if ((match = core.match(/^(左耳|右耳|左眼|右眼|嘴巴|前面的小装饰|后面的小装饰)自定义$/))) result = `Custom: ${translate(match[1], 'en')}`;
     else if (core.includes(' / ')) result = core.split(' / ').map(s => translate(s, 'en')).join(' / ');
     else if (core.includes(' · ')) result = core.split(' · ').map(s => translate(s, 'en')).join(' · ');
   }
