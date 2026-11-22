@@ -144,7 +144,12 @@ function updateDock(){
 function queueDock(){if(!dockFrame)dockFrame=requestAnimationFrame(()=>{dockFrame=0;updateDock()})}
 function jumpToPart(id){
  const target=$('#picker-'+id);if(id==='ears-and-decor')target.querySelectorAll('details.picker-section').forEach(d=>d.open=true);
- if(mobileScreen.matches)$('#preview-dock').classList.add('is-compact');
+ if(mobileScreen.matches){
+  const dock=$('#preview-dock');
+  if(!dock.classList.contains('is-compact'))dockFullHeight=dock.getBoundingClientRect().height;
+  dock.classList.add('is-compact');
+  if(dockFullHeight)dock.style.marginBottom=Math.max(0,dockFullHeight-dock.getBoundingClientRect().height)+'px';
+ }
  const height=$('#preview-dock').getBoundingClientRect().height;
  window.scrollTo({top:anchorTop(target.getBoundingClientRect().top,window.scrollY,height,mobileScreen.matches),behavior:'auto'});
  target.tabIndex=-1;target.focus({preventScroll:true});queueDock();
