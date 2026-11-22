@@ -1,7 +1,7 @@
-import {PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,compose,readFavorites,writeFavorites,copyText} from './model.js?v=12';
+import {earPieces,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,compose,readFavorites,writeFavorites,copyText} from './model.js?v=13';
 import {drawShareCard,SHARE_URL} from './share.js?v=4';
-import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=12';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=12';
+import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=13';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=13';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -26,9 +26,9 @@ let favorites=readFavorites(storage);
 let recent=readRecent(storage);
 const trays=new Map();
 const categories=['全部团子',...ANIMALS.map(x=>x.name),'新到表情','小恶魔','小天使','开心','撒娇','困困','委屈'];
-const customKeys={ears:['left','right'],eyes:['eyeLeft','eyeRight'],mouth:['mouth'],decor:['prefix','suffix','blushLeft','blushRight']};
+const customKeys={ears:['left','right','leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter'],eyes:['eyeLeft','eyeRight'],mouth:['mouth'],decor:['prefix','suffix','blushLeft','blushRight']};
 const accessorySlots={horns:['hornLeft','hornRight'],wings:['wingLeft','wingRight'],tail:['tail']};
-const names={left:'左耳',right:'右耳',eyeLeft:'左眼',eyeRight:'右眼',mouth:'嘴巴',prefix:'前面的小装饰',suffix:'后面的小装饰',blushLeft:'左腮红',blushRight:'右腮红',hornLeft:'左角',hornRight:'右角',wingLeft:'左翅膀',wingRight:'右翅膀',tail:'尾巴'};
+const names={left:'左耳',right:'右耳',eyeLeft:'左眼',eyeRight:'右眼',mouth:'嘴巴',prefix:'前面的小装饰',suffix:'后面的小装饰',leftOuter:'左外耳',leftFrame:'左脸边',leftInner:'左内侧',rightInner:'右内侧',rightFrame:'右脸边',rightOuter:'右外耳',blushLeft:'左腮红',blushRight:'右腮红',hornLeft:'左角',hornRight:'右角',wingLeft:'左翅膀',wingRight:'右翅膀',tail:'尾巴'};
 const labels={eyes:'选择眼睛',mouth:'选择嘴巴',ears:'换一对小耳朵',decor:'腮红与小装饰'};
 const looks=[
  {name:'委屈小狗',state:{...cloneState(DEFAULT),eyes:12,mouth:6}},
@@ -62,8 +62,8 @@ function render(){
  updateTrays();renderSaved();
 }
 function sample(k,x){if(k==='ears')return x.v[0]+'◦'+x.v[1];if(k==='eyes')return x.v[0]+' '+x.v[1];if(k==='mouth')return x.v;return x.v.join('')||'—'}
-function buildFamilies(){ANIMALS.forEach(animal=>{const look=ANIMAL_LOOKS.find(x=>x.id===animal.id);const b=button('family-option','',()=>change(()=>{state.ears=animal.earIndex;delete state.custom.left;delete state.custom.right;rememberPart('ears',state.ears)}));b.dataset.animal=animal.id;localizedAttr(b,'aria-label','捏一只'+animal.name);b.append(el('span','kaomoji',compose(look.state)),el('small','',animal.name));$('#families').append(b)})}
-function buildCustom(k){const details=el('details','custom-editor');details.append(el('summary','','自己输入'+(k==='decor'?'前后装饰':labels[k].replace('选择','').replace('换一对小',''))));const grid=el('div','custom-fields');customKeys[k].forEach(key=>{const label=el('label','',names[key]);const input=el('input');input.type='text';input.dir='ltr';input.dataset.custom=key;localizedAttr(input,'aria-label',names[key]+'自定义');input.autocomplete='off';input.spellcheck=false;input.addEventListener('focus',checkpoint);input.addEventListener('input',()=>{state.custom[key]=Array.from(input.value.replace(/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/gu,'')).slice(0,16).join('');render()});label.append(input);grid.append(label)});details.append(grid);return details}
+function buildFamilies(){ANIMALS.forEach(animal=>{const look=ANIMAL_LOOKS.find(x=>x.id===animal.id);const b=button('family-option','',()=>change(()=>{state.ears=animal.earIndex;customKeys.ears.forEach(k=>delete state.custom[k]);rememberPart('ears',state.ears)}));b.dataset.animal=animal.id;localizedAttr(b,'aria-label','捏一只'+animal.name);b.append(el('span','kaomoji',compose(look.state)),el('small','',animal.name));$('#families').append(b)})}
+function buildCustom(k){const details=el('details','custom-editor');details.append(el('summary','','自己输入'+(k==='decor'?'前后装饰':labels[k].replace('选择','').replace('换一对小',''))));const grid=el('div','custom-fields');(k==='ears'?['left','right']:customKeys[k]).forEach(key=>{const label=el('label','',names[key]);const input=el('input');input.type='text';input.dir='ltr';input.dataset.custom=key;localizedAttr(input,'aria-label',names[key]+'自定义');input.autocomplete='off';input.spellcheck=false;input.addEventListener('focus',checkpoint);input.addEventListener('input',()=>{state.custom[key]=Array.from(input.value.replace(/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/gu,'')).slice(0,16).join('');render()});label.append(input);grid.append(label)});details.append(grid);return details}
 function syncCustom(){const v=values(state);$$('[data-custom]').forEach(input=>input.value=v[input.dataset.custom])}
 function updateTray(tray){
  const result=partTray(tray.key,{recent,expanded:tray.expanded,query:tray.query,mood:tray.mood});
@@ -176,10 +176,14 @@ function slotDefault(key){const v=values({...state,custom:{}}),a=state.accessori
  if(key==='tail')return ACCESSORIES.tail[a.tail||0].v;return v[key]??''}
 function slotValue(key){return Object.hasOwn(state.custom,key)?state.custom[key]:slotDefault(key)}
 const cleanSlot=v=>Array.from(v.replace(/[\u0000-\u001f\u007f‪-‮⁦-⁩]/gu,'')).slice(0,16).join('');
+const earSub={left:[['leftOuter','左外耳','outer'],['leftFrame','左脸边','frame'],['leftInner','左内侧','inner']],right:[['rightInner','右内侧','inner'],['rightFrame','右脸边','frame'],['rightOuter','右外耳','outer']]};
+function earSlots(side){if(Object.hasOwn(state.custom,side))return null;const base=PARTS.ears[state.ears].v[side==='left'?0:1];const p=earPieces(base,side);if(!p)return null;
+ return earSub[side].filter(([k,,piece])=>Object.hasOwn(state.custom,k)||p[piece].trim()!=='').map(([k,label,piece])=>({key:k,label,def:p[piece]}))}
 function renderSlots(){
  const box=$('#slot-list');box.replaceChildren();$('#slot-preview').textContent=compose(state);
  for(const [key,label,needs] of slotOrder){
   if(needs&&!state.accessories[needs])continue;
+  if(key==='left'||key==='right'){const subs=earSlots(key);if(subs){subs.forEach(sub=>box.append(pieceChip(sub)));continue}}
   const has=Object.hasOwn(state.custom,key),deleted=has&&state.custom[key]==='';
   if(!deleted&&!has&&slotDefault(key)==='')continue;
   const chip=el('div','slot-chip'+(deleted?' is-deleted':''));chip.append(el('small','',label));
@@ -212,3 +216,14 @@ async function openShare(){
 }
 $('#share-open').addEventListener('click',openShare);
 $('#share-close').addEventListener('click',()=>$('#share-card').close());
+
+// 拆开的耳朵块：保留原来那一块前后的空格，只换中间的字
+function pieceChip({key,label,def}){
+ const has=Object.hasOwn(state.custom,key),deleted=has&&state.custom[key]==='';
+ const lead=def.match(/^\s*/u)[0],trail=def.match(/\s*$/u)[0];
+ const chip=el('div','slot-chip'+(deleted?' is-deleted':''));chip.append(el('small','',label));
+ if(deleted){chip.append(button('slot-restore','↺ 恢复',()=>{delete state.custom[key];render();syncCustom();renderSlots()}));return chip}
+ const input=el('input');input.type='text';input.dir='ltr';input.value=(has?state.custom[key]:def).trim();input.spellcheck=false;input.autocomplete='off';localizedAttr(input,'aria-label',label);
+ input.addEventListener('input',()=>{const v=cleanSlot(input.value).trim();state.custom[key]=v?lead+v+trail:'';render();syncCustom();$('#slot-preview').textContent=compose(state)});
+ const del=button('slot-delete','×',()=>{state.custom[key]='';render();syncCustom();renderSlots()});localizedAttr(del,'aria-label','删掉'+label);
+ chip.append(input,del);return chip}

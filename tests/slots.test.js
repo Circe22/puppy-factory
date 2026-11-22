@@ -36,3 +36,18 @@ test('随机：耳朵带爪爪时，不再配「举起爪爪」装饰（不会�
     }
   }
 });
+
+test('拆耳朵：带脸框的耳朵拆成外耳、脸边、内侧，可以只删里面的小耳朵', async () => {
+  const {earPieces} = await import('../dist/model.js');
+  assert.deepEqual(earPieces('૮(ᐢ ', 'left'), {outer:'૮', frame:'(', inner:'ᐢ '});
+  assert.deepEqual(earPieces(' ᐢ)ა', 'right'), {inner:' ᐢ', frame:')', outer:'ა'});
+  assert.equal(earPieces('ᐢ', 'left'), null);
+  const rabbit = PARTS.ears.findIndex(x => x.v[0] === '૮(ᐢ ');
+  const s = cloneState({...DEFAULT, ears: rabbit});
+  const full = compose(s);
+  s.custom.leftInner = ''; s.custom.rightInner = '';
+  const cut = compose(s);
+  assert.ok(full.includes('ᐢ') && !cut.includes('ᐢ'));
+  assert.ok(cut.includes('૮(') && cut.includes(')ა'));
+  assert.ok(validState(s));
+});
