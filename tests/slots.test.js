@@ -25,3 +25,14 @@ test('拆零件：新的槽位能通过收藏校验，克隆后保留', () => {
   assert.equal(compose(cloneState(s)), compose(s));
   assert.ok(!validState({...s, custom:{...s.custom, unknown:'x'}}));
 });
+
+test('随机：耳朵带爪爪时，不再配「举起爪爪」装饰（不会出现四个爪爪）', async () => {
+  const {randomAnimalState, ANIMALS, PARTS} = await import('../dist/model.js');
+  for (const a of ANIMALS) {
+    for (let i = 0; i < 300; i++) {
+      const s = randomAnimalState(a.id);
+      const ears = PARTS.ears[s.ears].v.join(''), decor = PARTS.decor[s.decor].v.join('');
+      if (ears.includes('ฅ')) assert.ok(!decor.includes('ฅ'), `${a.id}: ${ears} + ${decor}`);
+    }
+  }
+});

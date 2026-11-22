@@ -72,6 +72,10 @@ export function randomAnimalState(animalId,mood=null,rng=Math.random){
   const ears=PARTS.ears.map((_,i)=>i).filter(i=>animalForEar(i)===animalId);
   state.ears=ears[Math.min(ears.length-1,Math.floor(rng()*ears.length))];
   state.mouth=animal.mouthIndex;
+  // 2026-11-23 界（拾发现「四个爪爪」）：耳朵里已经带了 ฅ 之类的字，随机时就不再配同样字的装饰，免得重复
+  const earChars=new Set(Array.from(PARTS.ears[state.ears].v.join('')).filter(ch=>ch.trim()&&!/[()₍₎\[\]]/u.test(ch)));
+  const clashes=i=>Array.from(PARTS.decor[i].v.join('')).some(ch=>earChars.has(ch));
+  if(clashes(state.decor)){const ok=PARTS.decor.map((_,i)=>i).filter(i=>!clashes(i));if(ok.length)state.decor=ok[Math.floor(rng()*ok.length)]}
   return state;
 }
 export const ANIMAL_LOOKS=ANIMALS.map(animal=>({
