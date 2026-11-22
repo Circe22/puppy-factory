@@ -1,6 +1,7 @@
 // Display text only: saved puppy states and Unicode faces stay language-neutral.
 export const LANGUAGE_KEY = 'puppy-factory:language';
 export const EN = {
+  '弯弯笑眼': 'Crescent smile eyes', '张嘴大笑': 'Big laugh', '紧凑圆脸': 'Snug round face', '举手欢呼': 'Hands up cheer', '欢呼团子': 'Cheering dango',
   '左外耳': 'Left outer ear', '左脸边': 'Left face edge', '左内侧': 'Left inner', '右内侧': 'Right inner', '右脸边': 'Right face edge', '右外耳': 'Right outer ear',
   '⇪ 卡片': '⇪ Card', '生成分享卡片': 'Make a share card', '⇪ 分享卡片': '⇪ Share card',
   '长按图片保存，或者点下面的按钮。卡片下面有二维码，朋友扫一下就能来捏。': 'Long-press to save, or use the buttons below. Friends can scan the QR code to make their own.',

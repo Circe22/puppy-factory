@@ -90,3 +90,10 @@ export function validState(s){return !!s&&(s.spacing===undefined||s.spacing===''
 export function readFavorites(storage){try{const data=JSON.parse(storage.getItem('puppy-factory:favorites')||'[]');return Array.isArray(data)?data.filter(validState).slice(0,500).map(cloneState):[]}catch{return []}}
 export function writeFavorites(storage,list){try{storage.setItem('puppy-factory:favorites',JSON.stringify(list));return true}catch{return false}}
 export async function copyText(text,nav,doc){try{if(nav.clipboard?.writeText){await nav.clipboard.writeText(text);return 'clipboard'}}catch{}const active=doc.activeElement;const input=doc.createElement('textarea');input.value=text;input.setAttribute('readonly','');input.setAttribute('dir','ltr');input.style.cssText='position:fixed;top:0;left:0;opacity:0;font-size:16px';doc.body.append(input);input.focus();input.select();input.setSelectionRange(0,text.length);let copied=false;try{copied=doc.execCommand('copy')}catch{}finally{input.remove();active?.focus?.()}return copied?'fallback':'manual'}
+
+// 2026-11-23 界（拾说「你现在用的这个也好可爱」）：把 ٩(ˊᗜˋ*)و 拆成零件加进来，只往后追加，不改已有编号
+const cheerEyes=addPart('eyes',{name:'弯弯笑眼',v:['ˊ','ˋ'],mood:'开心'});
+const cheerMouth=addPart('mouth',{name:'张嘴大笑',v:'ᗜ'});
+const tightEars=addPart('ears',{name:'紧凑圆脸',v:['(',')'],family:'soft',spacing:''});
+const cheerDecor=addPart('decor',{name:'举手欢呼',v:['٩','','*','و']});
+FRESH_LOOKS.push({name:'欢呼团子',expected:'٩(ˊᗜˋ*)و',state:{ears:tightEars,eyes:cheerEyes,mouth:cheerMouth,decor:cheerDecor,spacing:''}});
