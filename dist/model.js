@@ -35,11 +35,49 @@ export const FRESH_LOOKS=[
  {name:'调皮卷尾',expected:'˶ᗜ𐃷ᗜ˶ಣ',state:{ears:freshEars[2],eyes:freshEyes[5],mouth:freshMouths[3],decor:1,accessories:{horns:0,tail:curlyTail,wings:0}}},
  {name:'趴着呼噜',expected:'(՞_   ̫ _՞)ᐝ',state:{ears:freshEars[3],eyes:freshEyes[6],mouth:freshMouths[4],decor:sleepingDecor}}
 ];
+// Zizishou experiment: append new ear pairs; never renumber existing presets or favorites.
+const NEW_ANIMAL_EARS=[
+  {name:'兔兔长耳',v:['／(ᐢ ',' ᐢ)＼'],animal:'rabbit',spacing:''},
+  {name:'兔兔软耳',v:['૮(ᐢ ',' ᐢ)ა'],animal:'rabbit',spacing:''},
+  {name:'熊熊圆耳',v:['ʕ ',' ʔ'],animal:'bear',spacing:' '},
+  {name:'小熊抱抱',v:['ʕっ ',' っʔ'],animal:'bear',spacing:' '},
+  {name:'狐狸尖耳',v:['ฅ^','^ฅ'],animal:'fox',spacing:''},
+  {name:'狐狸蓬蓬',v:['ᐢ⸝ ',' ⸝ᐢ'],animal:'fox',spacing:''},
+  {name:'仓鼠团团',v:['꒰ ',' ꒱'],animal:'hamster',spacing:' '},
+  {name:'仓鼠鼓腮',v:['(⸝⸝ ',' ⸝⸝)'],animal:'hamster',spacing:''}
+];
+PARTS.ears.push(...NEW_ANIMAL_EARS);
+export const ANIMALS=[
+  {id:'dog',name:'小狗',earIndex:1,mouthIndex:0},
+  {id:'cat',name:'小猫',earIndex:12,mouthIndex:28},
+  {id:'rabbit',name:'兔兔',earIndex:16,mouthIndex:9},
+  {id:'bear',name:'熊熊',earIndex:18,mouthIndex:7},
+  {id:'fox',name:'狐狸',earIndex:20,mouthIndex:1},
+  {id:'hamster',name:'仓鼠',earIndex:22,mouthIndex:15}
+];
+export function animalForEar(index){
+  if(!Number.isInteger(index)||index<0||index>=PARTS.ears.length)return null;
+  return PARTS.ears[index].animal||([11,12,13].includes(index)?'cat':'dog');
+}
 export const DEFAULT={ears:1,eyes:0,mouth:0,decor:1,custom:{},accessories:{horns:0,tail:0,wings:0}};
 export function cloneState(s){return {...s,custom:{...s.custom},accessories:{horns:0,tail:0,wings:0,...s.accessories}}}
 export function values(s){const c=s.custom||{};return {left:c.left??PARTS.ears[s.ears].v[0],right:c.right??PARTS.ears[s.ears].v[1],eyeLeft:c.eyeLeft??PARTS.eyes[s.eyes].v[0],eyeRight:c.eyeRight??PARTS.eyes[s.eyes].v[1],mouth:c.mouth??PARTS.mouth[s.mouth].v,prefix:c.prefix??PARTS.decor[s.decor].v[0],blushLeft:PARTS.decor[s.decor].v[1],blushRight:PARTS.decor[s.decor].v[2],suffix:c.suffix??PARTS.decor[s.decor].v[3]}}
 export function compose(s){const v=values(s),a=s.accessories||{};const horns=ACCESSORIES.horns[a.horns||0].v,tail=ACCESSORIES.tail[a.tail||0].v,wings=ACCESSORIES.wings[a.wings||0].v;const ear=PARTS.ears[s.ears];const sep=s.spacing??ear.spacing??(ear.family==='classic'?'':' ');const left=a.horns?v.left.trimEnd()+horns[0]:v.left;const right=a.horns?horns[1]+v.right.trimStart():v.right;return v.prefix+wings[0]+left+v.blushLeft+v.eyeLeft+sep+v.mouth+sep+v.eyeRight+v.blushRight+right+wings[1]+tail+v.suffix}
 export function randomState(family=null,mood=null,rng=Math.random){const pick=a=>a[Math.floor(rng()*a.length)];const indexes=(key,fn)=>PARTS[key].map((v,i)=>({v,i})).filter(x=>!fn||fn(x.v)).map(x=>x.i);return {ears:pick(indexes('ears',family?v=>v.family===family:null)),eyes:pick(indexes('eyes',mood?v=>v.mood===mood:null)),mouth:pick(indexes('mouth')),decor:pick(indexes('decor')),custom:{}}}
+// Random and ready-made little creatures share the same existing Unicode composer.
+export function randomAnimalState(animalId,mood=null,rng=Math.random){
+  const animal=ANIMALS.find(a=>a.id===animalId);
+  if(!animal)throw new RangeError('Unknown animal: '+animalId);
+  const state=randomState(null,mood,rng);
+  const ears=PARTS.ears.map((_,i)=>i).filter(i=>animalForEar(i)===animalId);
+  state.ears=ears[Math.min(ears.length-1,Math.floor(rng()*ears.length))];
+  state.mouth=animal.mouthIndex;
+  return state;
+}
+export const ANIMAL_LOOKS=ANIMALS.map(animal=>({
+  id:animal.id,name:animal.name+'团子',
+  state:{...cloneState(DEFAULT),ears:animal.earIndex,mouth:animal.mouthIndex}
+}));
 export function validState(s){return !!s&&(s.spacing===undefined||s.spacing===''||s.spacing===' ')&&['ears','eyes','mouth','decor'].every(k=>Number.isInteger(s[k])&&s[k]>=0&&s[k]<PARTS[k].length)&&(!s.accessories||(typeof s.accessories==='object'&&Object.entries(s.accessories).every(([k,v])=>Object.hasOwn(ACCESSORIES,k)&&Number.isInteger(v)&&v>=0&&v<ACCESSORIES[k].length)))&&(!s.custom||Object.entries(s.custom).every(([k,v])=>['left','right','eyeLeft','eyeRight','mouth','prefix','suffix'].includes(k)&&typeof v==='string'&&Array.from(v).length<=16&&!/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(v)))}
 export function readFavorites(storage){try{const data=JSON.parse(storage.getItem('puppy-factory:favorites')||'[]');return Array.isArray(data)?data.filter(validState).slice(0,500).map(cloneState):[]}catch{return []}}
 export function writeFavorites(storage,list){try{storage.setItem('puppy-factory:favorites',JSON.stringify(list));return true}catch{return false}}
