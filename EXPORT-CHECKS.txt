@@ -1,0 +1,9 @@
+Puppy Factory v4 export checks
+
+Source commit: 6f61140bf89486e4600293f1d54247b0562f1b53
+Original source files: 29; SHA-256 matches all original files.
+Project tests: 22 passed.
+JavaScript syntax: passed for app.js, model.js, picker.js.
+Referenced local assets: 20; all present and relative.
+Bundled fonts: 16 WOFF files, plus font licenses.
+No browser visual or OS clipboard test performed for this export.

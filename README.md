@@ -1,4 +1,15 @@
-# Puppy Factory
+# Puppy Factory · 小狗颜文字工厂
+
+> 今天，想捏一只什么小狗？
+
+在线试玩：https://circe.circeworks.com/puppy-factory/
+
+眼睛、嘴巴、耳朵、尾巴，一块块捏出一只小狗，复制下来，带去每一次聊天。纯静态网页，不用构建，把 `dist/` 整个夹子部署出去就能用。
+
+由 Circe 与 AI 协作完成。最近一次的改动写在 `CHANGES-20261123.md`。
+
+---
+
 
 A buildless, responsive kaomoji studio. Deploy `dist/` as static assets. No application login, backend, analytics, or external runtime dependency. Favorites stay in `localStorage` in the current browser, and clearing browser data removes them.
 
@@ -23,11 +34,3 @@ All nine new user-provided faces match exact Unicode code points, including doub
 ## Version 4 validation
 
 The mobile editing dock contains copy/save and a single undo/random/clear row. It collapses past the editor boundary and keeps the section links directly beneath it. Mobile uses block layout so the sticky dock shares the entire editor as its containing block. Jumps account for the dock height and open the ear/decor group. Every tray starts with up to eight choices and expands reversibly. Eye moods each provide six options; search can find all eyes across moods. Recent indices are validated, deduplicated, bounded, and stored separately from favorites. Clear removes the current face/accessories and undo restores its prior snapshot. All 22 model/picker tests pass, HTML nesting/IDs/action placement and CSS parse pass. The required browser-control skill remains unavailable; real mobile visual and OS clipboard tests were not performed.
-
-## Version 5: Chinese / English
-
-A small Chinese / EN control in the header switches display text immediately and stores the preference in a separate localStorage key. Static text, dynamic parts, recipes, categories, notifications, search placeholders, and accessible labels are translated. Part search matches English and Chinese names. Switching updates text nodes and attributes in place, preserving the puppy, history, favorites, filters, custom inputs, and Unicode. Browser checks confirmed exact clipboard copying, face/filter preservation, saved favorites, and language persistence after reload. Desktop visual review passed; a mobile-width browser session was not available. The original version-specific notes above describe earlier validation.
-
-## 2026-11-23 supplied dock changes
-
-Merged the user-supplied preview-dock outline/shadow and full-height margin compensation into the Chinese/English release. HTML stylesheet and app cache keys advance from v5 to v6; dependent module URLs use v6 too. The compensation records the expanded dock height, restores the freed space while compact, and removes the margin when expanded.

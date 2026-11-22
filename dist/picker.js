@@ -1,5 +1,4 @@
-import {translate} from './i18n.js?v=6';
-import {PARTS, ACCESSORIES, NEW_PARTS, DEFAULT, cloneState} from './model.js?v=6';
+import {PARTS, ACCESSORIES, NEW_PARTS, DEFAULT, cloneState} from './model.js?v=4';
 
 export const RECENT_KEY = 'puppy-factory:recent-parts';
 const OPTIONS = {...PARTS, ...ACCESSORIES};
@@ -48,7 +47,7 @@ export function partTray(key, {recent = {}, expanded = false, query = '', mood =
   ])].filter(i => validIndex(key, i));
   const q = query.trim().toLowerCase();
   const candidates = order.filter(i => {
-    if (q) return (items[i].name + ' ' + translate(items[i].name,'en') + ' ' + (Array.isArray(items[i].v) ? items[i].v.join(' ') : items[i].v)).toLowerCase().includes(q);
+    if (q) return (items[i].name + (Array.isArray(items[i].v) ? items[i].v.join(' ') : items[i].v)).toLowerCase().includes(q);
     return key !== 'eyes' || mood === '常用' || (EYE_MOODS[mood] || []).includes(i);
   });
   return {visible: expanded ? candidates : candidates.slice(0, 8), total: candidates.length, hasMore: candidates.length > 8};
