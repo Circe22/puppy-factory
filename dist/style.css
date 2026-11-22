@@ -54,3 +54,8 @@
 .slot-chip.is-deleted{border-style:dashed;border-color:#d8c4bb;background:transparent}
 .slot-restore{border:0;background:none;font-size:12px;color:#a07b68;padding:6px 4px}
 #slot-done{width:100%}
+
+/* 拆零件：标题和输入框之间拉开距离，聚焦描边收紧，不再盖住上面的字（拾 11-23 反馈） */
+.slot-chip{padding:10px 10px 10px}
+.slot-chip small{margin-bottom:8px;line-height:1.2}
+.slot-chip input:focus-visible,.slot-chip input:focus{outline:2px solid #ba6b83;outline-offset:1px}
