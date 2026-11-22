@@ -49,7 +49,7 @@ const NEW_ANIMAL_EARS=[
 PARTS.ears.push(...NEW_ANIMAL_EARS);
 export const ANIMALS=[
   {id:'dog',name:'小狗',earIndex:1,mouthIndex:0},
-  {id:'cat',name:'小猫',earIndex:12,mouthIndex:28},
+  {id:'cat',name:'小猫',earIndex:12,mouthIndex:24},
   {id:'rabbit',name:'兔兔',earIndex:16,mouthIndex:9},
   {id:'bear',name:'熊熊',earIndex:18,mouthIndex:7},
   {id:'fox',name:'狐狸',earIndex:20,mouthIndex:1},
