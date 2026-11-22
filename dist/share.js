@@ -55,10 +55,22 @@ export async function drawShareCard(canvas, face, caption, labels) {
 
   // 左边文字，右边二维码
   ctx.textAlign = 'left';
-  ctx.fillStyle = INK; let bs = 54; ctx.font = `700 ${bs}px ${SANS}`; while (ctx.measureText(labels.brand).width > 480 && bs > 30) { bs -= 2; ctx.font = `700 ${bs}px ${SANS}`; } ctx.fillText(labels.brand, 150, 980);
-  ctx.fillStyle = MUTED; ctx.font = `34px ${SANS}`; ctx.fillText(labels.tagline, 150, 1050);
-  ctx.fillStyle = '#c67788'; ctx.font = `600 32px ${SANS}`; ctx.fillText(labels.scan, 150, 1120);
-  ctx.fillStyle = MUTED; ctx.font = `26px ${SANS}`; ctx.fillText(SHARE_URL.replace('https://', ''), 150, 1180);
+  ctx.fillStyle = INK; let bs = 50; ctx.font = `700 ${bs}px ${SANS}`; while (ctx.measureText(labels.brand).width > 480 && bs > 30) { bs -= 2; ctx.font = `700 ${bs}px ${SANS}`; } ctx.fillText(labels.brand, 150, 965);
+  ctx.fillStyle = MUTED; ctx.font = `30px ${SANS}`;
+  // 文案按宽度自动换行（最多 3 行）
+  const lines = []; let line = '';
+  // 优先在逗号后面断行，不把一个词拆开；一段本身太长时才按字断
+  const parts = labels.tagline.split(/(?<=[，,、])/u);
+  for (const part of parts) {
+    if (ctx.measureText(line + part).width <= 480) { line += part; continue; }
+    if (line) { lines.push(line); line = ''; }
+    for (const ch of Array.from(part)) { if (ctx.measureText(line + ch).width > 480) { lines.push(line); line = ch; } else line += ch; }
+  }
+  if (line) lines.push(line);
+  lines.slice(0, 3).forEach((l, i) => ctx.fillText(l, 150, 1035 + i * 42));
+  const after = 1035 + Math.min(lines.length, 3) * 42;
+  ctx.fillStyle = '#c67788'; ctx.font = `600 30px ${SANS}`; ctx.fillText(labels.scan, 150, after + 22);
+  ctx.fillStyle = MUTED; ctx.font = `24px ${SANS}`; ctx.fillText(SHARE_URL.replace('https://', ''), 150, after + 72);
   ctx.strokeStyle = PINK; ctx.lineWidth = 4; roundRect(ctx, W - 150 - 270, 920, 270, 270, 22); ctx.stroke();
   drawQR(ctx, W - 150 - 262, 928, 254);
 
