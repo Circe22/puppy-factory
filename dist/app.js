@@ -1,4 +1,5 @@
 import {PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,compose,readFavorites,writeFavorites,copyText} from './model.js?v=10';
+import {drawShareCard,SHARE_URL} from './share.js?v=2';
 import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=10';
 import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=10';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -194,3 +195,20 @@ $('#puppy').addEventListener('click',openSlots);
 $('#puppy').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSlots()}});
 $('#slot-open').addEventListener('click',openSlots);
 $('#slot-done').addEventListener('click',()=>{$('#slot-edit').close();render();toast('拆好啦，删掉的零件会一直保持')});
+
+// 2026-11-23 界（拾提）：分享卡片，底下带网址和二维码。
+let shareBlobUrl='';
+async function openShare(){
+ const canvas=document.createElement('canvas');
+ const t=x=>translate(x,language);
+ await drawShareCard(canvas,compose(state),t($('#puppy-caption').dataset.source||$('#puppy-caption').textContent),{brand:t('字字兽 · 颜文字团子工厂'),tagline:t('把可爱拼起来，带去每一次聊天'),scan:t('扫码捏一只你的团子 →')});
+ const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));if(!blob){toast('卡片生成失败了，再试一次吧');return}
+ if(shareBlobUrl)URL.revokeObjectURL(shareBlobUrl);shareBlobUrl=URL.createObjectURL(blob);
+ $('#share-img').src=shareBlobUrl;$('#share-download').href=shareBlobUrl;
+ const file=new File([blob],'zizishou.png',{type:'image/png'});
+ const canShare=!!(navigator.canShare&&navigator.canShare({files:[file]}));
+ $('#share-native').hidden=!canShare;$('#share-native').onclick=async()=>{try{await navigator.share({files:[file],title:t('字字兽'),text:compose(state)+' '+SHARE_URL})}catch{}};
+ $('#share-card').showModal();
+}
+$('#share-open').addEventListener('click',openShare);
+$('#share-close').addEventListener('click',()=>$('#share-card').close());

@@ -59,3 +59,11 @@
 .slot-chip{padding:10px 10px 10px}
 .slot-chip small{margin-bottom:8px;line-height:1.2}
 .slot-chip input:focus-visible,.slot-chip input:focus{outline:2px solid #ba6b83;outline-offset:1px}
+
+/* 分享卡片 */
+.action-row .share-btn{min-width:auto;padding:12px 14px}
+#share-card{width:440px}
+.share-img{display:block;width:100%;border-radius:14px;border:1px solid var(--line);margin:4px 0 16px;background:#fbe9ec;aspect-ratio:3/4}
+.share-actions{display:flex;gap:10px;flex-wrap:wrap}
+.share-actions .button{flex:1;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+@media(max-width:720px){.action-row .share-btn{padding:12px 10px}}
