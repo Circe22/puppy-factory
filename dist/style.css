@@ -72,6 +72,12 @@
 .preview-face-row output{min-width:0}
 .preview-text{display:block;width:max-content;margin:0 auto;padding:0 2px}
 .compact-actions{display:none}
+.preview-change{border-radius:.17em;background:#f3dce3;box-shadow:0 0 0 1px #d792a6}
+.preview-change:empty{position:relative;box-shadow:none}
+.preview-change:empty::after{
+  content:'';position:absolute;top:.15em;left:-2px;width:4px;height:.85em;pointer-events:none;
+  border-radius:3px;background:#f3dce3;box-shadow:0 0 0 1px #d792a6;
+}
 
 @media(max-width:720px){
   .preview-dock.is-compact .preview-face-row{gap:8px}
