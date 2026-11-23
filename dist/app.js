@@ -487,7 +487,16 @@ async function loadLanguage(){
  }
  return record.ok;
 }
+function detectFlexGap(){
+ const probe=el('div');
+ probe.style.cssText='position:absolute;visibility:hidden;display:flex;flex-direction:column;row-gap:1px';
+ probe.append(el('div'),el('div'));
+ document.body.append(probe);
+ document.documentElement.classList.toggle('has-flex-gap',probe.scrollHeight===1);
+ probe.remove();
+}
 function boot(){
+ detectFlexGap();
  bindStaticText();
  buildControls();
  render();
