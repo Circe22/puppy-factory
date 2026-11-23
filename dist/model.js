@@ -151,7 +151,9 @@ export function randomAnimalState(animalId,mood=null,rng=Math.random){
   state.mouth=animal.mouthIndex;
   // 2026-11-23 界（拾发现「四个爪爪」）：耳朵里已经带了 ฅ 之类的字，随机时就不再配同样字的装饰，免得重复
   const earChars=new Set(Array.from(PARTS.ears[state.ears].v.join('')).filter(ch=>ch.trim()&&!/[()₍₎\[\]]/u.test(ch)));
-  const clashes=i=>Array.from(PARTS.decor[i].v.join('')).some(ch=>earChars.has(ch));
+  // 2026-11-23 拾：耳朵里带手（っ ฅ ／＼ o( )o）时，也不配带手的装饰。只管随机，用户自己拼不拦。
+  const earHands=!!PARTS.ears[state.ears].hands;
+  const clashes=i=>(earHands&&!!PARTS.decor[i].hands)||Array.from(PARTS.decor[i].v.join('')).some(ch=>earChars.has(ch));
   if(clashes(state.decor)){const ok=PARTS.decor.map((_,i)=>i).filter(i=>!clashes(i));if(ok.length)state.decor=ok[Math.floor(rng()*ok.length)]}
   return state;
 }
@@ -213,3 +215,7 @@ FRESH_LOOKS.push(
  {name:'亮晶晶',expected:'(◍•͈⌔•͈◍)',state:{ears:24,eyes:glowEyes,mouth:boxMouth,decor:ballDecor}},
  {name:'翻白眼',expected:'｡◔‸◔｡',state:{ears:14,eyes:rollEyes,mouth:25,decor:dotDecor}},
 );
+
+// 2026-11-23 拾：「左内侧、右内侧其实也是手」——给带手的零件偷偷打标签，随机时手不和手撞。
+for(const i of [11,16,19,20,fistEars])PARTS.ears[i].hands=true;
+for(const i of [3,10,11,15])PARTS.decor[i].hands=true;

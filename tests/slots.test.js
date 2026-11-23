@@ -65,3 +65,20 @@ test('预览分段：脸边和内耳各自定位，戴角后复制仍保留原�
   );
   assert.equal(compose(state), '૮(^˃̣̣̥ﻌ•^)ა');
 });
+
+test('随机：耳朵里带手（如 ʕっ っʔ）时，不配带手的装饰；用户手动拼不受影响', async () => {
+  const {randomAnimalState, ANIMALS, PARTS, compose, cloneState, validState} = await import('../dist/model.js');
+  let handEars = 0;
+  for (const a of ANIMALS) {
+    for (let i = 0; i < 400; i++) {
+      const s = randomAnimalState(a.id);
+      if (PARTS.ears[s.ears].hands) { handEars++; assert.ok(!PARTS.decor[s.decor].hands, `${a.id}: ${compose(s)}`); }
+    }
+  }
+  assert.ok(handEars > 0, '随机里应该能抽到带手的耳朵');
+  const bear = PARTS.ears.findIndex(e => e.v[0] === 'ʕっ ');
+  const paws = PARTS.decor.findIndex(d => d.v[0] === 'ฅ ');
+  const manual = cloneState({ears: bear, eyes: 0, mouth: 0, decor: paws});
+  assert.ok(validState(manual));
+  assert.ok(compose(manual).includes('ฅ') && compose(manual).includes('っ'));
+});
