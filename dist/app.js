@@ -1,7 +1,7 @@
-import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText} from './model.js?v=26';
+import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText} from './model.js?v=27';
 import {drawShareCard,SHARE_URL} from './share.js?v=4';
-import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=30';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=29';
+import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=31';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=30';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -38,7 +38,7 @@ const looks=[
  {name:'天使小狗',state:{...cloneState(DEFAULT),eyes:3,accessories:{horns:0,tail:0,wings:2}}},
  {name:'困困抱抱',state:{...cloneState(DEFAULT),eyes:4,mouth:3,decor:0,accessories:{horns:0,tail:0,wings:0,hands:7}}}
 ];
-function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)setText(n,text);return n}
+function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;/* 拾 11-23：浏览器翻译会把 ó ò 翻成「哦」，颜文字一律不让翻 */if(cls&&/\bkaomoji\b|card-puppy/.test(cls))n.translate=false;if(text!==undefined)setText(n,text);return n}
 function button(cls,text,fn){const b=el('button',cls,text);b.type='button';b.addEventListener('click',fn);return b}
 function toast(message){setText($('#toast'),message);$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),2400)}
 function checkpoint(){history.push(cloneState(state));if(history.length>40)history.shift()}

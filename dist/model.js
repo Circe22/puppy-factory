@@ -301,3 +301,8 @@ addPart('ears',{name:'垂耳兔',v:['／( ',' )＼'],animal:'rabbit',spacing:''}
 Object.assign(PARTS.ears[16],{hidden:true,noRandom:true});
 // 拾 11-23 说过兔兔随机只要 ₍ᐢ ᐢ₎ 这种，新归来的两款兔耳只给自己挑，不进随机。
 PARTS.ears[21].noRandom=true;PARTS.ears[PARTS.ears.length-1].noRandom=true;
+
+// 2026-11-23 19:38 拾：OuO UuU OvO OAO OaO 这种字母脸。补字母嘴和 O、U 两种眼睛。
+['小u嘴|u','小v嘴|v','大A嘴|A','小a嘴|a'].forEach(x=>{const [name,v]=x.split('|');addPart('mouth',{name,v})});
+addPart('eyes',{name:'大O眼',v:['O','O'],mood:'日常'});
+addPart('eyes',{name:'U形眼',v:['U','U'],mood:'困困'});
