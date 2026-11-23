@@ -40,3 +40,11 @@ The mobile editing dock contains copy/save and a single undo/random/clear row. I
 顶部新增中文 / EN 即时切换，并在本机记住语言。页面、零件名称、分类、提示与无障碍标签一起切换；搜索同时支持中英文。切换保留当前小狗、筛选、自定义输入、撤回历史和收藏。
 
 已保留原有卡片描边和收缩补位，并补齐分类跳转时的高度计算。CSS、应用与依赖模块缓存键统一为 v8。新增 `dist/i18n.js` 与翻译覆盖测试，当前 27 项测试全部通过。浏览器已验证语言切换、刷新后记忆、状态保留与实际剪贴板复制；手机宽度的收缩补位仍待实机验证。
+
+## 授权 License
+
+字字兽的代码、零件系统、分类与界面设计以 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.zh-hans) 授权，署名 **Circe**。非商业使用请署名并附上本仓库链接；商业使用请先联系作者。
+
+单个颜文字和符号属于网络公共文化，本项目不主张其权利；部分零件参考自网友公开分享的颜文字，谢谢她们。字体子集沿用其原始协议（DejaVu / SIL OFL 1.1），见 `dist/font-licenses/`。
+
+Licensed under CC BY-NC 4.0 — see `LICENSE`. Fonts keep their own licenses.
