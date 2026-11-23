@@ -124,7 +124,7 @@ function takeCreature(s){
 }
 function renderSaved(){$('#favorite-count').textContent=favorites.length;$('#save').setAttribute('aria-pressed',String(hasSaved(state)));setText($('#save'),hasSaved(state)?'♥ 已收藏':'♡ 收藏');$$('.nav-item').forEach(b=>{if(b.dataset.view==='favorites')localizedAttr(b,'aria-label',`我的收藏，${favorites.length}只团子`)})}
 let renderedFaceParts,highlightTimer;
-// 拾 11-23：随机是整只换掉，不需要标出哪里变了，所以随机时跳过强调。
+// 拾 11-23：随机、一键穿搭、新到的小表情、集合里的「捏捏」、清空，都是整只换掉，不需要标出哪里变了，所以跳过强调。
 let quietFace=false;
 function renderFace(){
  const quiet=quietFace;quietFace=false;
@@ -217,7 +217,7 @@ function buildAccessories(){
  }
  return section;
 }
-function buildControls(){buildFamilies();FRESH_LOOKS.forEach(look=>{const b=button('preset fresh-preset','',()=>change(()=>{state=cloneState(look.state);counter++}));b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#fresh-presets').append(b)});$$('[data-spacing]').forEach(b=>b.addEventListener('click',()=>change(()=>{state.spacing=b.dataset.spacing}))); [...ANIMAL_LOOKS,...looks].forEach(look=>{const b=button('preset','',()=>change(()=>{state=cloneState(look.state);counter++}));b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#presets').append(b)});const earDecor=el('section','ear-decor-group');earDecor.id='picker-ears-and-decor';earDecor.append(buildPart('ears',false),buildPart('decor',false));$('#all-parts').append(buildPart('eyes'),buildPart('mouth'),buildAccessories(),earDecor);}
+function buildControls(){buildFamilies();FRESH_LOOKS.forEach(look=>{const b=button('preset fresh-preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#fresh-presets').append(b)});$$('[data-spacing]').forEach(b=>b.addEventListener('click',()=>change(()=>{state.spacing=b.dataset.spacing}))); [...ANIMAL_LOOKS,...looks].forEach(look=>{const b=button('preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#presets').append(b)});const earDecor=el('section','ear-decor-group');earDecor.id='picker-ears-and-decor';earDecor.append(buildPart('ears',false),buildPart('decor',false));$('#all-parts').append(buildPart('eyes'),buildPart('mouth'),buildAccessories(),earDecor);}
 function card(s){
  const text=compose(s),saved=hasSaved(s),animal=ANIMALS.find(x=>x.id===animalForEar(s.ears));
  const c=el('article','puppy-card'),top=el('div','card-portrait');
@@ -232,7 +232,7 @@ function card(s){
  name.append(el('small','',PARTS.ears[s.ears].name));
  const actions=el('div','card-actions');
  actions.append(button('','捏捏',()=>{
-  change(()=>{state=cloneState(s);counter++});
+  quietFace=true;change(()=>{state=cloneState(s);counter++});
   showView('studio');
   window.scrollTo(0,$('.workbench').getBoundingClientRect().top+window.scrollY-dockOffset());
  }),button('','复制',()=>takeCreature(s)));
@@ -291,7 +291,7 @@ $('#copy-compact').addEventListener('click',()=>takeCreature(state));
 $('#save').addEventListener('click',()=>save(state));
 $('#select-copy-text').addEventListener('click',selectText);
 $('#random').addEventListener('click',()=>{quietFace=true;change(()=>{state=newRandom();counter++});toast('噗叽！一只字字兽诞生啦')});
-$('#reset').addEventListener('click',()=>{change(()=>state=clearFace(state),{remember:false});toast('搭配已清空，点一下撤回就能找回来')});
+$('#reset').addEventListener('click',()=>{quietFace=true;change(()=>state=clearFace(state),{remember:false});toast('搭配已清空，点一下撤回就能找回来')});
 $('#undo').addEventListener('click',()=>{if(history.length){state=history.pop();render();syncCustom()}});
 $('#more').addEventListener('click',()=>{refreshGallery();toast('新的一窝团子来啦')});$('#close-dialog').addEventListener('click',()=>$('#manual-copy').close());
 
