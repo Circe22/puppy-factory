@@ -136,5 +136,14 @@
 .choice.none-choice[aria-pressed=true]{background:#f1d5dd;border-color:#ba6b83}
 
 @font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-19.woff?v=1') format('woff');font-display:swap;unicode-range:U+141F,U+1420}
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-20.woff?v=1') format('woff');font-display:swap;unicode-range:U+02CE,U+02D6,U+02D7,U+22B9,U+2729}
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-21.woff?v=1') format('woff');font-display:swap;unicode-range:U+08EA}
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-22.woff?v=1') format('woff');font-display:swap;unicode-range:U+0E51}
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-23.woff?v=1') format('woff');font-display:swap;unicode-range:U+0F72,U+0F80}
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-24.woff?v=1') format('woff');font-display:swap;unicode-range:U+1A13}
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-25.woff?v=1') format('woff');font-display:swap;unicode-range:U+239A}
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-26.woff?v=1') format('woff');font-display:swap;unicode-range:U+2AA8,U+2AA9}
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-27.woff?v=1') format('woff');font-display:swap;unicode-range:U+A564}
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-28.woff?v=1') format('woff');font-display:swap;unicode-range:U+169E7}
 
 .part-rail .kaomoji{display:block;max-width:100%;overflow:hidden;padding-left:2px;padding-right:2px}
