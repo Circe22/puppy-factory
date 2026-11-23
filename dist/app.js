@@ -1,7 +1,7 @@
-import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText} from './model.js?v=21';
+import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText} from './model.js?v=22';
 import {drawShareCard,SHARE_URL} from './share.js?v=4';
-import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=21';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=20';
+import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=22';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=21';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -27,8 +27,8 @@ let recent=readRecent(storage);
 const trays=new Map();
 const categories=['全部团子',...ANIMALS.map(x=>x.name),'新到表情','小恶魔','小天使','开心','撒娇','困困','委屈'];
 const customKeys={ears:['left','right','leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter'],eyes:['eyeLeft','eyeRight'],mouth:['mouth'],decor:['prefix','suffix','blushLeft','blushRight']};
-const accessorySlots={horns:['hornLeft','hornRight'],wings:['wingLeft','wingRight'],tail:['tail']};
-const names={left:'左耳',right:'右耳',eyeLeft:'左眼',eyeRight:'右眼',mouth:'嘴巴',prefix:'前面的小装饰',suffix:'后面的小装饰',leftOuter:'左外耳',leftFrame:'左脸边',leftInner:'左内侧',rightInner:'右内侧',rightFrame:'右脸边',rightOuter:'右外耳',blushLeft:'左腮红',blushRight:'右腮红',hornLeft:'左角',hornRight:'右角',wingLeft:'左翅膀',wingRight:'右翅膀',tail:'尾巴'};
+const accessorySlots={horns:['hornLeft','hornRight'],wings:['wingLeft','wingRight'],tail:['tail'],hands:['handLeft','handRight']};
+const names={left:'左耳',right:'右耳',eyeLeft:'左眼',eyeRight:'右眼',mouth:'嘴巴',prefix:'前面的小装饰',suffix:'后面的小装饰',leftOuter:'左外耳',handLeft:'左手',handRight:'右手',leftFrame:'左脸边',leftInner:'左内侧',rightInner:'右内侧',rightFrame:'右脸边',rightOuter:'右外耳',blushLeft:'左腮红',blushRight:'右腮红',hornLeft:'左角',hornRight:'右角',wingLeft:'左翅膀',wingRight:'右翅膀',tail:'尾巴'};
 const labels={eyes:'选择眼睛',mouth:'选择嘴巴',ears:'换一对小耳朵',decor:'腮红与小装饰'};
 const looks=[
  {name:'委屈小狗',state:{...cloneState(DEFAULT),eyes:12,mouth:6}},
@@ -36,7 +36,7 @@ const looks=[
  {name:'摇尾小恶魔',state:{...cloneState(DEFAULT),accessories:{horns:1,tail:1,wings:0}}},
  {name:'扑扇小天使',state:{...cloneState(DEFAULT),ears:8,eyes:13,mouth:9,decor:0,accessories:{horns:0,tail:0,wings:1}}},
  {name:'天使小狗',state:{...cloneState(DEFAULT),eyes:3,accessories:{horns:0,tail:0,wings:2}}},
- {name:'困困抱抱',state:{...cloneState(DEFAULT),eyes:4,mouth:3,decor:11}}
+ {name:'困困抱抱',state:{...cloneState(DEFAULT),eyes:4,mouth:3,decor:0,accessories:{horns:0,tail:0,wings:0,hands:7}}}
 ];
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)setText(n,text);return n}
 function button(cls,text,fn){const b=el('button',cls,text);b.type='button';b.addEventListener('click',fn);return b}
@@ -140,18 +140,18 @@ function buildPart(k,open=true){
  tray.toggle=button('expand-parts','展开全部 ▾',()=>{tray.expanded=!tray.expanded;updateTray(tray)});tray.toggle.setAttribute('aria-controls',grid.id);
  trays.set(k,tray);section.append(empty,grid,tray.toggle,buildCustom(k));return section;
 }
-function buildAccessories(){
- const section=el('section','picker-section accessory-section');section.id='picker-accessories';const h=el('div','picker-heading');h.append(el('h3','','角、尾巴与翅膀'),el('span','','三种可以一起戴'));section.append(h);
- for(const [key,label]of[['horns','小恶魔角'],['tail','小尾巴'],['wings','天使翅膀']]){
+function buildAccessories(rows=[['horns','小恶魔角'],['tail','小尾巴'],['wings','天使翅膀']],title='角、尾巴与翅膀',note='三种可以一起戴',id='picker-accessories'){
+ const section=el('section','picker-section accessory-section');section.id=id;const h=el('div','picker-heading');h.append(el('h3','',title),el('span','',note));section.append(h);
+ for(const [key,label]of rows){
   const row=el('fieldset','accessory-row'),legend=el('legend','',label),count=el('span','accessory-count');legend.append(count);row.append(legend);
   const grid=el('div','accessory-choices');grid.id='choices-'+key;const empty=el('p','part-empty');empty.hidden=true;
   const tray={key,grid,count,empty,expanded:false,query:'',mood:'常用',buttons:new Map(),items:ACCESSORIES[key]};
-  ACCESSORIES[key].forEach((x,i)=>{const b=button('choice accessory-choice','',()=>change(()=>{const selected=state.accessories[key]===i?0:i;state.accessories[key]=selected;accessorySlots[key].forEach(slot=>delete state.custom[slot]);rememberPart(key,selected)}));b.dataset.accessory=key;b.dataset.index=i;localizedAttr(b,'aria-label',x.name);b.append(el('span','kaomoji',i===0?'—':Array.isArray(x.v)?x.v.join(' ◦ '):x.v.trim()),el('small','',x.name));tray.buttons.set(i,b)});
+  ACCESSORIES[key].forEach((x,i)=>{const b=button('choice accessory-choice','',()=>change(()=>{const selected=state.accessories[key]===i?0:i;state.accessories[key]=selected;accessorySlots[key].forEach(slot=>delete state.custom[slot]);rememberPart(key,selected)}));b.dataset.accessory=key;b.dataset.index=i;localizedAttr(b,'aria-label',x.name);b.append(el('span','kaomoji',i===0?'—':Array.isArray(x.v)?x.v.join('\u200e ◦ \u200e'):x.v.trim()),el('small','',x.name));tray.buttons.set(i,b)});
   tray.toggle=button('expand-parts','展开全部 ▾',()=>{tray.expanded=!tray.expanded;updateTray(tray)});tray.toggle.setAttribute('aria-controls',grid.id);trays.set(key,tray);row.append(grid,tray.toggle);section.append(row);
  }
  return section;
 }
-function buildControls(){buildFamilies();FRESH_LOOKS.forEach(look=>{const b=button('preset fresh-preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#fresh-presets').append(b)});$$('[data-spacing]').forEach(b=>b.addEventListener('click',()=>change(()=>{state.spacing=b.dataset.spacing}))); [...ANIMAL_LOOKS,...looks].forEach(look=>{const b=button('preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#presets').append(b)});const earDecor=el('section','ear-decor-group');earDecor.id='picker-ears-and-decor';earDecor.append(buildPart('ears',false),buildPart('decor',false));$('#all-parts').append(buildPart('eyes'),buildPart('mouth'),buildAccessories(),earDecor);}
+function buildControls(){buildFamilies();FRESH_LOOKS.forEach(look=>{const b=button('preset fresh-preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#fresh-presets').append(b)});$$('[data-spacing]').forEach(b=>b.addEventListener('click',()=>change(()=>{state.spacing=b.dataset.spacing}))); [...ANIMAL_LOOKS,...looks].forEach(look=>{const b=button('preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#presets').append(b)});const earDecor=el('section','ear-decor-group');earDecor.id='picker-ears-and-decor';earDecor.append(buildPart('ears',false),buildAccessories([['hands','']],'小手','举在外面，或者抱在怀里','picker-hands'),buildPart('decor',false));$('#all-parts').append(buildPart('eyes'),buildPart('mouth'),buildAccessories(),earDecor);}
 function card(s){const text=compose(s),saved=hasSaved(s),animal=ANIMALS.find(x=>x.id===animalForEar(s.ears));const c=el('article','puppy-card'),top=el('div','card-portrait');const saveBtn=button('card-save',saved?'♥':'♡',()=>save(s));localizedAttr(saveBtn,'aria-label',(saved?'取消收藏 ':'收藏 ')+text);saveBtn.setAttribute('aria-pressed',String(saved));const face=el('span','kaomoji card-puppy',text);face.dir='ltr';if(Array.from(text).length>25)face.style.fontSize='16px';top.append(face,saveBtn);const bottom=el('div','card-bottom'),animalName=animal?.name||'团子';const name=el('span','card-name',s.accessories?.wings?'天使'+animalName:s.accessories?.horns?'恶魔'+animalName:PARTS.eyes[s.eyes].mood+animalName);name.append(el('small','',PARTS.ears[s.ears].name));const actions=el('div','card-actions');actions.append(button('','捏捏',()=>{quietFace=true;change(()=>{state=cloneState(s);counter++});showView('studio');$('.workbench').scrollIntoView({behavior:'smooth',block:'start'})}),button('','复制',()=>copy(s)));bottom.append(name,actions);c.append(top,bottom);return c}
 function matches(s){if(filter==='全部团子')return true;if(filter==='新到表情')return FRESH_LOOKS.some(x=>compose(x.state)===compose(s));const animal=ANIMALS.find(x=>x.name===filter);if(animal)return animalForEar(s.ears)===animal.id;if(filter==='小恶魔')return (s.accessories?.horns||0)>0;if(filter==='小天使')return (s.accessories?.wings||0)>0;return PARTS.eyes[s.eyes].mood===filter}
 function renderGallery(){$('#gallery').replaceChildren(...gallery.filter(matches).slice(0,12).map(card))}
@@ -218,11 +218,12 @@ $$('[data-language]').forEach(b=>b.addEventListener('click',()=>{language=b.data
 // 2026-11-23 界（拾提，照 Live2D 的思路）：「拆零件」。点颜文字，把它拆成一块块零件：
 // × 删掉这一块，点进去可以改字。删掉、改过的零件会一直保持，
 // 直到在下面重新选这个部件，才会被新部件覆盖。撤回照常可用。
-const slotOrder=[['prefix','前装饰'],['wingLeft','左翅膀','wings'],['left','左耳'],['hornLeft','左角','horns'],['blushLeft','左腮红'],['eyeLeft','左眼'],['mouth','嘴巴'],['eyeRight','右眼'],['blushRight','右腮红'],['hornRight','右角','horns'],['right','右耳'],['wingRight','右翅膀','wings'],['tail','尾巴','tail'],['suffix','后装饰']];
+const slotOrder=[['prefix','前装饰'],['wingLeft','左翅膀','wings'],['handLeft','左手','hands'],['left','左耳'],['hornLeft','左角','horns'],['blushLeft','左腮红'],['eyeLeft','左眼'],['mouth','嘴巴'],['eyeRight','右眼'],['blushRight','右腮红'],['hornRight','右角','horns'],['right','右耳'],['handRight','右手','hands'],['wingRight','右翅膀','wings'],['tail','尾巴','tail'],['suffix','后装饰']];
 function slotDefault(key){const v=values({...state,custom:{}}),a=state.accessories||{};
  if(key==='hornLeft')return ACCESSORIES.horns[a.horns||0].v[0];if(key==='hornRight')return ACCESSORIES.horns[a.horns||0].v[1];
  if(key==='wingLeft')return ACCESSORIES.wings[a.wings||0].v[0];if(key==='wingRight')return ACCESSORIES.wings[a.wings||0].v[1];
- if(key==='tail')return ACCESSORIES.tail[a.tail||0].v;return v[key]??''}
+ if(key==='handLeft'||key==='handRight')return a.hands?ACCESSORIES.hands[a.hands].v[key==='handLeft'?0:1]:''
+if(key==='tail')return ACCESSORIES.tail[a.tail||0].v;return v[key]??''}
 function slotValue(key){return Object.hasOwn(state.custom,key)?state.custom[key]:slotDefault(key)}
 const cleanSlot=v=>Array.from(v.replace(/[\u0000-\u001f\u007f‪-‮⁦-⁩]/gu,'')).slice(0,16).join('');
 function earSlots(side){

@@ -4,7 +4,8 @@ import {PARTS,ACCESSORIES,FRESH_LOOKS,compose,cloneState,validState} from '../di
 import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from '../dist/picker.js';
 
 test('every category starts with at most eight choices; expansion restores all',()=>{
-  for(const [key,items] of Object.entries({...PARTS,...ACCESSORIES})){
+  for(const [key,all] of Object.entries({...PARTS,...ACCESSORIES})){
+    const items=all.filter(x=>!x.hidden); // 2026-11-23：绑着手的旧零件藏起来了
     const short=partTray(key);assert.equal(short.visible.length,Math.min(8,items.length));assert.equal(short.total,items.length);
     assert.equal(short.hasMore,items.length>8);
     const full=partTray(key,{expanded:true});assert.equal(full.visible.length,items.length);assert.equal(new Set(full.visible).size,items.length);
@@ -41,7 +42,7 @@ test('invalid and blocked recent storage falls back safely without hiding all pa
 test('clear removes the current face and accessories while leaving a restorable snapshot',()=>{
   const previous=cloneState({...FRESH_LOOKS[7].state,ears:1,accessories:{horns:1,tail:2,wings:1}}),before=compose(previous);
   const cleared=clearFace(previous);assert(validState(cleared));assert.equal(cleared.ears,previous.ears);
-  assert.deepEqual(cleared.accessories,{horns:0,tail:0,wings:0});assert.equal(cleared.custom.eyeLeft,'');assert.equal(cleared.custom.eyeRight,'');assert.equal(cleared.custom.mouth,'');assert.equal(cleared.decor,0);
+  assert.deepEqual(cleared.accessories,{horns:0,tail:0,wings:0,hands:0});assert.equal(cleared.custom.eyeLeft,'');assert.equal(cleared.custom.eyeRight,'');assert.equal(cleared.custom.mouth,'');assert.equal(cleared.decor,0);
   assert.equal(compose(previous),before);assert.equal(compose(cloneState(previous)),before);
 });
 test('mobile dock collapses after the sticky boundary and expands when returning',()=>{

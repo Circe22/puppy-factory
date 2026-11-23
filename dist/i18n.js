@@ -3,6 +3,7 @@ export const LANGUAGE_KEY = 'puppy-factory:language';
 export const EN = {
   '弯弯笑眼': 'Crescent smile eyes', '张嘴大笑': 'Big laugh', '紧凑圆脸': 'Snug round face', '举手欢呼': 'Hands up cheer', '欢呼团子': 'Cheering dango',
   '皱眉豆豆眼': 'Frowny dot eyes', '软团贴脸': 'Snug soft ears', '气鼓鼓': 'Huffy cheeks', '气气团子': 'Huffy dango', '生气': 'Huffy',
+  '不带手': 'No hands', '举起爪爪': 'Paws up', '握拳小手': 'Little fists', '欢呼小手': 'Cheering hands', '抱抱小手': 'Hugging hands', '伸出小爪': 'Reaching paw', '捧着心心': 'Holding a heart', '狐狸尖尖': 'Pointy fox ears', '星星腮': 'Star cheek', '小手': 'Hands', '举在外面，或者抱在怀里': 'Raised outside, or hugged inside', '左手': 'Left hand', '右手': 'Right hand',
   '凸凸手': 'Double flip-off', '一字小嘴': 'Flat dash mouth', '贱贱团子': 'Cheeky bun',
   '肉垫小嘴': 'Paw-pad mouth', '尖尖小嘴': 'Pointy mouth', '波浪小嘴': 'Wavy mouth', '小方嘴': 'Little square mouth', '憋住的小尖嘴': 'Held-in pout',
   '挑眉眯眼': 'Smug squint', '软软眯眼': 'Soft squint', '鼓气斜眼': 'Huffy glance', '憋泪一线': 'Holding back tears', '皱眉圆眼': 'Frowny round eyes', '哭唧唧': 'Sobbing', '亮晶晶豆豆': 'Sparkly dots', '翻白眼': 'Eye roll',

@@ -59,8 +59,8 @@ export function animalForEar(index){
   if(!Number.isInteger(index)||index<0||index>=PARTS.ears.length)return null;
   return PARTS.ears[index].animal||([11,12,13].includes(index)?'cat':'dog');
 }
-export const DEFAULT={ears:1,eyes:0,mouth:0,decor:1,custom:{},accessories:{horns:0,tail:0,wings:0}};
-export function cloneState(s){return {...s,custom:{...s.custom},accessories:{horns:0,tail:0,wings:0,...s.accessories}}}
+export const DEFAULT={ears:1,eyes:0,mouth:0,decor:1,custom:{},accessories:{horns:0,tail:0,wings:0,hands:0}};
+export function cloneState(s){return {...s,custom:{...s.custom},accessories:{horns:0,tail:0,wings:0,hands:0,...s.accessories}}}
 // 2026-11-23 界（拾提）：带脸框的耳朵（如 ૮(ᐢ ）拆成三块：外耳、脸边、内侧，可以只删里面的小耳朵
 export const EAR_FRAMES=new Set(['(',')','₍','₎','꒰','꒱','[',']','（','）','ʕ','ʔ']);
 export function earPieces(str,side){const chars=Array.from(str);const i=side==='left'?chars.findIndex(ch=>EAR_FRAMES.has(ch)):chars.findLastIndex(ch=>EAR_FRAMES.has(ch));if(i<0)return null;const before=chars.slice(0,i).join(''),frame=chars[i],after=chars.slice(i+1).join('');return side==='left'?{outer:before,frame,inner:after}:{inner:before,frame,outer:after}}
@@ -105,6 +105,19 @@ function trimEarEdge(segments,edge){
     if(segment[1])return;
   }
 }
+function handParts(accessories,custom){
+  const index=accessories.hands||0,item=ACCESSORIES.hands?.[index];
+  if(!index||!item)return {outside:false,inside:false};
+  const inside=item.pos==='in';
+  return {outside:!inside,inside,left:custom.handLeft??item.v[0],right:custom.handRight??item.v[1]};
+}
+// 抱在里面的手：有脸框就塞在脸框里面（ʕっ ・ᴥ・ っʔ），没有脸框就贴着耳朵内侧。
+function insertInside(segments,hand,side){
+  const frame=segments.findIndex(([key])=>key===side+'Frame');
+  if(frame>=0)segments.splice(side==='left'?frame+1:frame,0,hand);
+  else if(side==='left')segments.push(hand);
+  else segments.unshift(hand);
+}
 export function composeParts(s){
   const custom=s.custom||{};
   const accessories=s.accessories||{};
@@ -116,6 +129,9 @@ export function composeParts(s){
   const horns=ACCESSORIES.horns[accessories.horns||0].v;
   const wings=ACCESSORIES.wings[accessories.wings||0].v;
   const tail=ACCESSORIES.tail[accessories.tail||0].v;
+  // 2026-11-23 拾：手从耳朵和装饰里拆出来，单独一个零件。举在外面的贴着耳朵外侧，抱在里面的贴着脸框内侧。
+  const hand=handParts(accessories,custom);
+  if(hand.inside){insertInside(left,['handLeft',hand.left],'left');insertInside(right,['handRight',hand.right],'right')}
   if(accessories.horns){
     trimEarEdge(left,'end');
     trimEarEdge(right,'start');
@@ -123,6 +139,7 @@ export function composeParts(s){
   return [
     ['prefix',face.prefix],
     ['wingLeft',accessories.wings?(custom.wingLeft??wings[0]):''],
+    ...(hand.outside?[['handLeft',hand.left]]:[]),
     ...left,
     ['hornLeft',accessories.horns?(custom.hornLeft??horns[0]):''],
     ['blushLeft',face.blushLeft],
@@ -134,13 +151,14 @@ export function composeParts(s){
     ['blushRight',face.blushRight],
     ['hornRight',accessories.horns?(custom.hornRight??horns[1]):''],
     ...right,
+    ...(hand.outside?[['handRight',hand.right]]:[]),
     ['wingRight',accessories.wings?(custom.wingRight??wings[1]):''],
     ['tail',accessories.tail?(custom.tail??tail):''],
     ['suffix',face.suffix]
   ];
 }
 export function compose(s){return joinSegments(composeParts(s))}
-export function randomState(family=null,mood=null,rng=Math.random){const pick=a=>a[Math.floor(rng()*a.length)];const indexes=(key,fn)=>PARTS[key].map((v,i)=>({v,i})).filter(x=>!fn||fn(x.v)).map(x=>x.i);return {ears:pick(indexes('ears',family?v=>v.family===family:null)),eyes:pick(indexes('eyes',mood?v=>v.mood===mood:null)),mouth:pick(indexes('mouth')),decor:pick(indexes('decor')),custom:{}}}
+export function randomState(family=null,mood=null,rng=Math.random){const pick=a=>a[Math.floor(rng()*a.length)];const indexes=(key,fn)=>PARTS[key].map((v,i)=>({v,i})).filter(x=>!x.v.hidden&&(!fn||fn(x.v))).map(x=>x.i);return {ears:pick(indexes('ears',family?v=>v.family===family:null)),eyes:pick(indexes('eyes',mood?v=>v.mood===mood:null)),mouth:pick(indexes('mouth')),decor:pick(indexes('decor')),custom:{}}}
 // Random and ready-made little creatures share the same existing Unicode composer.
 export function randomAnimalState(animalId,mood=null,rng=Math.random){
   const animal=ANIMALS.find(a=>a.id===animalId);
@@ -163,7 +181,7 @@ export const ANIMAL_LOOKS=ANIMALS.map(animal=>({
   id:animal.id,name:animal.name+'团子',
   state:{...cloneState(DEFAULT),ears:animal.earIndex,mouth:animal.mouthIndex}
 }));
-export function validState(s){return !!s&&(s.spacing===undefined||s.spacing===''||s.spacing===' ')&&['ears','eyes','mouth','decor'].every(k=>Number.isInteger(s[k])&&s[k]>=0&&s[k]<PARTS[k].length)&&(!s.accessories||(typeof s.accessories==='object'&&Object.entries(s.accessories).every(([k,v])=>Object.hasOwn(ACCESSORIES,k)&&Number.isInteger(v)&&v>=0&&v<ACCESSORIES[k].length)))&&(!s.custom||Object.entries(s.custom).every(([k,v])=>['left','right','eyeLeft','eyeRight','mouth','prefix','suffix','blushLeft','blushRight','hornLeft','hornRight','wingLeft','wingRight','tail','leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter'].includes(k)&&typeof v==='string'&&Array.from(v).length<=16&&!/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(v)))}
+export function validState(s){return !!s&&(s.spacing===undefined||s.spacing===''||s.spacing===' ')&&['ears','eyes','mouth','decor'].every(k=>Number.isInteger(s[k])&&s[k]>=0&&s[k]<PARTS[k].length)&&(!s.accessories||(typeof s.accessories==='object'&&Object.entries(s.accessories).every(([k,v])=>Object.hasOwn(ACCESSORIES,k)&&Number.isInteger(v)&&v>=0&&v<ACCESSORIES[k].length)))&&(!s.custom||Object.entries(s.custom).every(([k,v])=>['left','right','eyeLeft','eyeRight','mouth','prefix','suffix','blushLeft','blushRight','hornLeft','hornRight','wingLeft','wingRight','tail','leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter','handLeft','handRight'].includes(k)&&typeof v==='string'&&Array.from(v).length<=16&&!/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(v)))}
 export function readFavorites(storage){try{const data=JSON.parse(storage.getItem('puppy-factory:favorites')||'[]');return Array.isArray(data)?data.filter(validState).slice(0,500).map(cloneState):[]}catch{return []}}
 export function writeFavorites(storage,list){try{storage.setItem('puppy-factory:favorites',JSON.stringify(list));return true}catch{return false}}
 export async function copyText(text,nav,doc){try{if(nav.clipboard?.writeText){await nav.clipboard.writeText(text);return 'clipboard'}}catch{}const active=doc.activeElement;const input=doc.createElement('textarea');input.value=text;input.setAttribute('readonly','');input.setAttribute('dir','ltr');input.style.cssText='position:fixed;top:0;left:0;opacity:0;font-size:16px';doc.body.append(input);input.focus();input.select();input.setSelectionRange(0,text.length);let copied=false;try{copied=doc.execCommand('copy')}catch{}finally{input.remove();active?.focus?.()}return copied?'fallback':'manual'}
@@ -235,3 +253,30 @@ ANIMAL_LOOKS.find(l=>l.id==='rabbit').state.ears=softBunnyEars;
 const flipEars=addPart('ears',{name:'凸凸手',v:['凸','凸'],family:'soft',spacing:'',hands:true});
 const dashMouth=addPart('mouth',{name:'一字小嘴',v:'-'});
 FRESH_LOOKS.push({name:'贱贱团子',expected:'凸^-^凸',state:{ears:flipEars,eyes:14,mouth:dashMouth,decor:0}});
+
+// 2026-11-23 18:29 拾：「分类有点乱，特别是耳朵和手……把手拆开放到耳朵装饰这一边」。
+// 手单独做成一个零件（存在 accessories.hands，和角、尾巴、翅膀一样可以单独换）。
+// 原来绑着手的耳朵、装饰都不删（收藏过的团子打开还是原样），只是从列表和随机里藏起来。
+ACCESSORIES.hands=[
+  {name:'不带手',v:['','']},
+  {name:'举起爪爪',v:['ฅ','ฅ'],pos:'out'},
+  {name:'凸凸手',v:['凸','凸'],pos:'out'},
+  {name:'握拳小手',v:['o','o'],pos:'out'},
+  {name:'欢呼小手',v:['٩','و'],pos:'out'},
+  {name:'抱抱小手',v:['っ','っ'],pos:'in'},
+  {name:'伸出小爪',v:['',' っ'],pos:'out'},
+  {name:'捧着心心',v:['',' つ♡'],pos:'out'}
+];
+export const HANDS={paws:1,flip:2,fist:3,cheer:4,hug:5,reach:6,heart:7};
+const foxPointEars=addPart('ears',{name:'狐狸尖尖',v:['^','^'],animal:'fox',spacing:''});
+const cheerStarDecor=addPart('decor',{name:'星星腮',v:['','','*','']});
+for(const i of [11,19,20,fistEars,flipEars]){PARTS.ears[i].hidden=true;PARTS.ears[i].noRandom=true}
+for(const i of [3,10,11,cheerDecor])PARTS.decor[i].hidden=true;
+// 狐狸默认换成蓬蓬耳（不带手），按「狐狸」时和预览长得一样。
+ANIMALS.find(a=>a.id==='fox').earIndex=21;
+ANIMAL_LOOKS.find(l=>l.id==='fox').state.ears=21;
+// 用到旧捆绑零件的现成造型，换成「干净耳朵 + 小手」，拼出来一字不差。
+const withHands=(look,patch,hands)=>{Object.assign(look.state,patch);look.state.accessories={horns:0,tail:0,wings:0,...look.state.accessories,hands}};
+withHands(FRESH_LOOKS.find(l=>l.name==='鼓气包'),{ears:tightEars},HANDS.fist);
+withHands(FRESH_LOOKS.find(l=>l.name==='欢呼团子'),{decor:cheerStarDecor},HANDS.cheer);
+withHands(FRESH_LOOKS.find(l=>l.name==='贱贱团子'),{ears:freshEars[2]},HANDS.flip);
