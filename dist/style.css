@@ -114,3 +114,11 @@
 /* 2026-11-23 拾：卡片里太长的颜表情还能左右滑，但不要露出那条粗滚动条。 */
 .preset .kaomoji,.card-puppy{scrollbar-width:none;-ms-overflow-style:none}
 .preset .kaomoji::-webkit-scrollbar,.card-puppy::-webkit-scrollbar{display:none}
+/* 2026-11-23 拾：零件改成换装游戏式——一次一格，两排左右滑。 */
+.part-rail{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-template-rows:repeat(2,auto);grid-auto-columns:calc((100% - 28px)/5.4);gap:7px;min-height:0;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:2px 1px 10px;scrollbar-width:thin;scrollbar-color:#d8afa9 transparent}
+.part-rail::-webkit-scrollbar{height:4px}.part-rail::-webkit-scrollbar-thumb{background:#d8afa9;border-radius:4px}
+.part-rail>.choice{scroll-snap-align:start;min-width:0;flex:none}
+.part-rail .kaomoji{white-space:pre;overflow:hidden;text-overflow:clip}
+#all-parts>.picker-section,#all-parts>.ear-decor-group{border-top:0;padding-top:6px}
+.ear-decor-group>.picker-section+.picker-section{border-top:1px solid var(--line)}
+@media(max-width:720px){.part-rail{grid-auto-columns:calc((100% - 21px)/4.3)}}

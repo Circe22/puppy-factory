@@ -35,7 +35,7 @@ export const EN = {
   '眼睛、嘴巴直接点选，配件可以叠加哦': 'Pick eyes and a mouth. Stack accessories, too!',
   '跳到零件分区': 'Jump to a part section', '眼睛': 'Eyes', '嘴巴': 'Mouth',
   '角·尾巴·翅膀': 'Accessories', '耳朵·装饰': 'Ears & extras',
-  '捏捏你的小狗': 'Make your little puppy', '常用零件先看 8 个': '8 favorites first',
+  '捏捏你的小狗': 'Make your little puppy', '常用零件先看 8 个': '8 favorites first', '点上面的标签换一格，左右滑挑零件': 'Pick a tab above, then swipe for parts',
   '新到的小表情': 'Fresh little faces', '左右滑动 · 点一下就能继续捏': 'Swipe, tap, and make it yours',
   '一键穿搭': 'Ready-to-wear looks', '左右滑动看更多': 'Swipe for more', '选择小狗家族': 'Choose a puppy family',
   '只换耳朵，保留表情和配件': 'Change ears, keep the face and accessories',
