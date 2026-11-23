@@ -37,7 +37,7 @@ export const EN = {
   '角·尾巴·翅膀': 'Accessories', '耳朵·装饰': 'Ears & extras',
   '捏捏你的小狗': 'Make your little puppy', '常用零件先看 8 个': '8 favorites first', '点上面的标签换一格，左右滑挑零件': 'Pick a tab above, then swipe for parts',
   '新到的小表情': 'Fresh little faces', '左右滑动 · 点一下就能继续捏': 'Swipe, tap, and make it yours',
-  '一键穿搭': 'Ready-to-wear looks', '左右滑动看更多': 'Swipe for more', '选择小狗家族': 'Choose a puppy family',
+  '一键穿搭': 'Ready-to-wear looks', '选择要换的零件': 'Choose which part to change', '左右滑动看更多': 'Swipe for more', '选择小狗家族': 'Choose a puppy family',
   '只换耳朵，保留表情和配件': 'Change ears, keep the face and accessories',
   '脸部间距': 'Face spacing', '紧凑贴贴': 'Snug', '松软留白': 'Airy', '当前配方': 'Your recipe',
   '小狗集合啦': 'The puppy parade', '遇到喜欢的，就把它带走吧。': 'Find a favorite and take it along.',

@@ -122,3 +122,8 @@
 #all-parts>.picker-section,#all-parts>.ear-decor-group{border-top:0;padding-top:6px}
 .ear-decor-group>.picker-section+.picker-section{border-top:1px solid var(--line)}
 @media(max-width:720px){.part-rail{grid-auto-columns:calc((100% - 21px)/4.3)}}
+
+.part-switch{display:flex;gap:4px;background:#f6ece6;border:1px solid var(--line);border-radius:16px;padding:4px;margin:6px 0 10px;position:relative}
+.part-switch button{flex:1 1 auto;border:0;background:none;border-radius:12px;padding:9px 4px;font-size:12px;color:#9a8277;white-space:nowrap;min-height:38px}
+.part-switch button[aria-selected=true]{background:#fffaf5;color:#b9637b;font-weight:650;box-shadow:0 1px 4px #8a5a4a1f}
+@media(max-width:380px){.part-switch button{font-size:11px;padding:8px 2px}}
