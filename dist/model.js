@@ -146,7 +146,9 @@ export function randomAnimalState(animalId,mood=null,rng=Math.random){
   const animal=ANIMALS.find(a=>a.id===animalId);
   if(!animal)throw new RangeError('Unknown animal: '+animalId);
   const state=randomState(null,mood,rng);
-  const ears=PARTS.ears.map((_,i)=>i).filter(i=>animalForEar(i)===animalId);
+  // 2026-11-23 拾：外耳和内侧都是耳朵的（如 ૮(ᐢ ᐢ)ა），随机时不抽；用户自己选照样能用。
+  const allEars=PARTS.ears.map((_,i)=>i).filter(i=>animalForEar(i)===animalId);
+  const ears=allEars.filter(i=>!PARTS.ears[i].doubleEars).length?allEars.filter(i=>!PARTS.ears[i].doubleEars):allEars;
   state.ears=ears[Math.min(ears.length-1,Math.floor(rng()*ears.length))];
   state.mouth=animal.mouthIndex;
   // 2026-11-23 界（拾发现「四个爪爪」）：耳朵里已经带了 ฅ 之类的字，随机时就不再配同样字的装饰，免得重复
@@ -219,3 +221,5 @@ FRESH_LOOKS.push(
 // 2026-11-23 拾：「左内侧、右内侧其实也是手」——给带手的零件偷偷打标签，随机时手不和手撞。
 for(const i of [11,16,19,20,fistEars])PARTS.ears[i].hands=true;
 for(const i of [3,10,11,15])PARTS.decor[i].hands=true;
+// 外耳 ૮ ა 和内侧 ᐢ 都是耳朵，一张脸上两对耳朵，随机时跳过。
+PARTS.ears[17].doubleEars=true;

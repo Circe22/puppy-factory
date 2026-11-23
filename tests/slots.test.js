@@ -82,3 +82,12 @@ test('随机：耳朵里带手（如 ʕっ っʔ）时，不配带手的装饰�
   assert.ok(validState(manual));
   assert.ok(compose(manual).includes('ฅ') && compose(manual).includes('っ'));
 });
+
+test('随机：外耳和内侧都是耳朵的 ૮(ᐢ ᐢ)ა 不会被随机出来，但手动能选', async () => {
+  const {randomAnimalState, ANIMALS, PARTS, compose, cloneState, validState} = await import('../dist/model.js');
+  const double = PARTS.ears.findIndex(e => e.v[0] === '૮(ᐢ ');
+  assert.ok(PARTS.ears[double].doubleEars);
+  for (const a of ANIMALS) for (let i = 0; i < 400; i++) assert.notEqual(randomAnimalState(a.id).ears, double, a.id);
+  const manual = cloneState({ears: double, eyes: 0, mouth: 0, decor: 0});
+  assert.ok(validState(manual)); assert.ok(compose(manual).startsWith('૮(ᐢ'));
+});
