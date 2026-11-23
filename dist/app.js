@@ -232,7 +232,7 @@ function card(s){
   change(()=>{state=cloneState(s);counter++});
   showView('studio');
   window.scrollTo(0,$('.workbench').getBoundingClientRect().top+window.scrollY-dockOffset());
- }),button('','带走',()=>takeCreature(s)));
+ }),button('','复制',()=>takeCreature(s)));
  bottom.append(name,actions);c.append(top,bottom);return c;
 }
 function matches(s){
