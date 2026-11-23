@@ -283,3 +283,11 @@ withHands(FRESH_LOOKS.find(l=>l.name==='贱贱团子'),{ears:freshEars[2]},HANDS
 
 // 2026-11-23 18:54 拾：想要 = = 这种眯眯眼；软软眯眼、亮晶晶豆豆也都留着。
 addPart('eyes',{name:'眯眯眼',v:['=','='],mood:'撒娇'});
+
+// 2026-11-23 19:18 拾：小猫、狐狸、兔兔都用 ᐢ，看着一样。
+// 狐狸回到原来的 ฅ^ ^ฅ（干净尖耳 + 自动配的爪爪）；小猫换成大三角耳 /ᐠ ᐟ\（字体包 19，DejaVu Sans）。
+const catTriEars=addPart('ears',{name:'猫猫三角耳',v:['/ᐠ','ᐟ\\'],animal:'cat',spacing:''});
+ANIMALS.find(a=>a.id==='cat').earIndex=catTriEars;
+ANIMAL_LOOKS.find(l=>l.id==='cat').state.ears=catTriEars;
+const fox=ANIMALS.find(a=>a.id==='fox');fox.earIndex=foxPointEars;fox.hands=HANDS.paws;
+Object.assign(ANIMAL_LOOKS.find(l=>l.id==='fox').state,{ears:foxPointEars,accessories:{horns:0,tail:0,wings:0,hands:HANDS.paws}});

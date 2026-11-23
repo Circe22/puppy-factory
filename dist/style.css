@@ -134,3 +134,5 @@
 /* 2026-11-23 拾：「不带」那一格用标签栏的底色，一眼找到；固定排在第一个。 */
 .choice.none-choice{background:#f6ece6;border-color:#ead8d0}
 .choice.none-choice[aria-pressed=true]{background:#f1d5dd;border-color:#ba6b83}
+
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-19.woff?v=1') format('woff');font-display:swap;unicode-range:U+141F,U+1420}
