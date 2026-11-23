@@ -108,7 +108,7 @@ function buildCustom(k){const details=el('details','custom-editor');details.appe
 function syncCustom(){const v=values(state);$$('[data-custom]').forEach(input=>input.value=v[input.dataset.custom])}
 function updateTray(tray){
  const result=partTray(tray.key,{recent,expanded:tray.rail||tray.expanded,query:tray.query,mood:tray.mood});
- const visible=new Set(result.visible),order=[...result.visible,...tray.buttons.keys()].filter((x,i,a)=>a.indexOf(x)===i);
+ const visible=new Set(result.visible),order=[...((tray.key==='decor'||Object.hasOwn(ACCESSORIES,tray.key))&&visible.has(0)?[0]:[]),...result.visible,...tray.buttons.keys()].filter((x,i,a)=>a.indexOf(x)===i);
  const focused=document.activeElement;
  if(tray.lastOrder!==order.join(',')&&(!tray.rail||!tray.lastOrder||tray.allowReorder)){tray.grid.append(...order.map(i=>tray.buttons.get(i)));tray.lastOrder=order.join(',')}
  tray.buttons.forEach((b,i)=>{b.hidden=!visible.has(i);b.classList.toggle('recent-choice',(recent[tray.key]||[]).includes(i));localizedAttr(b,'title',((recent[tray.key]||[]).includes(i)?'最近使用 · ':'')+tray.items[i].name)});
@@ -134,7 +134,7 @@ function buildPart(k,open=true){
   search.addEventListener('input',()=>{tray.query=search.value;tray.expanded=false;updateTray(tray)});tray.search=search;section.append(search);
  }
  PARTS[k].forEach((x,i)=>{
-  const b=button('choice','',()=>change(()=>{state[k]=i;customKeys[k].forEach(key=>delete state.custom[key]);rememberPart(k,i)}));
+  const b=button('choice'+(k==='decor'&&i===0?' none-choice':''),'',()=>{const cur=state[k];if(cur===i&&prevPick[k]===undefined)return;change(()=>{if(cur===i){state[k]=prevPick[k];delete prevPick[k]}else{prevPick[k]=cur;state[k]=i}customKeys[k].forEach(key=>delete state.custom[key]);rememberPart(k,state[k])})});
   b.dataset.choice=k;b.dataset.index=i;localizedAttr(b,'aria-label',labels[k]+'：'+x.name);b.append(el('span','kaomoji',sample(k,x)),el('small','',x.name));tray.buttons.set(i,b);
  });
  tray.toggle=button('expand-parts','展开全部 ▾',()=>{tray.expanded=!tray.expanded;updateTray(tray)});tray.toggle.setAttribute('aria-controls',grid.id);
@@ -146,7 +146,7 @@ function buildAccessories(rows=[['horns','小恶魔角'],['tail','小尾巴'],['
   const row=el('fieldset','accessory-row'),legend=el('legend','',label),count=el('span','accessory-count');legend.append(count);row.append(legend);
   const grid=el('div','accessory-choices part-rail');grid.id='choices-'+key;const empty=el('p','part-empty');empty.hidden=true;
   const tray={key,grid,count,empty,expanded:false,rail:true,query:'',mood:'常用',buttons:new Map(),items:ACCESSORIES[key]};
-  ACCESSORIES[key].forEach((x,i)=>{const b=button('choice accessory-choice','',()=>change(()=>{const selected=state.accessories[key]===i?0:i;state.accessories[key]=selected;accessorySlots[key].forEach(slot=>delete state.custom[slot]);rememberPart(key,selected)}));b.dataset.accessory=key;b.dataset.index=i;localizedAttr(b,'aria-label',x.name);b.append(el('span','kaomoji',i===0?'—':Array.isArray(x.v)?x.v.join('\u200e ◦ \u200e'):x.v.trim()),el('small','',x.name));tray.buttons.set(i,b)});
+  ACCESSORIES[key].forEach((x,i)=>{const b=button('choice accessory-choice'+(i===0?' none-choice':''),'',()=>{const cur=state.accessories[key]||0;let selected;if(cur===i){if(prevPick[key]===undefined&&i===0)return;selected=prevPick[key]??0;delete prevPick[key]}else{prevPick[key]=cur;selected=i}change(()=>{state.accessories[key]=selected;accessorySlots[key].forEach(slot=>delete state.custom[slot]);rememberPart(key,selected)})});b.dataset.accessory=key;b.dataset.index=i;localizedAttr(b,'aria-label',x.name);b.append(el('span','kaomoji',i===0?'—':Array.isArray(x.v)?x.v.join('\u200e ◦ \u200e'):x.v.trim()),el('small','',x.name));tray.buttons.set(i,b)});
   tray.toggle=button('expand-parts','展开全部 ▾',()=>{tray.expanded=!tray.expanded;updateTray(tray)});tray.toggle.setAttribute('aria-controls',grid.id);trays.set(key,tray);row.append(grid,tray.toggle);section.append(row);
  }
  return section;
@@ -154,6 +154,8 @@ function buildAccessories(rows=[['horns','小恶魔角'],['tail','小尾巴'],['
 function buildControls(){buildFamilies();FRESH_LOOKS.forEach(look=>{const b=button('preset fresh-preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#fresh-presets').append(b)});$$('[data-spacing]').forEach(b=>b.addEventListener('click',()=>change(()=>{state.spacing=b.dataset.spacing}))); [...ANIMAL_LOOKS,...looks].forEach(look=>{const b=button('preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#presets').append(b)});const earDecor=el('section','ear-decor-group');earDecor.id='picker-ears-and-decor';earDecor.append(buildPart('ears'),buildAccessories([['hands','']],'小手','举在外面，或者抱在怀里','picker-hands'),buildPart('decor'));const face=el('section','ear-decor-group face-group');face.id='picker-face';face.append(buildPart('eyes'),buildPart('mouth'));$('#all-parts').append(face,buildAccessories(),earDecor);showPart(activePart);}
 // 2026-11-23 拾：像换装游戏一样——顶上的「眼睛 / 嘴巴 / 角 / 耳朵」是切换标签，下面一次只摆一格衣柜，每格两排左右滑。
 // 2026-11-23 19:08 拾：眼睛、嘴巴合成一格「眼睛·嘴巴」；耳朵那格叫「耳朵·装饰·爪爪」。
+// 2026-11-23 拾：选中的零件再点一下＝反悔这一下，回到点它之前的那一个（配件一开始是「不带」，所以通常就是取消）。
+const prevPick={};
 const PART_TABS=['face','accessories','ears-and-decor'];let activePart='face';
 function showPart(id){if(!PART_TABS.includes(id))return;activePart=id;/* 横滑时点一下不让零件跳走：只在换标签时按「最近用过」重新排 */trays.forEach(t=>{const before=t.lastOrder;t.allowReorder=true;updateTray(t);t.allowReorder=false;if(t.rail&&t.lastOrder!==before)t.grid.scrollLeft=0});PART_TABS.forEach(x=>{const s=document.getElementById('picker-'+x);if(s)s.hidden=x!==id});document.querySelectorAll('[data-jump]').forEach(b=>{if(b.dataset.jump===id)b.setAttribute('aria-current','location');else b.removeAttribute('aria-current')});document.querySelectorAll('[data-part-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.partTab===id)))}
 // 2026-11-23 拾：零件区上面也放一排标签，免得有人没发现顶上那排能切换。这里点了只换格子，不滚动。
