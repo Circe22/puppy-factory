@@ -170,3 +170,9 @@ const cheerMouth=addPart('mouth',{name:'张嘴大笑',v:'ᗜ'});
 const tightEars=addPart('ears',{name:'紧凑圆脸',v:['(',')'],family:'soft',spacing:''});
 const cheerDecor=addPart('decor',{name:'举手欢呼',v:['٩','','*','و']});
 FRESH_LOOKS.push({name:'欢呼团子',expected:'٩(ˊᗜˋ*)و',state:{ears:tightEars,eyes:cheerEyes,mouth:cheerMouth,decor:cheerDecor,spacing:''}});
+
+// 2026-11-23 界（拾：「加个这个气气素材好不好？」૮₍ꐦ˶•᷅ ﻌ •᷄˶₎ა）：拆成零件，只往后追加，不改已有编号
+const angryEyes=addPart('eyes',{name:'皱眉豆豆眼',v:['•᷅','•᷄'],mood:'生气'});
+const snugSoftEars=addPart('ears',{name:'软团贴脸',v:['૮₍','₎ა'],family:'soft',spacing:' '});
+const angryDecor=addPart('decor',{name:'气鼓鼓',v:['','ꐦ˶','˶','']});
+FRESH_LOOKS.push({name:'气气团子',expected:'૮₍ꐦ˶•᷅ ﻌ •᷄˶₎ა',state:{ears:snugSoftEars,eyes:angryEyes,mouth:0,decor:angryDecor}});
