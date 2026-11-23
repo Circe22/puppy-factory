@@ -280,3 +280,6 @@ const withHands=(look,patch,hands)=>{Object.assign(look.state,patch);look.state.
 withHands(FRESH_LOOKS.find(l=>l.name==='鼓气包'),{ears:tightEars},HANDS.fist);
 withHands(FRESH_LOOKS.find(l=>l.name==='欢呼团子'),{decor:cheerStarDecor},HANDS.cheer);
 withHands(FRESH_LOOKS.find(l=>l.name==='贱贱团子'),{ears:freshEars[2]},HANDS.flip);
+
+// 2026-11-23 18:54 拾：想要 = = 这种眯眯眼；软软眯眼、亮晶晶豆豆也都留着。
+addPart('eyes',{name:'眯眯眼',v:['=','='],mood:'撒娇'});
