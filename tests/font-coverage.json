@@ -252,5 +252,13 @@
     "codepoints": [
       8980
     ]
+  },
+  {
+    "file": "puppy-unicode-19.woff",
+    "source": "DejaVuSans.ttf",
+    "codepoints": [
+      5151,
+      5152
+    ]
   }
 ]

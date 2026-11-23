@@ -162,3 +162,40 @@ html:not(.has-flex-gap) .share-actions>:not([hidden])~:not([hidden]){margin-left
   }
   .compact-copy:hover{background:#964b63}
 }
+
+/* 2026-11-23 拾：「一键穿搭列表太长，要划很久才到眼睛、嘴巴」——改成两排、左右滑，跟「新到的小表情」一样。露出半张卡提示还能往右滑。 */
+.quick-presets .picker-heading{margin-bottom:0}.quick-presets .picker-heading>span:last-child{font-size:9px;color:#ac8d7e}
+.preset-rail{grid-template-columns:none;grid-auto-flow:column;grid-template-rows:repeat(2,auto);grid-auto-columns:calc((100% - 16px)/2.35);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:2px 1px 9px;scrollbar-width:thin;scrollbar-color:#d8afa9 transparent}
+.preset-rail .preset{scroll-snap-align:start;min-width:0}
+.preset-rail::-webkit-scrollbar{height:4px}.preset-rail::-webkit-scrollbar-thumb{background:#d8afa9;border-radius:4px}
+@media(min-width:721px){.preset-rail{grid-auto-columns:calc((100% - 24px)/3.4)}}
+
+/* 2026-11-23 拾：「新到的小表情」和「一键穿搭」挪到零件后面，先捏零件，捏累了再往下看现成的。 */
+.ready-made{border-top:1px solid var(--line);padding-top:21px;margin-top:4px}
+/* 2026-11-23 拾：卡片里太长的颜表情还能左右滑，但不要露出那条粗滚动条。 */
+.preset .kaomoji,.card-puppy{scrollbar-width:none;-ms-overflow-style:none}
+.preset .kaomoji::-webkit-scrollbar,.card-puppy::-webkit-scrollbar{display:none}
+/* 2026-11-23 拾：零件改成换装游戏式——一次一格，两排左右滑。 */
+.part-rail{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-template-rows:repeat(2,auto);grid-auto-columns:calc((100% - 28px)/5.4);gap:7px;min-height:0;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:2px 1px 10px;scrollbar-width:thin;scrollbar-color:#d8afa9 transparent}
+.part-rail::-webkit-scrollbar{height:4px}.part-rail::-webkit-scrollbar-thumb{background:#d8afa9;border-radius:4px}
+.part-rail>.choice{scroll-snap-align:start;min-width:0;flex:none}
+.part-rail .kaomoji{white-space:pre;overflow:hidden;text-overflow:clip}
+#all-parts>.picker-section,#all-parts>.ear-decor-group{border-top:0;padding-top:6px}
+.ear-decor-group>.picker-section+.picker-section{border-top:1px solid var(--line)}
+@media(max-width:720px){.part-rail{grid-auto-columns:calc((100% - 21px)/4.3)}}
+
+.part-switch{display:flex;gap:4px;background:#f6ece6;border:1px solid var(--line);border-radius:16px;padding:4px;margin:6px 0 10px;position:relative}
+.part-switch button{flex:1 1 auto;border:0;background:none;border-radius:12px;padding:9px 4px;font-size:12px;color:#9a8277;white-space:nowrap;min-height:38px}
+.part-switch button[aria-selected=true]{background:#fffaf5;color:#b9637b;font-weight:650;box-shadow:0 1px 4px #8a5a4a1f}
+@media(max-width:380px){.part-switch button{font-size:11px;padding:8px 2px}}
+
+/* 三个标签：眼睛·嘴巴 / 角·尾巴·翅膀 / 耳朵·装饰·爪爪 */
+.dock-tabs{grid-template-columns:1fr 1.15fr 1.25fr}
+
+/* 2026-11-23 拾：「不带」那一格用标签栏的底色，一眼找到；固定排在第一个。 */
+.choice.none-choice{background:#f6ece6;border-color:#ead8d0}
+.choice.none-choice[aria-pressed=true]{background:#f1d5dd;border-color:#ba6b83}
+
+@font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-19.woff?v=1') format('woff');font-display:swap;unicode-range:U+141F,U+1420}
+
+.part-rail .kaomoji{display:block;max-width:100%;overflow:hidden;padding-left:2px;padding-right:2px}

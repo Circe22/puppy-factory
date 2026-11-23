@@ -4,7 +4,8 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#fffaf5"><meta name="description" content="捏一只属于你的字字兽。选小狗、小猫、兔兔或更多小动物，自由拼装颜文字。">
   <title>字字兽 · 颜文字团子工厂</title>
-  <link rel="stylesheet" href="style.css?v=21"><script type="module" src="app.js?v=23"></script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%23f8d6d8'/%3E%3Ctext x='8' y='44' font-size='32'%3EUωU%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css?v=22"><script type="module" src="app.js?v=24"></script>
 </head>
 <body>
   <header class="topbar"><a class="brand" href="#" aria-label="Puppy Factory 首页"><span class="brand-icon" aria-hidden="true">U･ᴥ･U</span><span>字字兽<small>ZIZISHOU · 颜文字团子工厂</small></span></a><nav aria-label="主导航"><button class="nav-item active" data-view="studio">团子工坊</button><button class="nav-item" data-view="favorites">♡ 我的收藏 <span id="favorite-count">0</span></button></nav><div class="language-switch" role="group" aria-label="切换语言"><button type="button" data-language="zh" lang="zh-CN" aria-pressed="true">中文</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div><span class="header-note">made of tiny happiness ✧</span></header>
@@ -25,7 +26,7 @@
               <span class="spark spark-three" aria-hidden="true">✦</span>
               <div class="sticker" aria-hidden="true">100%<br>可爱</div>
               <div class="preview-face-row">
-                <output id="puppy" class="kaomoji" dir="ltr" aria-live="polite" tabindex="0" role="button" title="点一下，拆开零件" aria-label="点一下，拆开零件"><span id="puppy-text" class="preview-text">૮₍ ˶• ﻌ •˶ ₎ა</span></output>
+                <output id="puppy" translate="no" class="kaomoji" dir="ltr" aria-live="polite" tabindex="0" role="button" title="点一下，拆开零件" aria-label="点一下，拆开零件"><span id="puppy-text" class="preview-text">૮₍ ˶• ﻌ •˶ ₎ა</span></output>
                 <div class="compact-actions">
                   <button id="slot-open-compact" type="button" class="compact-edit" aria-label="拆零件"><span aria-hidden="true">✎</span></button>
                   <button id="copy-compact" type="button" class="button primary compact-copy" aria-label="复制团子">
@@ -52,21 +53,21 @@
             </div>
           </div>
           <div class="jump-links dock-tabs" role="navigation" aria-label="跳到零件分区">
-            <button data-jump="eyes" aria-controls="picker-eyes">眼睛</button>
-            <button data-jump="mouth" aria-controls="picker-mouth">嘴巴</button>
+            <button data-jump="face" aria-controls="picker-face">眼睛·嘴巴</button>
+            
             <button data-jump="accessories" aria-controls="picker-accessories">角·尾巴·翅膀</button>
-            <button data-jump="ears-and-decor" aria-controls="picker-ears-and-decor">耳朵·装饰</button>
+            <button data-jump="ears-and-decor" aria-controls="picker-ears-and-decor">耳朵·装饰·爪爪</button>
           </div>
         </div>
-        <div class="controls"><div class="section-title"><h2>捏捏你的字字兽</h2><span class="controls-hint">常用零件先看 8 个</span></div><div class="fresh-section"><div class="picker-heading"><h3>新到的小表情 <span class="new-badge">NEW</span></h3><span>左右滑动 · 点一下就能继续捏</span></div><div id="fresh-presets" class="fresh-presets"></div></div><div class="quick-presets"><span class="picker-label">一键穿搭</span><div id="presets" class="preset-grid"></div></div><fieldset><legend>选择小动物 <small>换一只团子，保留表情与配件</small></legend><div class="family-grid" id="families"></div></fieldset><div class="spacing-control"><span>脸部间距</span><button data-spacing="" aria-pressed="false">紧凑贴贴</button><button data-spacing=" " aria-pressed="true">松软留白</button></div><div id="all-parts"></div><div class="recipe"><span>当前配方</span><p id="recipe"></p><span class="recipe-heart" aria-hidden="true">♡</span></div></div>
+        <div class="controls"><div class="section-title"><h2>捏捏你的字字兽</h2><span class="controls-hint">点上面的标签换一格，左右滑挑零件</span></div><fieldset><legend>选择小动物 <small>换一只团子，保留表情与配件</small></legend><div class="family-grid" id="families"></div></fieldset><div class="spacing-control"><span>脸部间距</span><button data-spacing="" aria-pressed="false">紧凑贴贴</button><button data-spacing=" " aria-pressed="true">松软留白</button></div><div class="part-switch" role="tablist" aria-label="选择要换的零件"><button type="button" data-part-tab="face">眼睛·嘴巴</button><button type="button" data-part-tab="accessories">角·尾巴·翅膀</button><button type="button" data-part-tab="ears-and-decor">耳朵·装饰·爪爪</button></div><div id="all-parts"></div><div class="ready-made"><div class="fresh-section"><div class="picker-heading"><h3>新到的小表情 <span class="new-badge">NEW</span></h3><span>左右滑动 · 点一下就能继续捏</span></div><div id="fresh-presets" class="fresh-presets"></div></div><div class="quick-presets"><div class="picker-heading"><span class="picker-label">一键穿搭</span><span>左右滑动看更多</span></div><div id="presets" class="preset-grid preset-rail"></div></div></div><div class="recipe"><span>当前配方</span><p id="recipe"></p><span class="recipe-heart" aria-hidden="true">♡</span></div></div>
       </section>
       <section class="collection"><div class="collection-heading"><div><span class="eyebrow">A LITTLE DANGO PARADE</span><h2>字字兽集合啦 <span class="small-flower">✿</span></h2></div><p>遇到喜欢的，就把它带走吧。</p></div><div class="filters" aria-label="字字兽分类" id="filters"></div><div class="card-grid" id="gallery"></div><button id="more" class="button more-button">再来一窝团子 ⤨</button></section>
     </div>
-    <section id="favorites" class="collection" hidden><div class="collection-heading"><div><span class="eyebrow">YOUR LITTLE HAPPY PLACE</span><h2>收藏的字字兽 ♡</h2></div><p>住在这台设备、这个浏览器里。</p></div><p id="favorites-storage-status" role="status" hidden>当前无法读取收藏，请在新版小红书中重开小工具</p><div id="favorite-grid" class="card-grid"></div><div id="empty-favorites" class="empty"><span class="kaomoji">U ˘ ﻌ ˘ U</span><h3>这里等着小团子入住</h3><p>点一下 ♡，就能把喜欢的团子留在这里。</p><button class="button primary" data-view="studio">去捏一只字字兽</button></div></section>
-    <footer><span class="footer-brand">字字兽 · ZIZISHOU</span><span>字字兽负责可爱，你负责开心。<br><small>无需注册 · 收藏仅保存在本机 · 不同设备的字形可能略有差异</small></span><span class="kaomoji footer-dog" aria-hidden="true">U・ﻌ・U ♡</span></footer>
+    <section id="favorites" class="collection" hidden><div class="collection-heading"><div><span class="eyebrow">YOUR LITTLE HAPPY PLACE</span><h2>收藏的字字兽 ♡</h2></div><p>住在这台设备、这个浏览器里。</p></div><p id="favorites-storage-status" role="status" hidden>当前无法读取收藏，请在新版小红书中重开小工具</p><div id="favorite-grid" class="card-grid"></div><div id="empty-favorites" class="empty"><span translate="no" class="kaomoji">U ˘ ﻌ ˘ U</span><h3>这里等着小团子入住</h3><p>点一下 ♡，就能把喜欢的团子留在这里。</p><button class="button primary" data-view="studio">去捏一只字字兽</button></div></section>
+    <footer><span class="footer-brand">字字兽 · ZIZISHOU</span><span>字字兽负责可爱，你负责开心。<br><small>无需注册 · 收藏仅保存在本机 · 不同设备的字形可能略有差异</small></span><span translate="no" class="kaomoji footer-dog" aria-hidden="true">U・ﻌ・U ♡</span></footer>
   </main>
   <div id="toast" role="status" aria-live="polite"></div>
-  <dialog id="slot-edit"><h2>✂ 拆零件</h2><p>点 × 删掉不想要的那一块，点格子可以自己改字。删掉、改过的零件会一直保持，直到你在下面重新选这个部件。</p><output id="slot-preview" class="kaomoji slot-preview" dir="ltr"></output><div id="slot-list" class="slot-list"></div><button id="slot-done" class="button primary" type="button">好了</button></dialog>
+  <dialog id="slot-edit"><h2>✂ 拆零件</h2><p>点 × 删掉不想要的那一块，点格子可以自己改字。删掉、改过的零件会一直保持，直到你在下面重新选这个部件。</p><output id="slot-preview" translate="no" class="kaomoji slot-preview" dir="ltr"></output><div id="slot-list" class="slot-list"></div><button id="slot-done" class="button primary" type="button">好了</button></dialog>
   <dialog id="share-card" aria-labelledby="share-title">
     <h2 id="share-title">⇪ 分享卡片</h2>
     <canvas id="share-img" class="share-img" width="810" height="1080" role="img" aria-label="字字兽分享卡片"></canvas>

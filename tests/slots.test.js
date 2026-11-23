@@ -75,7 +75,8 @@ test('随机：耳朵里带手（如 ʕっ っʔ）时，不配带手的装饰�
       if (PARTS.ears[s.ears].hands) { handEars++; assert.ok(!PARTS.decor[s.decor].hands, `${a.id}: ${compose(s)}`); }
     }
   }
-  assert.ok(handEars > 0, '随机里应该能抽到带手的耳朵');
+  // 2026-11-23：手拆成单独零件后，绑着手的耳朵不再进随机。
+  assert.equal(handEars, 0, '随机里不该再抽到绑着手的耳朵');
   const bear = PARTS.ears.findIndex(e => e.v[0] === 'ʕっ ');
   const paws = PARTS.decor.findIndex(d => d.v[0] === 'ฅ ');
   const manual = cloneState({ears: bear, eyes: 0, mouth: 0, decor: paws});
