@@ -3,6 +3,10 @@ export const LANGUAGE_KEY = 'puppy-factory:language';
 export const EN = {
   '弯弯笑眼': 'Crescent smile eyes', '张嘴大笑': 'Big laugh', '紧凑圆脸': 'Snug round face', '举手欢呼': 'Hands up cheer', '欢呼团子': 'Cheering dango',
   '皱眉豆豆眼': 'Frowny dot eyes', '软团贴脸': 'Snug soft ears', '气鼓鼓': 'Huffy cheeks', '气气团子': 'Huffy dango', '生气': 'Huffy',
+  '肉垫小嘴': 'Paw-pad mouth', '尖尖小嘴': 'Pointy mouth', '波浪小嘴': 'Wavy mouth', '小方嘴': 'Little square mouth', '憋住的小尖嘴': 'Held-in pout',
+  '挑眉眯眼': 'Smug squint', '软软眯眼': 'Soft squint', '鼓气斜眼': 'Huffy glance', '憋泪一线': 'Holding back tears', '皱眉圆眼': 'Frowny round eyes', '哭唧唧': 'Sobbing', '亮晶晶豆豆': 'Sparkly dots', '翻白眼': 'Eye roll',
+  '握拳小手': 'Little fists', '大圆脸蛋': 'Big round cheeks', '小心心': 'Little heart', '圆圆腮': 'Round cheeks', '圆腮比心': 'Round cheeks + heart', '小句点': 'Tiny dots',
+  '肉垫笑笑狗': 'Paw-pad grin pup', '挑眉小狗': 'Smug pup', '软软比心': 'Soft heart', '鼓气包': 'Huffy bun', '憋泪小猫': 'Teary kitty', '皱眉委屈': 'Frowny pout', '扑扑小天使': 'Fluttering angel', '大圆脸笑': 'Big round grin', '亮晶晶': 'Sparkly',
   '左外耳': 'Left outer ear', '左脸边': 'Left face edge', '左内侧': 'Left inner', '右内侧': 'Right inner', '右脸边': 'Right face edge', '右外耳': 'Right outer ear',
   '⇪ 卡片': '⇪ Card', '生成分享卡片': 'Make a share card', '⇪ 分享卡片': '⇪ Share card',
   '长按图片保存，或者点下面的按钮。卡片下面有二维码，朋友扫一下就能来捏。': 'Long-press to save, or use the buttons below. Friends can scan the QR code to make their own.',

@@ -141,9 +141,11 @@
     "codepoints": [
       12539,
       42022,
+      42150,
       42160,
       42161,
       42163,
+      65377,
       65381
     ]
   },
@@ -223,6 +225,32 @@
     "codepoints": [
       10826,
       10828
+    ]
+  },
+  {
+    "file": "puppy-unicode-16.woff",
+    "source": "DejaVuSans.ttf",
+    "codepoints": [
+      840,
+      3764,
+      9677,
+      9684,
+      65056,
+      65057
+    ]
+  },
+  {
+    "file": "puppy-unicode-17.woff",
+    "source": "NotoSansMandaic-Regular.ttf",
+    "codepoints": [
+      2119
+    ]
+  },
+  {
+    "file": "puppy-unicode-18.woff",
+    "source": "NotoSansSymbols-Regular.ttf",
+    "codepoints": [
+      8980
     ]
   }
 ]

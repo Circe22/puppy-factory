@@ -176,3 +176,40 @@ const angryEyes=addPart('eyes',{name:'皱眉豆豆眼',v:['•᷅','•᷄'],moo
 const snugSoftEars=addPart('ears',{name:'软团贴脸',v:['૮₍','₎ა'],family:'soft',spacing:' '});
 const angryDecor=addPart('decor',{name:'气鼓鼓',v:['','ꐦ˶','˶','']});
 FRESH_LOOKS.push({name:'气气团子',expected:'૮₍ꐦ˶•᷅ ﻌ •᷄˶₎ა',state:{ears:snugSoftEars,eyes:angryEyes,mouth:0,decor:angryDecor}});
+
+// 2026-11-23 界（拾丢来一串 12 只：「按照我们的 live 2d 的形式切分塞到素材里」）：只往后追加，不改已有编号。
+// (◍•ᴗ•◍)❤ 的 ❤ 在 iOS/微信会变彩色 emoji，换成 ♡。
+const padMouth=addPart('mouth',{name:'肉垫小嘴',v:'ࡇ'});
+const pointMouth=addPart('mouth',{name:'尖尖小嘴',v:'^'});
+const waveMouth=addPart('mouth',{name:'波浪小嘴',v:'~'});
+const boxMouth=addPart('mouth',{name:'小方嘴',v:'⌔'});
+// 憋泪小猫的嘴两边要两个空格，但收藏只认 '' 或 ' ' 的间距，所以把多出的空格放进嘴里（同「趴睡小鼻子」的做法）。
+const wideSulkMouth=addPart('mouth',{name:'憋住的小尖嘴',v:' ‸ '});
+const smugEyes=addPart('eyes',{name:'挑眉眯眼',v:['-̀','-́'],mood:'日常'});
+const softEyes=addPart('eyes',{name:'软软眯眼',v:['´͈','`͈'],mood:'撒娇'});
+const huffEyes=addPart('eyes',{name:'鼓气斜眼',v:['´','｀'],mood:'生气'});
+const holdTearEyes=addPart('eyes',{name:'憋泪一线',v:['_','_ ̥'],mood:'委屈'});
+const frownEyes=addPart('eyes',{name:'皱眉圆眼',v:['•︡','•︠'],mood:'委屈'});
+const sobEyes=addPart('eyes',{name:'哭唧唧',v:['꒦ິ','꒦ິ'],mood:'委屈'});
+const glowEyes=addPart('eyes',{name:'亮晶晶豆豆',v:['•͈','•͈'],mood:'撒娇'});
+const rollEyes=addPart('eyes',{name:'翻白眼',v:['◔','◔'],mood:'日常'});
+const fistEars=addPart('ears',{name:'握拳小手',v:['o(',')o'],family:'soft',spacing:''});
+const cheekEars=addPart('ears',{name:'大圆脸蛋',v:['(O ',' O)'],family:'soft',spacing:' '});
+const heartDecor=addPart('decor',{name:'小心心',v:['','','','♡']});
+const ballDecor=addPart('decor',{name:'圆圆腮',v:['','◍','◍','']});
+const ballHeartDecor=addPart('decor',{name:'圆腮比心',v:['','◍','◍','♡']});
+const dotDecor=addPart('decor',{name:'小句点',v:['｡','','','｡']});
+FRESH_LOOKS.push(
+ {name:'肉垫笑笑狗',expected:'૮₍ ˶ᵕࡇᵕ˶ ₎ა',state:{ears:1,eyes:27,mouth:padMouth,decor:1,spacing:''}},
+ {name:'挑眉小狗',expected:'૮₍ ˶-̀ ᴗ -́˶ ₎ა',state:{ears:1,eyes:smugEyes,mouth:2,decor:1}},
+ {name:'软软比心',expected:'( ´͈ ᵕ `͈ )♡',state:{ears:8,eyes:softEyes,mouth:9,decor:heartDecor,spacing:' '}},
+ {name:'鼓气包',expected:'o(´^｀)o',state:{ears:fistEars,eyes:huffEyes,mouth:pointMouth,decor:0}},
+ {name:'憋泪小猫',expected:'ᐢ_  ‸  _ ̥ᐢ',state:{ears:12,eyes:holdTearEyes,mouth:wideSulkMouth,decor:0,spacing:' '}},
+ {name:'皱眉委屈',expected:'•︡ᯅ•︠',state:{ears:14,eyes:frownEyes,mouth:6,decor:0}},
+ {name:'哭唧唧',expected:'꒦ິ^꒦ິ',state:{ears:14,eyes:sobEyes,mouth:pointMouth,decor:0}},
+ {name:'圆腮比心',expected:'(◍•ᴗ•◍)♡',state:{ears:24,eyes:0,mouth:2,decor:ballHeartDecor}},
+ {name:'扑扑小天使',expected:'⁽⁽ଘ( ˊᵕˋ )ଓ⁾⁾',state:{ears:8,eyes:13,mouth:9,decor:0,accessories:{wings:1}}},
+ {name:'大圆脸笑',expected:'(O ^ ~ ^ O)',state:{ears:cheekEars,eyes:14,mouth:waveMouth,decor:0}},
+ {name:'亮晶晶',expected:'(◍•͈⌔•͈◍)',state:{ears:24,eyes:glowEyes,mouth:boxMouth,decor:ballDecor}},
+ {name:'翻白眼',expected:'｡◔‸◔｡',state:{ears:14,eyes:rollEyes,mouth:25,decor:dotDecor}},
+);
