@@ -101,3 +101,10 @@
   .compact-copy:not(.is-copied) .copy-done,
   .compact-copy.is-copied .copy-idle{visibility:hidden}
 }
+
+/* 2026-11-23 拾：「一键穿搭列表太长，要划很久才到眼睛、嘴巴」——改成两排、左右滑，跟「新到的小表情」一样。露出半张卡提示还能往右滑。 */
+.quick-presets .picker-heading{margin-bottom:0}.quick-presets .picker-heading>span:last-child{font-size:9px;color:#ac8d7e}
+.preset-rail{grid-template-columns:none;grid-auto-flow:column;grid-template-rows:repeat(2,auto);grid-auto-columns:calc((100% - 16px)/2.35);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:2px 1px 9px;scrollbar-width:thin;scrollbar-color:#d8afa9 transparent}
+.preset-rail .preset{scroll-snap-align:start;min-width:0}
+.preset-rail::-webkit-scrollbar{height:4px}.preset-rail::-webkit-scrollbar-thumb{background:#d8afa9;border-radius:4px}
+@media(min-width:721px){.preset-rail{grid-auto-columns:calc((100% - 24px)/3.4)}}
