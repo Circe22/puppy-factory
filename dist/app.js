@@ -155,7 +155,7 @@ function buildControls(){buildFamilies();FRESH_LOOKS.forEach(look=>{const b=butt
 // 2026-11-23 拾：像换装游戏一样——顶上的「眼睛 / 嘴巴 / 角 / 耳朵」是切换标签，下面一次只摆一格衣柜，每格两排左右滑。
 // 2026-11-23 19:08 拾：眼睛、嘴巴合成一格「眼睛·嘴巴」；耳朵那格叫「耳朵·装饰·爪爪」。
 const PART_TABS=['face','accessories','ears-and-decor'];let activePart='face';
-function showPart(id){if(!PART_TABS.includes(id))return;activePart=id;/* 横滑时点一下不让零件跳走：只在换标签时按「最近用过」重新排 */trays.forEach(t=>{t.allowReorder=true;updateTray(t);t.allowReorder=false});PART_TABS.forEach(x=>{const s=document.getElementById('picker-'+x);if(s)s.hidden=x!==id});document.querySelectorAll('[data-jump]').forEach(b=>{if(b.dataset.jump===id)b.setAttribute('aria-current','location');else b.removeAttribute('aria-current')});document.querySelectorAll('[data-part-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.partTab===id)))}
+function showPart(id){if(!PART_TABS.includes(id))return;activePart=id;/* 横滑时点一下不让零件跳走：只在换标签时按「最近用过」重新排 */trays.forEach(t=>{const before=t.lastOrder;t.allowReorder=true;updateTray(t);t.allowReorder=false;if(t.rail&&t.lastOrder!==before)t.grid.scrollLeft=0});PART_TABS.forEach(x=>{const s=document.getElementById('picker-'+x);if(s)s.hidden=x!==id});document.querySelectorAll('[data-jump]').forEach(b=>{if(b.dataset.jump===id)b.setAttribute('aria-current','location');else b.removeAttribute('aria-current')});document.querySelectorAll('[data-part-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.partTab===id)))}
 // 2026-11-23 拾：零件区上面也放一排标签，免得有人没发现顶上那排能切换。这里点了只换格子，不滚动。
 document.querySelectorAll('[data-part-tab]').forEach(b=>{b.setAttribute('role','tab');b.addEventListener('click',()=>{showPart(b.dataset.partTab);queueDock()})})
 
