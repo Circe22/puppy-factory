@@ -112,7 +112,7 @@ export const EN = {
   "团子工坊": "Creature Studio",
   "什么字字兽？": "will you make today?",
   "刚出炉的软乎乎团子": "Freshly made fluffy creature",
-  "▣ 复制团子": "▣ Copy creature",
+  "✿ 复制团子": "✿ Copy creature",
   "复制团子": "Copy creature",
   "已复制": "Copied",
   "捏捏你的字字兽": "Make your creature",
