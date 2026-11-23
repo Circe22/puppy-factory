@@ -108,3 +108,6 @@
 .preset-rail .preset{scroll-snap-align:start;min-width:0}
 .preset-rail::-webkit-scrollbar{height:4px}.preset-rail::-webkit-scrollbar-thumb{background:#d8afa9;border-radius:4px}
 @media(min-width:721px){.preset-rail{grid-auto-columns:calc((100% - 24px)/3.4)}}
+
+/* 2026-11-23 拾：「新到的小表情」和「一键穿搭」挪到零件后面，先捏零件，捏累了再往下看现成的。 */
+.ready-made{border-top:1px solid var(--line);padding-top:21px;margin-top:4px}
