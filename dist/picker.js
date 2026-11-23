@@ -2,7 +2,7 @@ import {translate} from './i18n.js?v=15';
 import {PARTS, ACCESSORIES, NEW_PARTS, DEFAULT, cloneState} from './model.js?v=15';
 
 export const RECENT_KEY = 'puppy-factory:recent-parts';
-const OPTIONS = {...PARTS, ...ACCESSORIES};
+const OPTIONS = Object.assign({},PARTS,ACCESSORIES);
 export const EYE_MOODS = {
   '开心': [3, 2, 14, 20, 26, 31],
   '困': [4, 5, 24, 28, 33, 36],
@@ -17,7 +17,8 @@ const COMMON = {
   decor: [1, 0, 2, 3, 6, 9, 11, 14],
 };
 function validIndex(key, value) {
-  return Number.isInteger(value) && value >= 0 && value < (OPTIONS[key]?.length || 0);
+  const options=OPTIONS[key]||[];
+  return Number.isInteger(value) && value >= 0 && value < options.length;
 }
 export function cleanRecent(data) {
   const result = {};
@@ -29,7 +30,7 @@ export function cleanRecent(data) {
 }
 export function readRecent(storage) {
   try { return cleanRecent(JSON.parse(storage.getItem(RECENT_KEY) || '{}')); }
-  catch { return {}; }
+  catch (error) { return {}; }
 }
 export function usePart(recent, key, index) {
   const next = cleanRecent(recent);
@@ -38,7 +39,7 @@ export function usePart(recent, key, index) {
 }
 export function writeRecent(storage, recent) {
   try { storage.setItem(RECENT_KEY, JSON.stringify(cleanRecent(recent))); return true; }
-  catch { return false; }
+  catch (error) { return false; }
 }
 export function partTray(key, {recent = {}, expanded = false, query = '', mood = '常用'} = {}) {
   const items = OPTIONS[key] || [];

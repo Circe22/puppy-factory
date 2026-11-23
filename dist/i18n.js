@@ -208,9 +208,10 @@ export const EN = {
   "天使仓鼠": "Angel hamster",
   "恶魔仓鼠": "Devil hamster",
 };
+export function hasHanText(text){return /[\u3400-\u9fff\uf900-\ufaff]/u.test(text)}
 export function translate(value, language = 'zh') {
   const source = String(value);
-  if (language !== 'en' || !/\p{Script=Han}/u.test(source)) return source;
+  if (language !== 'en' || !hasHanText(source)) return source;
   const core = source.trim(), leading = source.slice(0, source.indexOf(core)), trailing = source.slice(source.indexOf(core) + core.length);
   let result = EN[core];
   if (result === undefined) {
@@ -225,12 +226,12 @@ export function translate(value, language = 'zh') {
     else if (core.includes(' / ')) result = core.split(' / ').map(s => translate(s, 'en')).join(' / ');
     else if (core.includes(' · ')) result = core.split(' · ').map(s => translate(s, 'en')).join(' · ');
   }
-  return leading + (result ?? core) + trailing;
+  return leading + (result === undefined ? core : result) + trailing;
 }
 export function readLanguage(storage) {
-  try { return storage.getItem(LANGUAGE_KEY) === 'en' ? 'en' : 'zh'; } catch { return 'zh'; }
+  try { return storage.getItem(LANGUAGE_KEY) === 'en' ? 'en' : 'zh'; } catch (error) { return 'zh'; }
 }
 export function writeLanguage(storage, language) {
   if (!['zh', 'en'].includes(language)) return false;
-  try { storage.setItem(LANGUAGE_KEY, language); return true; } catch { return false; }
+  try { storage.setItem(LANGUAGE_KEY, language); return true; } catch (error) { return false; }
 }
