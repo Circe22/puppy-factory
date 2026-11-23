@@ -291,3 +291,13 @@ ANIMALS.find(a=>a.id==='cat').earIndex=catTriEars;
 ANIMAL_LOOKS.find(l=>l.id==='cat').state.ears=catTriEars;
 const fox=ANIMALS.find(a=>a.id==='fox');fox.earIndex=foxPointEars;fox.hands=HANDS.paws;
 Object.assign(ANIMAL_LOOKS.find(l=>l.id==='fox').state,{ears:foxPointEars,accessories:{horns:0,tail:0,wings:0,hands:HANDS.paws}});
+
+// 2026-11-23 19:34 拾：狐狸是尖耳朵，ᐢ⸝ ⸝ᐢ 更像兔兔。
+// 原「狐狸蓬蓬」原地改名「蓬松兔耳」、归到兔兔（字不变，收藏不变样）；另做尖尖的「蓬松狐耳」。
+Object.assign(PARTS.ears[21],{name:'蓬松兔耳',animal:'rabbit'});
+addPart('ears',{name:'蓬松狐耳',v:['^⸝ ',' ⸝^'],animal:'fox',spacing:''});
+// 兔兔长耳去掉里面的小耳朵，只留外面的斜线，叫「垂耳兔」。旧的藏起来，收藏过的照旧。
+addPart('ears',{name:'垂耳兔',v:['／( ',' )＼'],animal:'rabbit',spacing:''});
+Object.assign(PARTS.ears[16],{hidden:true,noRandom:true});
+// 拾 11-23 说过兔兔随机只要 ₍ᐢ ᐢ₎ 这种，新归来的两款兔耳只给自己挑，不进随机。
+PARTS.ears[21].noRandom=true;PARTS.ears[PARTS.ears.length-1].noRandom=true;
