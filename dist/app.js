@@ -1,7 +1,7 @@
 import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText} from './model.js?v=24';
 import {drawShareCard,SHARE_URL} from './share.js?v=4';
-import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=27';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=26';
+import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=28';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=27';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -151,9 +151,10 @@ function buildAccessories(rows=[['horns','小恶魔角'],['tail','小尾巴'],['
  }
  return section;
 }
-function buildControls(){buildFamilies();FRESH_LOOKS.forEach(look=>{const b=button('preset fresh-preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#fresh-presets').append(b)});$$('[data-spacing]').forEach(b=>b.addEventListener('click',()=>change(()=>{state.spacing=b.dataset.spacing}))); [...ANIMAL_LOOKS,...looks].forEach(look=>{const b=button('preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#presets').append(b)});const earDecor=el('section','ear-decor-group');earDecor.id='picker-ears-and-decor';earDecor.append(buildPart('ears'),buildAccessories([['hands','']],'小手','举在外面，或者抱在怀里','picker-hands'),buildPart('decor'));$('#all-parts').append(buildPart('eyes'),buildPart('mouth'),buildAccessories(),earDecor);showPart(activePart);}
+function buildControls(){buildFamilies();FRESH_LOOKS.forEach(look=>{const b=button('preset fresh-preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#fresh-presets').append(b)});$$('[data-spacing]').forEach(b=>b.addEventListener('click',()=>change(()=>{state.spacing=b.dataset.spacing}))); [...ANIMAL_LOOKS,...looks].forEach(look=>{const b=button('preset','',()=>{quietFace=true;change(()=>{state=cloneState(look.state);counter++})});b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#presets').append(b)});const earDecor=el('section','ear-decor-group');earDecor.id='picker-ears-and-decor';earDecor.append(buildPart('ears'),buildAccessories([['hands','']],'小手','举在外面，或者抱在怀里','picker-hands'),buildPart('decor'));const face=el('section','ear-decor-group face-group');face.id='picker-face';face.append(buildPart('eyes'),buildPart('mouth'));$('#all-parts').append(face,buildAccessories(),earDecor);showPart(activePart);}
 // 2026-11-23 拾：像换装游戏一样——顶上的「眼睛 / 嘴巴 / 角 / 耳朵」是切换标签，下面一次只摆一格衣柜，每格两排左右滑。
-const PART_TABS=['eyes','mouth','accessories','ears-and-decor'];let activePart='eyes';
+// 2026-11-23 19:08 拾：眼睛、嘴巴合成一格「眼睛·嘴巴」；耳朵那格叫「耳朵·装饰·爪爪」。
+const PART_TABS=['face','accessories','ears-and-decor'];let activePart='face';
 function showPart(id){if(!PART_TABS.includes(id))return;activePart=id;/* 横滑时点一下不让零件跳走：只在换标签时按「最近用过」重新排 */trays.forEach(t=>{t.allowReorder=true;updateTray(t);t.allowReorder=false});PART_TABS.forEach(x=>{const s=document.getElementById('picker-'+x);if(s)s.hidden=x!==id});document.querySelectorAll('[data-jump]').forEach(b=>{if(b.dataset.jump===id)b.setAttribute('aria-current','location');else b.removeAttribute('aria-current')});document.querySelectorAll('[data-part-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.partTab===id)))}
 // 2026-11-23 拾：零件区上面也放一排标签，免得有人没发现顶上那排能切换。这里点了只换格子，不滚动。
 document.querySelectorAll('[data-part-tab]').forEach(b=>{b.setAttribute('role','tab');b.addEventListener('click',()=>{showPart(b.dataset.partTab);queueDock()})})

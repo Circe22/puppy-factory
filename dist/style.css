@@ -127,3 +127,6 @@
 .part-switch button{flex:1 1 auto;border:0;background:none;border-radius:12px;padding:9px 4px;font-size:12px;color:#9a8277;white-space:nowrap;min-height:38px}
 .part-switch button[aria-selected=true]{background:#fffaf5;color:#b9637b;font-weight:650;box-shadow:0 1px 4px #8a5a4a1f}
 @media(max-width:380px){.part-switch button{font-size:11px;padding:8px 2px}}
+
+/* 三个标签：眼睛·嘴巴 / 角·尾巴·翅膀 / 耳朵·装饰·爪爪 */
+.dock-tabs{grid-template-columns:1fr 1.15fr 1.25fr}

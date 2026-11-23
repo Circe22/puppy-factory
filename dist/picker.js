@@ -1,4 +1,4 @@
-import {translate} from './i18n.js?v=26';
+import {translate} from './i18n.js?v=27';
 import {PARTS, ACCESSORIES, NEW_PARTS, DEFAULT, cloneState} from './model.js?v=24';
 
 export const RECENT_KEY = 'puppy-factory:recent-parts';
