@@ -111,3 +111,6 @@
 
 /* 2026-11-23 拾：「新到的小表情」和「一键穿搭」挪到零件后面，先捏零件，捏累了再往下看现成的。 */
 .ready-made{border-top:1px solid var(--line);padding-top:21px;margin-top:4px}
+/* 2026-11-23 拾：卡片里太长的颜表情还能左右滑，但不要露出那条粗滚动条。 */
+.preset .kaomoji,.card-puppy{scrollbar-width:none;-ms-overflow-style:none}
+.preset .kaomoji::-webkit-scrollbar,.card-puppy::-webkit-scrollbar{display:none}
