@@ -124,14 +124,17 @@ function takeCreature(s){
 }
 function renderSaved(){$('#favorite-count').textContent=favorites.length;$('#save').setAttribute('aria-pressed',String(hasSaved(state)));setText($('#save'),hasSaved(state)?'♥ 已收藏':'♡ 收藏');$$('.nav-item').forEach(b=>{if(b.dataset.view==='favorites')localizedAttr(b,'aria-label',`我的收藏，${favorites.length}只团子`)})}
 let renderedFaceParts,highlightTimer;
+// 拾 11-23：随机是整只换掉，不需要标出哪里变了，所以随机时跳过强调。
+let quietFace=false;
 function renderFace(){
+ const quiet=quietFace;quietFace=false;
  const parts=composeParts(state);
  if(renderedFaceParts&&renderedFaceParts.size===parts.length&&parts.every(([key,text])=>renderedFaceParts.get(key)===text))return;
 
  const preview=document.createDocumentFragment();
  for(const [key,text] of parts){
   // Ignore padding-only differences, such as the spaces trimmed when putting on horns.
-  if(renderedFaceParts&&(renderedFaceParts.get(key)||'').trim()!==text.trim()){
+  if(!quiet&&renderedFaceParts&&(renderedFaceParts.get(key)||'').trim()!==text.trim()){
    const mark=el('span','preview-change');
    mark.dataset.part=key;
    mark.textContent=text;
@@ -287,7 +290,7 @@ $('#copy').addEventListener('click',()=>takeCreature(state));
 $('#copy-compact').addEventListener('click',()=>takeCreature(state));
 $('#save').addEventListener('click',()=>save(state));
 $('#select-copy-text').addEventListener('click',selectText);
-$('#random').addEventListener('click',()=>{change(()=>{state=newRandom();counter++});toast('噗叽！一只字字兽诞生啦')});
+$('#random').addEventListener('click',()=>{quietFace=true;change(()=>{state=newRandom();counter++});toast('噗叽！一只字字兽诞生啦')});
 $('#reset').addEventListener('click',()=>{change(()=>state=clearFace(state),{remember:false});toast('搭配已清空，点一下撤回就能找回来')});
 $('#undo').addEventListener('click',()=>{if(history.length){state=history.pop();render();syncCustom()}});
 $('#more').addEventListener('click',()=>{refreshGallery();toast('新的一窝团子来啦')});$('#close-dialog').addEventListener('click',()=>$('#manual-copy').close());
