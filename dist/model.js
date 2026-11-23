@@ -229,3 +229,9 @@ PARTS.ears[16].noRandom=true;
 PARTS.ears[17].noRandom=true;
 ANIMALS.find(a=>a.id==='rabbit').earIndex=softBunnyEars;
 ANIMAL_LOOKS.find(l=>l.id==='rabbit').state.ears=softBunnyEars;
+
+// 2026-11-23 18:01 拾：评论区说「凸^-^凸 这个很可爱 贱贱的」，加进素材；库里已有的（^ 笑弯了）不重复加。
+// 凸 是常用汉字，手机自带中文字体都有，不用另外打字体包。
+const flipEars=addPart('ears',{name:'凸凸手',v:['凸','凸'],family:'soft',spacing:'',hands:true});
+const dashMouth=addPart('mouth',{name:'一字小嘴',v:'-'});
+FRESH_LOOKS.push({name:'贱贱团子',expected:'凸^-^凸',state:{ears:flipEars,eyes:14,mouth:dashMouth,decor:0}});
