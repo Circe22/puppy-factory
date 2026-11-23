@@ -64,9 +64,82 @@ export function cloneState(s){return {...s,custom:{...s.custom},accessories:{hor
 // 2026-11-23 界（拾提）：带脸框的耳朵（如 ૮(ᐢ ）拆成三块：外耳、脸边、内侧，可以只删里面的小耳朵
 export const EAR_FRAMES=new Set(['(',')','₍','₎','꒰','꒱','[',']','（','）','ʕ','ʔ']);
 export function earPieces(str,side){const chars=Array.from(str);const i=side==='left'?chars.findIndex(ch=>EAR_FRAMES.has(ch)):chars.findLastIndex(ch=>EAR_FRAMES.has(ch));if(i<0)return null;const before=chars.slice(0,i).join(''),frame=chars[i],after=chars.slice(i+1).join('');return side==='left'?{outer:before,frame,inner:after}:{inner:before,frame,outer:after}}
-function earValue(c,ear,side){const whole=side==='left'?c.left:c.right;if(whole!==undefined)return whole;const base=ear.v[side==='left'?0:1];const p=earPieces(base,side);if(!p)return base;const k=side==='left'?['leftOuter','leftFrame','leftInner']:['rightInner','rightFrame','rightOuter'];return side==='left'?(c[k[0]]??p.outer)+(c[k[1]]??p.frame)+(c[k[2]]??p.inner):(c[k[0]]??p.inner)+(c[k[1]]??p.frame)+(c[k[2]]??p.outer)}
-export function values(s){const c=s.custom||{};return {left:earValue(c,PARTS.ears[s.ears],'left'),right:earValue(c,PARTS.ears[s.ears],'right'),eyeLeft:c.eyeLeft??PARTS.eyes[s.eyes].v[0],eyeRight:c.eyeRight??PARTS.eyes[s.eyes].v[1],mouth:c.mouth??PARTS.mouth[s.mouth].v,prefix:c.prefix??PARTS.decor[s.decor].v[0],blushLeft:c.blushLeft??PARTS.decor[s.decor].v[1],blushRight:c.blushRight??PARTS.decor[s.decor].v[2],suffix:c.suffix??PARTS.decor[s.decor].v[3]}}
-export function compose(s){const v=values(s),a=s.accessories||{};const horns=ACCESSORIES.horns[a.horns||0].v,tail=ACCESSORIES.tail[a.tail||0].v,wings=ACCESSORIES.wings[a.wings||0].v;const ear=PARTS.ears[s.ears];const sep=s.spacing??ear.spacing??(ear.family==='classic'?'':' ');const c=s.custom||{};const left=a.horns?v.left.trimEnd()+(c.hornLeft??horns[0]):v.left;const right=a.horns?(c.hornRight??horns[1])+v.right.trimStart():v.right;const wl=a.wings?(c.wingLeft??wings[0]):'',wr=a.wings?(c.wingRight??wings[1]):'',tl=a.tail?(c.tail??tail):'';return v.prefix+wl+left+v.blushLeft+v.eyeLeft+sep+v.mouth+sep+v.eyeRight+v.blushRight+right+wr+tl+v.suffix}
+const EAR_SEGMENTS={
+  left:[['leftOuter','outer'],['leftFrame','frame'],['leftInner','inner']],
+  right:[['rightInner','inner'],['rightFrame','frame'],['rightOuter','outer']]
+};
+export function earSegments(custom,ear,side){
+  const base=ear.v[side==='left'?0:1];
+  if(custom[side]!==undefined)return [[side,custom[side]]];
+  const pieces=earPieces(base,side);
+  if(!pieces)return [[side,base]];
+  return EAR_SEGMENTS[side].map(([key,piece])=>[key,custom[key]??pieces[piece]]);
+}
+function joinSegments(segments){return segments.map(([,text])=>text).join('')}
+function faceValues(s,custom){
+  const eyes=PARTS.eyes[s.eyes].v;
+  const decor=PARTS.decor[s.decor].v;
+  return {
+    eyeLeft:custom.eyeLeft??eyes[0],
+    eyeRight:custom.eyeRight??eyes[1],
+    mouth:custom.mouth??PARTS.mouth[s.mouth].v,
+    prefix:custom.prefix??decor[0],
+    blushLeft:custom.blushLeft??decor[1],
+    blushRight:custom.blushRight??decor[2],
+    suffix:custom.suffix??decor[3]
+  };
+}
+export function values(s){
+  const custom=s.custom||{};
+  const ear=PARTS.ears[s.ears];
+  return {
+    left:joinSegments(earSegments(custom,ear,'left')),
+    right:joinSegments(earSegments(custom,ear,'right')),
+    ...faceValues(s,custom)
+  };
+}
+function trimEarEdge(segments,edge){
+  const fromStart=edge==='start';
+  for(const segment of fromStart?segments:[...segments].reverse()){
+    segment[1]=fromStart?segment[1].trimStart():segment[1].trimEnd();
+    if(segment[1])return;
+  }
+}
+export function composeParts(s){
+  const custom=s.custom||{};
+  const accessories=s.accessories||{};
+  const ear=PARTS.ears[s.ears];
+  const face=faceValues(s,custom);
+  const gap=s.spacing??ear.spacing??(ear.family==='classic'?'':' ');
+  const left=earSegments(custom,ear,'left');
+  const right=earSegments(custom,ear,'right');
+  const horns=ACCESSORIES.horns[accessories.horns||0].v;
+  const wings=ACCESSORIES.wings[accessories.wings||0].v;
+  const tail=ACCESSORIES.tail[accessories.tail||0].v;
+  if(accessories.horns){
+    trimEarEdge(left,'end');
+    trimEarEdge(right,'start');
+  }
+  return [
+    ['prefix',face.prefix],
+    ['wingLeft',accessories.wings?(custom.wingLeft??wings[0]):''],
+    ...left,
+    ['hornLeft',accessories.horns?(custom.hornLeft??horns[0]):''],
+    ['blushLeft',face.blushLeft],
+    ['eyeLeft',face.eyeLeft],
+    ['leftGap',gap],
+    ['mouth',face.mouth],
+    ['rightGap',gap],
+    ['eyeRight',face.eyeRight],
+    ['blushRight',face.blushRight],
+    ['hornRight',accessories.horns?(custom.hornRight??horns[1]):''],
+    ...right,
+    ['wingRight',accessories.wings?(custom.wingRight??wings[1]):''],
+    ['tail',accessories.tail?(custom.tail??tail):''],
+    ['suffix',face.suffix]
+  ];
+}
+export function compose(s){return joinSegments(composeParts(s))}
 export function randomState(family=null,mood=null,rng=Math.random){const pick=a=>a[Math.floor(rng()*a.length)];const indexes=(key,fn)=>PARTS[key].map((v,i)=>({v,i})).filter(x=>!fn||fn(x.v)).map(x=>x.i);return {ears:pick(indexes('ears',family?v=>v.family===family:null)),eyes:pick(indexes('eyes',mood?v=>v.mood===mood:null)),mouth:pick(indexes('mouth')),decor:pick(indexes('decor')),custom:{}}}
 // Random and ready-made little creatures share the same existing Unicode composer.
 export function randomAnimalState(animalId,mood=null,rng=Math.random){

@@ -1,7 +1,7 @@
-import {earPieces,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,compose,readFavorites,writeFavorites,copyText} from './model.js?v=14';
+import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText} from './model.js?v=15';
 import {drawShareCard,SHARE_URL} from './share.js?v=4';
-import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=14';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=14';
+import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=15';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=15';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -46,11 +46,49 @@ function rememberPart(key,index){recent=usePart(recent,key,index);writeRecent(st
 function change(fn,{remember=true}={}){const previous=cloneState(state);checkpoint();fn();if(remember){for(const k of Object.keys(PARTS))if(previous[k]!==state[k])rememberPart(k,state[k]);for(const k of Object.keys(ACCESSORIES))if(previous.accessories[k]!==state.accessories[k])rememberPart(k,state.accessories[k])}render();syncCustom()}
 const hasSaved=s=>favorites.some(x=>compose(x)===compose(s));
 function save(s){const t=compose(s),next=hasSaved(s)?favorites.filter(x=>compose(x)!==t):[cloneState(s),...favorites];if(next.length>500){toast('团子小窝已经住满 500 只啦');return}if(!writeFavorites(storage,next)){toast('浏览器无法保存收藏，请允许本地存储后再试');return}const added=next.length>favorites.length;favorites=next;renderSaved();renderGallery();renderFavorites();toast(added?'♡ 团子住进收藏夹啦':'已从收藏中移出')}
-async function copy(s){const text=compose(s);const method=await copyText(text,navigator,document);if(method==='manual'){$('#copy-text').value=text;$('#manual-copy').showModal();$('#copy-text').focus();$('#copy-text').select()}else toast('复制好啦！把团子带去聊天吧 ♡')}
+async function copy(s){
+ const text=compose(s);
+ const method=await copyText(text,navigator,document);
+ if(method==='manual'){
+  const input=$('#copy-text');
+  input.value=text;
+  $('#manual-copy').showModal();
+  input.focus();
+  input.select();
+ }else toast('复制好啦！把团子带去聊天吧 ♡');
+ return method;
+}
 function renderSaved(){$('#favorite-count').textContent=favorites.length;$('#save').setAttribute('aria-pressed',String(hasSaved(state)));setText($('#save'),hasSaved(state)?'♥ 已收藏':'♡ 收藏');$$('.nav-item').forEach(b=>{if(b.dataset.view==='favorites')localizedAttr(b,'aria-label',`我的收藏，${favorites.length}只团子`)})}
+let renderedFaceParts,highlightTimer;
+function renderFace(){
+ const parts=composeParts(state);
+ if(renderedFaceParts?.size===parts.length&&parts.every(([key,text])=>renderedFaceParts.get(key)===text))return;
+
+ const preview=document.createDocumentFragment();
+ for(const [key,text] of parts){
+  // Ignore padding-only differences, such as the spaces trimmed when putting on horns.
+  if(renderedFaceParts&&(renderedFaceParts.get(key)??'').trim()!==text.trim()){
+   const mark=el('span','preview-change');
+   mark.dataset.part=key;
+   mark.textContent=text;
+   preview.append(mark);
+  }else preview.append(text);
+ }
+ preview.normalize();
+ const face=$('#puppy-text');
+ face.replaceChildren(preview.cloneNode(true));
+ $('#slot-preview').replaceChildren(preview);
+ $('#puppy').classList.toggle('long-puppy',Array.from(face.textContent).length>27);
+ renderedFaceParts=new Map(parts);
+
+ clearTimeout(highlightTimer);
+ if(face.querySelector('.preview-change')){
+  highlightTimer=setTimeout(()=>$$('.preview-change').forEach(mark=>mark.classList.remove('preview-change')),1600);
+ }
+}
 function render(){
  const currentSpace=state.spacing??PARTS.ears[state.ears].spacing??(PARTS.ears[state.ears].family==='classic'?'':' ');$$('[data-spacing]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.spacing===currentSpace)));
- const text=compose(state);$('#puppy').textContent=text;$('#puppy').classList.toggle('long-puppy',Array.from(text).length>27);
+ renderFace();
  const recipe=['ears','eyes','mouth','decor'].map(k=>PARTS[k][state[k]].name);
  Object.entries(state.accessories||{}).forEach(([k,v])=>{if(v)recipe.push(ACCESSORIES[k][v].name)});
  setText($('#recipe'),state.custom.eyeLeft===''&&state.custom.eyeRight===''&&state.custom.mouth===''?'空脸团子 · 等待你选零件':recipe.join(' / ')+(Object.keys(state.custom).length?' · 自定义':''));
@@ -123,6 +161,14 @@ $$('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.v
 $('.brand').addEventListener('click',e=>{e.preventDefault();showView('studio');window.scrollTo({top:0,behavior:'smooth'})});
 $$('[data-jump]').forEach(b=>b.addEventListener('click',()=>jumpToPart(b.dataset.jump)));
 $('#copy').addEventListener('click',()=>copy(state));$('#save').addEventListener('click',()=>save(state));
+const compactCopy=$('#copy-compact');
+let copyFeedbackTimer;
+compactCopy.addEventListener('click',async()=>{
+ const method=await copy(state);
+ clearTimeout(copyFeedbackTimer);
+ compactCopy.classList.toggle('is-copied',method!=='manual');
+ if(method!=='manual')copyFeedbackTimer=setTimeout(()=>compactCopy.classList.remove('is-copied'),1400);
+});
 $('#random').addEventListener('click',()=>{change(()=>{state=newRandom();counter++});toast('噗叽！一只字字兽诞生啦')});
 $('#reset').addEventListener('click',()=>{change(()=>state=clearFace(state),{remember:false});toast('搭配已清空，点一下撤回就能找回来')});
 $('#undo').addEventListener('click',()=>{if(history.length){state=history.pop();render();syncCustom()}});
@@ -176,11 +222,15 @@ function slotDefault(key){const v=values({...state,custom:{}}),a=state.accessori
  if(key==='tail')return ACCESSORIES.tail[a.tail||0].v;return v[key]??''}
 function slotValue(key){return Object.hasOwn(state.custom,key)?state.custom[key]:slotDefault(key)}
 const cleanSlot=v=>Array.from(v.replace(/[\u0000-\u001f\u007f‪-‮⁦-⁩]/gu,'')).slice(0,16).join('');
-const earSub={left:[['leftOuter','左外耳','outer'],['leftFrame','左脸边','frame'],['leftInner','左内侧','inner']],right:[['rightInner','右内侧','inner'],['rightFrame','右脸边','frame'],['rightOuter','右外耳','outer']]};
-function earSlots(side){if(Object.hasOwn(state.custom,side))return null;const base=PARTS.ears[state.ears].v[side==='left'?0:1];const p=earPieces(base,side);if(!p)return null;
- return earSub[side].filter(([k,,piece])=>Object.hasOwn(state.custom,k)||p[piece].trim()!=='').map(([k,label,piece])=>({key:k,label,def:p[piece]}))}
+function earSlots(side){
+ if(Object.hasOwn(state.custom,side))return null;
+ const segments=earSegments({},PARTS.ears[state.ears],side);
+ if(segments[0][0]===side)return null;
+ return segments.filter(([key,def])=>Object.hasOwn(state.custom,key)||def.trim()!=='')
+  .map(([key,def])=>({key,label:names[key],def}));
+}
 function renderSlots(){
- const box=$('#slot-list');box.replaceChildren();$('#slot-preview').textContent=compose(state);
+ const box=$('#slot-list');box.replaceChildren();
  for(const [key,label,needs] of slotOrder){
   if(needs&&!state.accessories[needs])continue;
   if(key==='left'||key==='right'){const subs=earSlots(key);if(subs){subs.forEach(sub=>box.append(pieceChip(sub)));continue}}
@@ -189,7 +239,7 @@ function renderSlots(){
   const chip=el('div','slot-chip'+(deleted?' is-deleted':''));chip.append(el('small','',label));
   if(deleted){chip.append(button('slot-restore','↺ 恢复',()=>{delete state.custom[key];render();syncCustom();renderSlots()}))}
   else{const input=el('input');input.type='text';input.dir='ltr';input.value=slotValue(key);input.spellcheck=false;input.autocomplete='off';localizedAttr(input,'aria-label',label);
-   input.addEventListener('input',()=>{state.custom[key]=cleanSlot(input.value);render();syncCustom();$('#slot-preview').textContent=compose(state)});
+   input.addEventListener('input',()=>{state.custom[key]=cleanSlot(input.value);render();syncCustom()});
    const del=button('slot-delete','×',()=>{state.custom[key]='';render();syncCustom();renderSlots()});localizedAttr(del,'aria-label','删掉'+label);
    chip.append(input,del)}
   box.append(chip)}
@@ -198,6 +248,7 @@ function openSlots(){checkpoint();render();renderSlots();$('#slot-edit').showMod
 $('#puppy').addEventListener('click',openSlots);
 $('#puppy').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSlots()}});
 $('#slot-open').addEventListener('click',openSlots);
+$('#slot-open-compact').addEventListener('click',openSlots);
 $('#slot-done').addEventListener('click',()=>{$('#slot-edit').close();render();toast('拆好啦，删掉的零件会一直保持')});
 
 // 2026-11-23 界（拾提）：分享卡片，底下带网址和二维码。
@@ -224,6 +275,6 @@ function pieceChip({key,label,def}){
  const chip=el('div','slot-chip'+(deleted?' is-deleted':''));chip.append(el('small','',label));
  if(deleted){chip.append(button('slot-restore','↺ 恢复',()=>{delete state.custom[key];render();syncCustom();renderSlots()}));return chip}
  const input=el('input');input.type='text';input.dir='ltr';input.value=(has?state.custom[key]:def).trim();input.spellcheck=false;input.autocomplete='off';localizedAttr(input,'aria-label',label);
- input.addEventListener('input',()=>{const v=cleanSlot(input.value).trim();state.custom[key]=v?lead+v+trail:'';render();syncCustom();$('#slot-preview').textContent=compose(state)});
+ input.addEventListener('input',()=>{const v=cleanSlot(input.value).trim();state.custom[key]=v?lead+v+trail:'';render();syncCustom()});
  const del=button('slot-delete','×',()=>{state.custom[key]='';render();syncCustom();renderSlots()});localizedAttr(del,'aria-label','删掉'+label);
  chip.append(input,del);return chip}

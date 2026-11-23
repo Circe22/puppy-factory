@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PARTS,ACCESSORIES,DEFAULT,compose,cloneState,validState} from '../dist/model.js';
+import {PARTS,ACCESSORIES,DEFAULT,compose,composeParts,cloneState,validState} from '../dist/model.js';
 
 test('拆零件：删掉一只腮红、一只角、一只翅膀和尾巴，组合结果跟着变', () => {
   const s = cloneState({...DEFAULT, accessories:{horns:1, wings:2, tail:1}});
@@ -50,4 +50,18 @@ test('拆耳朵：带脸框的耳朵拆成外耳、脸边、内侧，可以只�
   assert.ok(full.includes('ᐢ') && !cut.includes('ᐢ'));
   assert.ok(cut.includes('૮(') && cut.includes(')ა'));
   assert.ok(validState(s));
+});
+
+test('预览分段：脸边和内耳各自定位，戴角后复制仍保留原始字形', () => {
+  const ears = PARTS.ears.findIndex(part => part.v[0] === '૮(ᐢ ');
+  const state = cloneState({...DEFAULT, ears, decor:0, accessories:{horns:1}});
+  state.custom = {leftInner:'  ', rightInner:'  ', hornLeft:'^', hornRight:'^', eyeLeft:'˃̣̣̥'};
+  const pieces = new Map(composeParts(state));
+
+  assert.deepEqual(
+    ['leftFrame', 'leftInner', 'hornLeft', 'eyeLeft', 'hornRight', 'rightInner', 'rightFrame']
+      .map(key => pieces.get(key)),
+    ['(', '', '^', '˃̣̣̥', '^', '', ')']
+  );
+  assert.equal(compose(state), '૮(^˃̣̣̥ﻌ•^)ა');
 });
