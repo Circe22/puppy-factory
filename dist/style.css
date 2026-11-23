@@ -136,3 +136,5 @@
 .choice.none-choice[aria-pressed=true]{background:#f1d5dd;border-color:#ba6b83}
 
 @font-face{font-family:PuppyUnicode;src:url('./puppy-unicode-19.woff?v=1') format('woff');font-display:swap;unicode-range:U+141F,U+1420}
+
+.part-rail .kaomoji{display:block;max-width:100%;overflow:hidden;padding-left:2px;padding-right:2px}
