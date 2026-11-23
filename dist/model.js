@@ -170,12 +170,16 @@ export function randomAnimalState(animalId,mood=null,rng=Math.random){
   const animal=ANIMALS.find(a=>a.id===animalId);
   if(!animal)throw new RangeError('Unknown animal: '+animalId);
   const state=randomState(null,mood,rng);
-  const ears=PARTS.ears.map((_,i)=>i).filter(i=>animalForEar(i)===animalId);
+  // 2026-11-23 拾：打了 noRandom 的耳朵（两对耳朵的 ૮(ᐢ ᐢ)ა、她不想随机到的长耳）随机时不抽；用户自己选照样能用。
+  const allEars=PARTS.ears.map((_,i)=>i).filter(i=>animalForEar(i)===animalId);
+  const ears=allEars.filter(i=>!PARTS.ears[i].noRandom).length?allEars.filter(i=>!PARTS.ears[i].noRandom):allEars;
   state.ears=ears[Math.min(ears.length-1,Math.floor(rng()*ears.length))];
   state.mouth=animal.mouthIndex;
   // 2026-11-23 界（拾发现「四个爪爪」）：耳朵里已经带了 ฅ 之类的字，随机时就不再配同样字的装饰，免得重复
   const earChars=new Set(Array.from(PARTS.ears[state.ears].v.join('')).filter(ch=>ch.trim()&&!/[()₍₎\[\]]/u.test(ch)));
-  const clashes=i=>Array.from(PARTS.decor[i].v.join('')).some(ch=>earChars.has(ch));
+  // 2026-11-23 拾：耳朵里带手（っ ฅ ／＼ o( )o）时，也不配带手的装饰。只管随机，用户自己拼不拦。
+  const earHands=!!PARTS.ears[state.ears].hands;
+  const clashes=i=>(earHands&&!!PARTS.decor[i].hands)||Array.from(PARTS.decor[i].v.join('')).some(ch=>earChars.has(ch));
   if(clashes(state.decor)){const ok=PARTS.decor.map((_,i)=>i).filter(i=>!clashes(i));if(ok.length)state.decor=ok[Math.floor(rng()*ok.length)]}
   return state;
 }
@@ -193,3 +197,58 @@ const cheerMouth=addPart('mouth',{name:'张嘴大笑',v:'ᗜ'});
 const tightEars=addPart('ears',{name:'紧凑圆脸',v:['(',')'],family:'soft',spacing:''});
 const cheerDecor=addPart('decor',{name:'举手欢呼',v:['٩','','*','و']});
 FRESH_LOOKS.push({name:'欢呼团子',expected:'٩(ˊᗜˋ*)و',state:{ears:tightEars,eyes:cheerEyes,mouth:cheerMouth,decor:cheerDecor,spacing:''}});
+
+// 2026-11-23 界（拾：「加个这个气气素材好不好？」૮₍ꐦ˶•᷅ ﻌ •᷄˶₎ა）：拆成零件，只往后追加，不改已有编号
+const angryEyes=addPart('eyes',{name:'皱眉豆豆眼',v:['•᷅','•᷄'],mood:'生气'});
+const snugSoftEars=addPart('ears',{name:'软团贴脸',v:['૮₍','₎ა'],family:'soft',spacing:' '});
+const angryDecor=addPart('decor',{name:'气鼓鼓',v:['','ꐦ˶','˶','']});
+FRESH_LOOKS.push({name:'气气团子',expected:'૮₍ꐦ˶•᷅ ﻌ •᷄˶₎ა',state:{ears:snugSoftEars,eyes:angryEyes,mouth:0,decor:angryDecor}});
+
+// 2026-11-23 界（拾丢来一串 12 只：「按照我们的 live 2d 的形式切分塞到素材里」）：只往后追加，不改已有编号。
+// (◍•ᴗ•◍)❤ 的 ❤ 在 iOS/微信会变彩色 emoji，换成 ♡。
+const padMouth=addPart('mouth',{name:'肉垫小嘴',v:'ࡇ'});
+const pointMouth=addPart('mouth',{name:'尖尖小嘴',v:'^'});
+const waveMouth=addPart('mouth',{name:'波浪小嘴',v:'~'});
+const boxMouth=addPart('mouth',{name:'小方嘴',v:'⌔'});
+// 憋泪小猫的嘴两边要两个空格，但收藏只认 '' 或 ' ' 的间距，所以把多出的空格放进嘴里（同「趴睡小鼻子」的做法）。
+const wideSulkMouth=addPart('mouth',{name:'憋住的小尖嘴',v:' ‸ '});
+const smugEyes=addPart('eyes',{name:'挑眉眯眼',v:['-̀','-́'],mood:'日常'});
+const softEyes=addPart('eyes',{name:'软软眯眼',v:['´͈','`͈'],mood:'撒娇'});
+const huffEyes=addPart('eyes',{name:'鼓气斜眼',v:['´','｀'],mood:'生气'});
+const holdTearEyes=addPart('eyes',{name:'憋泪一线',v:['_','_ ̥'],mood:'委屈'});
+const frownEyes=addPart('eyes',{name:'皱眉圆眼',v:['•︡','•︠'],mood:'委屈'});
+const sobEyes=addPart('eyes',{name:'哭唧唧',v:['꒦ິ','꒦ິ'],mood:'委屈'});
+const glowEyes=addPart('eyes',{name:'亮晶晶豆豆',v:['•͈','•͈'],mood:'撒娇'});
+const rollEyes=addPart('eyes',{name:'翻白眼',v:['◔','◔'],mood:'日常'});
+const fistEars=addPart('ears',{name:'握拳小手',v:['o(',')o'],family:'soft',spacing:''});
+const cheekEars=addPart('ears',{name:'大圆脸蛋',v:['(O ',' O)'],family:'soft',spacing:' '});
+const heartDecor=addPart('decor',{name:'小心心',v:['','','','♡']});
+const ballDecor=addPart('decor',{name:'圆圆腮',v:['','◍','◍','']});
+const ballHeartDecor=addPart('decor',{name:'圆腮比心',v:['','◍','◍','♡']});
+const dotDecor=addPart('decor',{name:'小句点',v:['｡','','','｡']});
+FRESH_LOOKS.push(
+ {name:'肉垫笑笑狗',expected:'૮₍ ˶ᵕࡇᵕ˶ ₎ა',state:{ears:1,eyes:27,mouth:padMouth,decor:1,spacing:''}},
+ {name:'挑眉小狗',expected:'૮₍ ˶-̀ ᴗ -́˶ ₎ა',state:{ears:1,eyes:smugEyes,mouth:2,decor:1}},
+ {name:'软软比心',expected:'( ´͈ ᵕ `͈ )♡',state:{ears:8,eyes:softEyes,mouth:9,decor:heartDecor,spacing:' '}},
+ {name:'鼓气包',expected:'o(´^｀)o',state:{ears:fistEars,eyes:huffEyes,mouth:pointMouth,decor:0}},
+ {name:'憋泪小猫',expected:'ᐢ_  ‸  _ ̥ᐢ',state:{ears:12,eyes:holdTearEyes,mouth:wideSulkMouth,decor:0,spacing:' '}},
+ {name:'皱眉委屈',expected:'•︡ᯅ•︠',state:{ears:14,eyes:frownEyes,mouth:6,decor:0}},
+ {name:'哭唧唧',expected:'꒦ິ^꒦ິ',state:{ears:14,eyes:sobEyes,mouth:pointMouth,decor:0}},
+ {name:'圆腮比心',expected:'(◍•ᴗ•◍)♡',state:{ears:24,eyes:0,mouth:2,decor:ballHeartDecor}},
+ {name:'扑扑小天使',expected:'⁽⁽ଘ( ˊᵕˋ )ଓ⁾⁾',state:{ears:8,eyes:13,mouth:9,decor:0,accessories:{wings:1}}},
+ {name:'大圆脸笑',expected:'(O ^ ~ ^ O)',state:{ears:cheekEars,eyes:14,mouth:waveMouth,decor:0}},
+ {name:'亮晶晶',expected:'(◍•͈⌔•͈◍)',state:{ears:24,eyes:glowEyes,mouth:boxMouth,decor:ballDecor}},
+ {name:'翻白眼',expected:'｡◔‸◔｡',state:{ears:14,eyes:rollEyes,mouth:25,decor:dotDecor}},
+);
+
+// 2026-11-23 拾：「左内侧、右内侧其实也是手」——给带手的零件偷偷打标签，随机时手不和手撞。
+for(const i of [11,16,19,20,fistEars])PARTS.ears[i].hands=true;
+for(const i of [3,10,11,15])PARTS.decor[i].hands=true;
+// 2026-11-23 拾：「喜欢 ₍ᐢ ᐢ₎ 这种，不要长耳朵了」。
+// 旧的两款兔耳留在零件库（收藏过的人不变样），但不进随机；兔兔默认换成软团兔耳。
+const softBunnyEars=addPart('ears',{name:'兔兔团耳',v:['₍ᐢ ',' ᐢ₎'],animal:'rabbit',spacing:''});
+const snugBunnyEars=addPart('ears',{name:'兔兔贴脸',v:['₍ᐢ','ᐢ₎'],animal:'rabbit',spacing:''});
+PARTS.ears[16].noRandom=true;
+PARTS.ears[17].noRandom=true;
+ANIMALS.find(a=>a.id==='rabbit').earIndex=softBunnyEars;
+ANIMAL_LOOKS.find(l=>l.id==='rabbit').state.ears=softBunnyEars;
