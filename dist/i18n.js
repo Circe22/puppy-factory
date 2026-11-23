@@ -6,7 +6,7 @@ export const EN = {
   '不带手': 'No hands', '举起爪爪': 'Paws up', '握拳小手': 'Little fists', '欢呼小手': 'Cheering hands', '抱抱小手': 'Hugging hands', '伸出小爪': 'Reaching paw', '捧着心心': 'Holding a heart', '狐狸尖尖': 'Pointy fox ears', '星星腮': 'Star cheek', '小手': 'Hands', '举在外面，或者抱在怀里': 'Raised outside, or hugged inside', '左手': 'Left hand', '右手': 'Right hand',
   '凸凸手': 'Double flip-off', '一字小嘴': 'Flat dash mouth', '贱贱团子': 'Cheeky bun',
   '肉垫小嘴': 'Paw-pad mouth', '尖尖小嘴': 'Pointy mouth', '波浪小嘴': 'Wavy mouth', '小方嘴': 'Little square mouth', '憋住的小尖嘴': 'Held-in pout',
-  '挑眉眯眼': 'Smug squint', '软软眯眼': 'Soft squint', '眯眯眼': 'Squinty =', '鼓气斜眼': 'Huffy glance', '憋泪一线': 'Holding back tears', '皱眉圆眼': 'Frowny round eyes', '哭唧唧': 'Sobbing', '亮晶晶豆豆': 'Sparkly dots', '翻白眼': 'Eye roll',
+  '挑眉眯眼': 'Smug squint', '软软眯眼': 'Soft squint', '鼓气斜眼': 'Huffy glance', '憋泪一线': 'Holding back tears', '皱眉圆眼': 'Frowny round eyes', '哭唧唧': 'Sobbing', '亮晶晶豆豆': 'Sparkly dots', '翻白眼': 'Eye roll',
   '握拳小手': 'Little fists', '大圆脸蛋': 'Big round cheeks', '小心心': 'Little heart', '圆圆腮': 'Round cheeks', '圆腮比心': 'Round cheeks + heart', '小句点': 'Tiny dots', '兔兔团耳': 'Soft bunny ears', '兔兔贴脸': 'Snug bunny ears',
   '肉垫笑笑狗': 'Paw-pad grin pup', '挑眉小狗': 'Smug pup', '软软比心': 'Soft heart', '鼓气包': 'Huffy bun', '憋泪小猫': 'Teary kitty', '皱眉委屈': 'Frowny pout', '扑扑小天使': 'Fluttering angel', '大圆脸笑': 'Big round grin', '亮晶晶': 'Sparkly',
   '左外耳': 'Left outer ear', '左脸边': 'Left face edge', '左内侧': 'Left inner', '右内侧': 'Right inner', '右脸边': 'Right face edge', '右外耳': 'Right outer ear',
