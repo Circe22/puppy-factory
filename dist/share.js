@@ -1,8 +1,3 @@
-// 2026-11-23 界（拾提）：分享卡片。把现在捏的团子画到一张 3:4 的卡片上，底下带网址和二维码，方便发小红书、朋友圈。
-// 二维码是提前生成好的，指向 https://circe.circeworks.com/zizishou/（拾 11-23 定的正式地址），不连任何外部服务。
-export const SHARE_URL = 'https://circe.circeworks.com/zizishou/';
-const QR = ["11111110000111000010001111111","10000010110010101110001000001","10111010110100101001001011101","10111010101111111100001011101","10111010011101001001101011101","10000010000011100110101000001","11111110101010101010101111111","00000000101000100001100000000","10000010111000000111011001110","11010000001000110111000110110","00011011000000011100100100000","11101101111110010011110011000","11001010010101110001011100001","11011000101001011011101110011","11100111111011111110101001100","11110001100011101000000010101","11000110100000100100000101100","10110101101010011111101110111","11101010111001111001011011001","10100000011110110001011000000","10111111111010001100111110111","00000000110001010110100011000","11111110011001111001101011100","10000010001011000001100010001","10111010000101001011111111001","10111010001011011110110001101","10111010000000010100011111110","10000010000001111001000101101","11111110101001001101000010100"];
-
 const W = 1080, H = 1440;
 const INK = '#614d46', MUTED = '#a78a7c', PINK = '#d794a1', CREAM = '#fffaf5';
 const SANS = "'PingFang SC','Noto Sans SC','Microsoft YaHei',system-ui,sans-serif";
@@ -14,18 +9,20 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
 }
 
-function drawQR(ctx, x, y, size) {
-  const n = QR.length, quiet = 3, cell = size / (n + quiet * 2);
-  ctx.fillStyle = '#ffffff'; roundRect(ctx, x, y, size, size, 18); ctx.fill();
-  ctx.fillStyle = INK;
-  QR.forEach((row, r) => { for (let c = 0; c < n; c++) if (row[c] === '1') ctx.fillRect(Math.floor(x + (c + quiet) * cell), Math.floor(y + (r + quiet) * cell), Math.ceil(cell), Math.ceil(cell)); });
-}
-
-// labels：已经翻译好的文案 {brand, tagline, scan}
 export async function drawShareCard(canvas, face, caption, labels) {
-  canvas.width = W; canvas.height = H;
+  const scale = 0.75;
+  canvas.width = W * scale; canvas.height = H * scale;
   const ctx = canvas.getContext('2d');
-  try { await document.fonts.load(`120px PuppyUnicode`, face); await document.fonts.ready; } catch {}
+  if (!ctx) throw new Error('Canvas drawing is unavailable');
+  if (document.fonts && typeof document.fonts.load === 'function') {
+    try {
+      await Promise.race([
+        document.fonts.load('120px PuppyUnicode', face),
+        new Promise(resolve => setTimeout(resolve, 350))
+      ]);
+    } catch (error) {}
+  }
+  ctx.scale(scale, scale);
 
   // 粉色波点纸
   ctx.fillStyle = '#fbe9ec'; ctx.fillRect(0, 0, W, H);
@@ -45,7 +42,7 @@ export async function drawShareCard(canvas, face, caption, labels) {
   ctx.fillStyle = '#f8ece6'; roundRect(ctx, 140, 290, W - 280, 440, 36); ctx.fill();
   let size = 132; ctx.font = `${size}px ${FACE}`;
   while (ctx.measureText(face).width > W - 360 && size > 40) { size -= 4; ctx.font = `${size}px ${FACE}`; }
-  ctx.fillStyle = INK; ctx.fillText(face, W / 2, 510);
+  ctx.fillStyle = INK; ctx.fillText(face, W / 2, 510, W - 360);
 
   ctx.fillStyle = MUTED; ctx.font = `38px ${SANS}`; ctx.fillText(caption, W / 2, 800);
 
@@ -53,26 +50,12 @@ export async function drawShareCard(canvas, face, caption, labels) {
   ctx.strokeStyle = '#ead8d0'; ctx.lineWidth = 3; ctx.setLineDash([12, 10]);
   ctx.beginPath(); ctx.moveTo(140, 880); ctx.lineTo(W - 140, 880); ctx.stroke(); ctx.setLineDash([]);
 
-  // 左边文字，右边二维码
-  ctx.textAlign = 'left';
-  ctx.fillStyle = INK; let bs = 50; ctx.font = `700 ${bs}px ${SANS}`; while (ctx.measureText(labels.brand).width > 480 && bs > 30) { bs -= 2; ctx.font = `700 ${bs}px ${SANS}`; } ctx.fillText(labels.brand, 150, 965);
-  ctx.fillStyle = MUTED; ctx.font = `30px ${SANS}`;
-  // 文案按宽度自动换行（最多 3 行）
-  const lines = []; let line = '';
-  // 优先在逗号后面断行，不把一个词拆开；一段本身太长时才按字断
-  const parts = labels.tagline.split(/(?<=[，,、])/u);
-  for (const part of parts) {
-    if (ctx.measureText(line + part).width <= 480) { line += part; continue; }
-    if (line) { lines.push(line); line = ''; }
-    for (const ch of Array.from(part)) { if (ctx.measureText(line + ch).width > 480) { lines.push(line); line = ch; } else line += ch; }
-  }
-  if (line) lines.push(line);
-  lines.slice(0, 3).forEach((l, i) => ctx.fillText(l, 150, 1035 + i * 42));
-  const after = 1035 + Math.min(lines.length, 3) * 42;
-  ctx.fillStyle = '#c67788'; ctx.font = `600 30px ${SANS}`; ctx.fillText(labels.scan, 150, after + 22);
-  ctx.fillStyle = MUTED; ctx.font = `24px ${SANS}`; ctx.fillText(SHARE_URL.replace('https://', ''), 150, after + 72);
-  ctx.strokeStyle = PINK; ctx.lineWidth = 4; roundRect(ctx, W - 150 - 270, 920, 270, 270, 22); ctx.stroke();
-  drawQR(ctx, W - 150 - 262, 928, 254);
+  ctx.fillStyle = INK;
+  ctx.font = `700 50px ${SANS}`;
+  ctx.fillText(labels.brand, W / 2, 995, W - 300);
+  ctx.fillStyle = MUTED;
+  ctx.font = `34px ${SANS}`;
+  ctx.fillText(labels.tagline, W / 2, 1095, W - 300);
 
   ctx.textAlign = 'center'; ctx.fillStyle = '#b48a90'; ctx.font = `30px ${FACE}`;
   ctx.fillText('૮₍ ˶• ﻌ •˶ ₎ა  ♡', W / 2, 1360);

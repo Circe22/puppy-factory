@@ -1,16 +1,16 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#fffaf5"><meta name="description" content="捏一只属于你的字字兽。选小狗、小猫、兔兔或更多小动物，自由拼装颜文字。">
   <title>字字兽 · 颜文字团子工厂</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%23f8d6d8'/%3E%3Ctext x='8' y='44' font-size='32'%3EUωU%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css?v=21"><script type="module" src="app.js?v=23"></script>
 </head>
 <body>
   <header class="topbar"><a class="brand" href="#" aria-label="Puppy Factory 首页"><span class="brand-icon" aria-hidden="true">U･ᴥ･U</span><span>字字兽<small>ZIZISHOU · 颜文字团子工厂</small></span></a><nav aria-label="主导航"><button class="nav-item active" data-view="studio">团子工坊</button><button class="nav-item" data-view="favorites">♡ 我的收藏 <span id="favorite-count">0</span></button></nav><div class="language-switch" role="group" aria-label="切换语言"><button type="button" data-language="zh" lang="zh-CN" aria-pressed="true">中文</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div><span class="header-note">made of tiny happiness ✧</span></header>
   <main>
     <section class="intro"><span class="eyebrow">THE LITTLE KAOMOJI STUDIO</span><h1>今天，想捏一只<span>什么字字兽？</span><i aria-hidden="true">✳</i></h1><p>一点软乎乎，一点小情绪。把可爱拼起来，带去每一次聊天。</p></section>
+    <p id="startup-status" class="startup-status" role="status">正在准备团子工坊。若长时间未就绪，请退出后重新打开。</p>
     <div id="studio">
       <section class="workbench" aria-label="颜文字编辑器">
         <div class="preview-dock" id="preview-dock">
@@ -28,9 +28,8 @@
                 <output id="puppy" class="kaomoji" dir="ltr" aria-live="polite" tabindex="0" role="button" title="点一下，拆开零件" aria-label="点一下，拆开零件"><span id="puppy-text" class="preview-text">૮₍ ˶• ﻌ •˶ ₎ა</span></output>
                 <div class="compact-actions">
                   <button id="slot-open-compact" type="button" class="compact-edit" aria-label="拆零件"><span aria-hidden="true">✎</span></button>
-                  <button id="copy-compact" type="button" class="button primary compact-copy" aria-label="复制团子">
-                    <span class="copy-idle"><span aria-hidden="true">▣ </span>复制</span>
-                    <span class="copy-done"><span aria-hidden="true">✓ </span>已复制</span>
+                  <button id="copy-compact" type="button" class="button primary compact-copy" aria-label="带走团子">
+                    <span><span aria-hidden="true">▣ </span>带走</span>
                   </button>
                 </div>
               </div>
@@ -39,7 +38,7 @@
             </div>
             <div class="preview-bottom">
               <div class="action-row">
-                <button id="copy" class="button primary">▣ 复制团子</button>
+                <button id="copy" class="button primary">▣ 带走团子</button>
                 <button id="save" class="button secondary" aria-pressed="false">♡ 收藏</button>
                 <button id="share-open" class="button secondary share-btn" type="button" aria-label="生成分享卡片">⇪ 卡片</button>
               </div>
@@ -63,9 +62,30 @@
       </section>
       <section class="collection"><div class="collection-heading"><div><span class="eyebrow">A LITTLE DANGO PARADE</span><h2>字字兽集合啦 <span class="small-flower">✿</span></h2></div><p>遇到喜欢的，就把它带走吧。</p></div><div class="filters" aria-label="字字兽分类" id="filters"></div><div class="card-grid" id="gallery"></div><button id="more" class="button more-button">再来一窝团子 ⤨</button></section>
     </div>
-    <section id="favorites" class="collection" hidden><div class="collection-heading"><div><span class="eyebrow">YOUR LITTLE HAPPY PLACE</span><h2>收藏的字字兽 ♡</h2></div><p>住在这台设备、这个浏览器里。</p></div><div id="favorite-grid" class="card-grid"></div><div id="empty-favorites" class="empty"><span class="kaomoji">U ˘ ﻌ ˘ U</span><h3>这里等着小团子入住</h3><p>点一下 ♡，就能把喜欢的团子留在这里。</p><button class="button primary" data-view="studio">去捏一只字字兽</button></div></section>
+    <section id="favorites" class="collection" hidden><div class="collection-heading"><div><span class="eyebrow">YOUR LITTLE HAPPY PLACE</span><h2>收藏的字字兽 ♡</h2></div><p>住在这台设备、这个浏览器里。</p></div><p id="favorites-storage-status" role="status" hidden>当前无法读取收藏，请在新版小红书中重开小工具</p><div id="favorite-grid" class="card-grid"></div><div id="empty-favorites" class="empty"><span class="kaomoji">U ˘ ﻌ ˘ U</span><h3>这里等着小团子入住</h3><p>点一下 ♡，就能把喜欢的团子留在这里。</p><button class="button primary" data-view="studio">去捏一只字字兽</button></div></section>
     <footer><span class="footer-brand">字字兽 · ZIZISHOU</span><span>字字兽负责可爱，你负责开心。<br><small>无需注册 · 收藏仅保存在本机 · 不同设备的字形可能略有差异</small></span><span class="kaomoji footer-dog" aria-hidden="true">U・ﻌ・U ♡</span></footer>
   </main>
   <div id="toast" role="status" aria-live="polite"></div>
-  <dialog id="slot-edit"><h2>✂ 拆零件</h2><p>点 × 删掉不想要的那一块，点格子可以自己改字。删掉、改过的零件会一直保持，直到你在下面重新选这个部件。</p><output id="slot-preview" class="kaomoji slot-preview" dir="ltr"></output><div id="slot-list" class="slot-list"></div><button id="slot-done" class="button primary" type="button">好了</button></dialog><dialog id="share-card"><h2>⇪ 分享卡片</h2><p>长按图片保存，或者点下面的按钮。卡片下面有二维码，朋友扫一下就能来捏。</p><img id="share-img" class="share-img" alt="字字兽分享卡片"><div class="share-actions"><a id="share-download" class="button primary" download="zizishou.png">保存图片</a><button id="share-native" class="button secondary" type="button" hidden>分享</button><button id="share-close" class="button secondary" type="button">关闭</button></div></dialog><dialog id="manual-copy"><h2>长按，把团子带走</h2><p>浏览器暂时不允许自动复制，请选中下方文字手动复制。</p><textarea id="copy-text" readonly dir="ltr" aria-label="待复制的团子颜文字"></textarea><button id="close-dialog" class="button primary">完成</button></dialog>
+  <dialog id="slot-edit"><h2>✂ 拆零件</h2><p>点 × 删掉不想要的那一块，点格子可以自己改字。删掉、改过的零件会一直保持，直到你在下面重新选这个部件。</p><output id="slot-preview" class="kaomoji slot-preview" dir="ltr"></output><div id="slot-list" class="slot-list"></div><button id="slot-done" class="button primary" type="button">好了</button></dialog>
+  <dialog id="share-card" aria-labelledby="share-title">
+    <h2 id="share-title">⇪ 分享卡片</h2>
+    <canvas id="share-img" class="share-img" width="810" height="1080" role="img" aria-label="字字兽分享卡片"></canvas>
+    <p id="share-unavailable" hidden>可以预览卡片。保存或分享请在支持的小红书客户端使用。</p>
+    <div class="share-actions">
+      <button id="share-save" class="button primary" type="button" hidden>保存到相册</button>
+      <button id="share-native" class="button secondary" type="button" hidden>分享</button>
+      <button id="share-close" class="button secondary" type="button">关闭</button>
+    </div>
+    <p id="share-action-status" role="status"></p>
+  </dialog>
+  <dialog id="manual-copy" aria-labelledby="take-title">
+    <h2 id="take-title">把团子带走</h2>
+    <p>颜文字已选中。长按文字，在系统选字菜单中点「复制」。</p>
+    <textarea id="copy-text" readonly dir="ltr" aria-label="待复制的团子颜文字"></textarea>
+    <div class="share-actions">
+      <button id="select-copy-text" class="button primary" type="button">全选文字</button>
+      <button id="text-card" class="button secondary" type="button">表情卡</button>
+      <button id="close-dialog" class="button secondary" type="button">完成</button>
+    </div>
+  </dialog>
 </body></html>

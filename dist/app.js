@@ -1,17 +1,21 @@
-import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText} from './model.js?v=15';
-import {drawShareCard,SHARE_URL} from './share.js?v=4';
-import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=15';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=15';
+import {earSegments,PARTS,ACCESSORIES,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,FAVORITES_KEY,cloneState,values,composeParts,compose,faceSpacing,hasOwn,validState} from './model.js';
+import {drawShareCard} from './share.js';
+import {RECENT_KEY,EYE_MOODS,cleanRecent,usePart,partTray,clearFace,compactDock,anchorTop} from './picker.js';
+import {LANGUAGE_KEY,hasHanText,translate} from './i18n.js';
+import {createMiniTool,createPreferences,topInset} from './minitool.js';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
-try{storage=localStorage}catch{}
-let language=readLanguage(storage);
+const miniTool=createMiniTool(window.xhs);
+const preferences=createPreferences(miniTool);
+let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[];
+let language='zh',languageChanged=false;
+let favorites=[],favoritesReady,loadingFavorites=true,savingFavorite=false;
+let recent={},recentReady,recentSaveTimer;
 const textBindings=new Map(),attributeBindings=new Map();
 function setText(node,value){const source=String(value);const literal=node.classList.contains('kaomoji')||node.id==='puppy';node.textContent=literal?source:translate(source,language);if(!literal&&node.firstChild)textBindings.set(node.firstChild,source)}
 function localizedAttr(node,name,value){const source=String(value);node.setAttribute(name,translate(source,language));if(!attributeBindings.has(node))attributeBindings.set(node,new Map());attributeBindings.get(node).set(name,source)}
 function bindStaticText(){
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
- while((node=walker.nextNode())){if(/\p{Script=Han}/u.test(node.data)&&!node.parentElement.closest('.kaomoji,script,style,[data-language]'))textBindings.set(node,node.data)}
+ while((node=walker.nextNode())){if(hasHanText(node.data)&&!node.parentElement.closest('.kaomoji,script,style,[data-language]'))textBindings.set(node,node.data)}
  document.querySelectorAll('[aria-label],[placeholder],[title]').forEach(node=>{for(const name of ['aria-label','placeholder','title'])if(node.hasAttribute(name))localizedAttr(node,name,node.getAttribute(name))});
 }
 function applyLanguage(){
@@ -22,8 +26,6 @@ function applyLanguage(){
  document.querySelector('meta[name="description"]').content=translate('捏一只属于你的字字兽。选小狗、小猫、兔兔或更多小动物，自由拼装颜文字。',language);
  $$('[data-language]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.language===language)));queueDock();
 }
-let favorites=readFavorites(storage);
-let recent=readRecent(storage);
 const trays=new Map();
 const categories=['全部团子',...ANIMALS.map(x=>x.name),'新到表情','小恶魔','小天使','开心','撒娇','困困','委屈'];
 const customKeys={ears:['left','right','leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter'],eyes:['eyeLeft','eyeRight'],mouth:['mouth'],decor:['prefix','suffix','blushLeft','blushRight']};
@@ -31,43 +33,105 @@ const accessorySlots={horns:['hornLeft','hornRight'],wings:['wingLeft','wingRigh
 const names={left:'左耳',right:'右耳',eyeLeft:'左眼',eyeRight:'右眼',mouth:'嘴巴',prefix:'前面的小装饰',suffix:'后面的小装饰',leftOuter:'左外耳',leftFrame:'左脸边',leftInner:'左内侧',rightInner:'右内侧',rightFrame:'右脸边',rightOuter:'右外耳',blushLeft:'左腮红',blushRight:'右腮红',hornLeft:'左角',hornRight:'右角',wingLeft:'左翅膀',wingRight:'右翅膀',tail:'尾巴'};
 const labels={eyes:'选择眼睛',mouth:'选择嘴巴',ears:'换一对小耳朵',decor:'腮红与小装饰'};
 const looks=[
- {name:'委屈小狗',state:{...cloneState(DEFAULT),eyes:12,mouth:6}},
- {name:'小恶魔',state:{...cloneState(DEFAULT),accessories:{horns:1,tail:0,wings:0}}},
- {name:'摇尾小恶魔',state:{...cloneState(DEFAULT),accessories:{horns:1,tail:1,wings:0}}},
- {name:'扑扇小天使',state:{...cloneState(DEFAULT),ears:8,eyes:13,mouth:9,decor:0,accessories:{horns:0,tail:0,wings:1}}},
- {name:'天使小狗',state:{...cloneState(DEFAULT),eyes:3,accessories:{horns:0,tail:0,wings:2}}},
- {name:'困困抱抱',state:{...cloneState(DEFAULT),eyes:4,mouth:3,decor:11}}
+ {name:'委屈小狗',state:Object.assign(cloneState(DEFAULT),{eyes:12,mouth:6})},
+ {name:'小恶魔',state:Object.assign(cloneState(DEFAULT),{accessories:{horns:1,tail:0,wings:0}})},
+ {name:'摇尾小恶魔',state:Object.assign(cloneState(DEFAULT),{accessories:{horns:1,tail:1,wings:0}})},
+ {name:'扑扇小天使',state:Object.assign(cloneState(DEFAULT),{ears:8,eyes:13,mouth:9,decor:0,accessories:{horns:0,tail:0,wings:1}})},
+ {name:'天使小狗',state:Object.assign(cloneState(DEFAULT),{eyes:3,accessories:{horns:0,tail:0,wings:2}})},
+ {name:'困困抱抱',state:Object.assign(cloneState(DEFAULT),{eyes:4,mouth:3,decor:11})}
 ];
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)setText(n,text);return n}
 function button(cls,text,fn){const b=el('button',cls,text);b.type='button';b.addEventListener('click',fn);return b}
+function replaceContents(node,...children){
+ node.textContent='';
+ node.append(...children);
+}
 function toast(message){setText($('#toast'),message);$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),2400)}
 function checkpoint(){history.push(cloneState(state));if(history.length>40)history.shift()}
-function rememberPart(key,index){recent=usePart(recent,key,index);writeRecent(storage,recent)}
+function rememberPart(key,index){
+ recent=usePart(recent,key,index);
+ clearTimeout(recentSaveTimer);
+ recentSaveTimer=setTimeout(async()=>{
+  if(await recentReady)preferences.write(RECENT_KEY,recent);
+ },180);
+}
 function change(fn,{remember=true}={}){const previous=cloneState(state);checkpoint();fn();if(remember){for(const k of Object.keys(PARTS))if(previous[k]!==state[k])rememberPart(k,state[k]);for(const k of Object.keys(ACCESSORIES))if(previous.accessories[k]!==state.accessories[k])rememberPart(k,state.accessories[k])}render();syncCustom()}
 const hasSaved=s=>favorites.some(x=>compose(x)===compose(s));
-function save(s){const t=compose(s),next=hasSaved(s)?favorites.filter(x=>compose(x)!==t):[cloneState(s),...favorites];if(next.length>500){toast('团子小窝已经住满 500 只啦');return}if(!writeFavorites(storage,next)){toast('浏览器无法保存收藏，请允许本地存储后再试');return}const added=next.length>favorites.length;favorites=next;renderSaved();renderGallery();renderFavorites();toast(added?'♡ 团子住进收藏夹啦':'已从收藏中移出')}
-async function copy(s){
- const text=compose(s);
- const method=await copyText(text,navigator,document);
- if(method==='manual'){
-  const input=$('#copy-text');
-  input.value=text;
-  $('#manual-copy').showModal();
-  input.focus();
-  input.select();
- }else toast('复制好啦！把团子带去聊天吧 ♡');
- return method;
+async function loadFavorites(){
+ loadingFavorites=true;
+ const record=await preferences.read(FAVORITES_KEY,list=>Array.isArray(list)&&list.every(validState));
+ loadingFavorites=false;
+ if(record.ok)favorites=(record.value||[]).slice(0,500).map(cloneState);
+ $('#favorites-storage-status').hidden=record.ok;
+ $('#favorite-count').hidden=!record.ok;
+ renderSaved();
+ if(record.ok)renderGallery();
+ renderFavorites();
+ return record.ok;
+}
+async function loadRecent(){
+ const record=await preferences.read(RECENT_KEY,value=>value&&typeof value==='object'&&!Array.isArray(value));
+ if(!record.ok)return false;
+ const restored=cleanRecent(record.value);
+ for(const [key,indices] of Object.entries(recent)){
+  restored[key]=[...new Set(indices.concat(restored[key]||[]))].slice(0,8);
+ }
+ recent=restored;
+ updateTrays();
+ return true;
+}
+async function save(s){
+ if(savingFavorite)return;
+ const selected=cloneState(s);
+ savingFavorite=true;
+ try{
+  if(!await favoritesReady){
+   toast('当前无法读取收藏，请在新版小红书中重开小工具');
+   return;
+  }
+  const text=compose(selected);
+  const added=!hasSaved(selected);
+  const next=added?[selected,...favorites]:favorites.filter(item=>compose(item)!==text);
+  if(next.length>500){
+   toast('团子小窝已经住满 500 只啦');
+   return;
+  }
+  if(!await preferences.write(FAVORITES_KEY,next)){
+   toast('收藏未确认保存，可以稍后再试');
+   favoritesReady=loadFavorites();
+   return;
+  }
+  favorites=next;
+  renderSaved();
+  renderGallery();
+  renderFavorites();
+  toast(added?'♡ 团子住进收藏夹啦':'已从收藏中移出');
+ }finally{
+  savingFavorite=false;
+ }
+}
+let selectedOutput;
+function selectText(){
+ const input=$('#copy-text');
+ input.focus();
+ input.setSelectionRange(0,input.value.length);
+}
+function takeCreature(s){
+ selectedOutput=cloneState(s);
+ $('#copy-text').value=compose(selectedOutput);
+ $('#manual-copy').showModal();
+ selectText();
 }
 function renderSaved(){$('#favorite-count').textContent=favorites.length;$('#save').setAttribute('aria-pressed',String(hasSaved(state)));setText($('#save'),hasSaved(state)?'♥ 已收藏':'♡ 收藏');$$('.nav-item').forEach(b=>{if(b.dataset.view==='favorites')localizedAttr(b,'aria-label',`我的收藏，${favorites.length}只团子`)})}
 let renderedFaceParts,highlightTimer;
 function renderFace(){
  const parts=composeParts(state);
- if(renderedFaceParts?.size===parts.length&&parts.every(([key,text])=>renderedFaceParts.get(key)===text))return;
+ if(renderedFaceParts&&renderedFaceParts.size===parts.length&&parts.every(([key,text])=>renderedFaceParts.get(key)===text))return;
 
  const preview=document.createDocumentFragment();
  for(const [key,text] of parts){
   // Ignore padding-only differences, such as the spaces trimmed when putting on horns.
-  if(renderedFaceParts&&(renderedFaceParts.get(key)??'').trim()!==text.trim()){
+  if(renderedFaceParts&&(renderedFaceParts.get(key)||'').trim()!==text.trim()){
    const mark=el('span','preview-change');
    mark.dataset.part=key;
    mark.textContent=text;
@@ -76,8 +140,8 @@ function renderFace(){
  }
  preview.normalize();
  const face=$('#puppy-text');
- face.replaceChildren(preview.cloneNode(true));
- $('#slot-preview').replaceChildren(preview);
+ replaceContents(face,preview.cloneNode(true));
+ replaceContents($('#slot-preview'),preview);
  $('#puppy').classList.toggle('long-puppy',Array.from(face.textContent).length>27);
  renderedFaceParts=new Map(parts);
 
@@ -87,7 +151,8 @@ function renderFace(){
  }
 }
 function render(){
- const currentSpace=state.spacing??PARTS.ears[state.ears].spacing??(PARTS.ears[state.ears].family==='classic'?'':' ');$$('[data-spacing]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.spacing===currentSpace)));
+ const currentSpace=faceSpacing(state);
+ $$('[data-spacing]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.spacing===currentSpace)));
  renderFace();
  const recipe=['ears','eyes','mouth','decor'].map(k=>PARTS[k][state[k]].name);
  Object.entries(state.accessories||{}).forEach(([k,v])=>{if(v)recipe.push(ACCESSORIES[k][v].name)});
@@ -95,9 +160,10 @@ function render(){
  setText($('#puppy-caption'),state.custom.eyeLeft===''&&state.custom.eyeRight===''&&state.custom.mouth===''?'空空的小脸，重新捏一只吧':state.accessories.wings?'小天使正在扑扇翅膀':state.accessories.horns?'今天也是可爱的小恶魔':PARTS.eyes[state.eyes].mood==='困困'?'团子困困，陪你慢慢休息':'这一只，是你的独家字字兽');
  $('#puppy-number').textContent=String(counter).padStart(3,'0');$('#undo').disabled=!history.length;
  $$('[data-animal]').forEach(b=>b.setAttribute('aria-pressed',String(animalForEar(state.ears)===b.dataset.animal)));
- $$('[data-choice]').forEach(b=>{const k=b.dataset.choice;b.setAttribute('aria-pressed',String(state[k]===Number(b.dataset.index)&&!customKeys[k].some(x=>Object.hasOwn(state.custom,x))))});
+ updateTrays();
+ $$('[data-choice]').forEach(b=>{const k=b.dataset.choice;b.setAttribute('aria-pressed',String(state[k]===Number(b.dataset.index)&&!customKeys[k].some(x=>hasOwn(state.custom,x))))});
  $$('[data-accessory]').forEach(b=>b.setAttribute('aria-pressed',String((state.accessories[b.dataset.accessory]||0)===Number(b.dataset.index))));
- updateTrays();renderSaved();
+ renderSaved();
 }
 function sample(k,x){if(k==='ears')return x.v[0]+'◦'+x.v[1];if(k==='eyes')return x.v[0]+' '+x.v[1];if(k==='mouth')return x.v;return x.v.join('')||'—'}
 function buildFamilies(){ANIMALS.forEach(animal=>{const look=ANIMAL_LOOKS.find(x=>x.id===animal.id);const b=button('family-option','',()=>change(()=>{state.ears=animal.earIndex;customKeys.ears.forEach(k=>delete state.custom[k]);rememberPart('ears',state.ears)}));b.dataset.animal=animal.id;localizedAttr(b,'aria-label','捏一只'+animal.name);b.append(el('span','kaomoji',compose(look.state)),el('small','',animal.name));$('#families').append(b)})}
@@ -149,43 +215,99 @@ function buildAccessories(){
  return section;
 }
 function buildControls(){buildFamilies();FRESH_LOOKS.forEach(look=>{const b=button('preset fresh-preset','',()=>change(()=>{state=cloneState(look.state);counter++}));b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#fresh-presets').append(b)});$$('[data-spacing]').forEach(b=>b.addEventListener('click',()=>change(()=>{state.spacing=b.dataset.spacing}))); [...ANIMAL_LOOKS,...looks].forEach(look=>{const b=button('preset','',()=>change(()=>{state=cloneState(look.state);counter++}));b.append(el('span','kaomoji',compose(look.state)),el('small','',look.name));$('#presets').append(b)});const earDecor=el('section','ear-decor-group');earDecor.id='picker-ears-and-decor';earDecor.append(buildPart('ears',false),buildPart('decor',false));$('#all-parts').append(buildPart('eyes'),buildPart('mouth'),buildAccessories(),earDecor);}
-function card(s){const text=compose(s),saved=hasSaved(s),animal=ANIMALS.find(x=>x.id===animalForEar(s.ears));const c=el('article','puppy-card'),top=el('div','card-portrait');const saveBtn=button('card-save',saved?'♥':'♡',()=>save(s));localizedAttr(saveBtn,'aria-label',(saved?'取消收藏 ':'收藏 ')+text);saveBtn.setAttribute('aria-pressed',String(saved));const face=el('span','kaomoji card-puppy',text);face.dir='ltr';if(Array.from(text).length>25)face.style.fontSize='16px';top.append(face,saveBtn);const bottom=el('div','card-bottom'),animalName=animal?.name||'团子';const name=el('span','card-name',s.accessories?.wings?'天使'+animalName:s.accessories?.horns?'恶魔'+animalName:PARTS.eyes[s.eyes].mood+animalName);name.append(el('small','',PARTS.ears[s.ears].name));const actions=el('div','card-actions');actions.append(button('','捏捏',()=>{change(()=>{state=cloneState(s);counter++});showView('studio');$('.workbench').scrollIntoView({behavior:'smooth',block:'start'})}),button('','复制',()=>copy(s)));bottom.append(name,actions);c.append(top,bottom);return c}
-function matches(s){if(filter==='全部团子')return true;if(filter==='新到表情')return FRESH_LOOKS.some(x=>compose(x.state)===compose(s));const animal=ANIMALS.find(x=>x.name===filter);if(animal)return animalForEar(s.ears)===animal.id;if(filter==='小恶魔')return (s.accessories?.horns||0)>0;if(filter==='小天使')return (s.accessories?.wings||0)>0;return PARTS.eyes[s.eyes].mood===filter}
-function renderGallery(){$('#gallery').replaceChildren(...gallery.filter(matches).slice(0,12).map(card))}
+function card(s){
+ const text=compose(s),saved=hasSaved(s),animal=ANIMALS.find(x=>x.id===animalForEar(s.ears));
+ const c=el('article','puppy-card'),top=el('div','card-portrait');
+ const saveBtn=button('card-save',saved?'♥':'♡',()=>save(s));
+ localizedAttr(saveBtn,'aria-label',(saved?'取消收藏 ':'收藏 ')+text);
+ saveBtn.setAttribute('aria-pressed',String(saved));
+ const face=el('span','kaomoji card-puppy',text);
+ face.dir='ltr';if(Array.from(text).length>25)face.style.fontSize='16px';
+ top.append(face,saveBtn);
+ const bottom=el('div','card-bottom'),animalName=animal?animal.name:'团子',a=s.accessories||{};
+ const name=el('span','card-name',(a.wings?'天使':a.horns?'恶魔':PARTS.eyes[s.eyes].mood)+animalName);
+ name.append(el('small','',PARTS.ears[s.ears].name));
+ const actions=el('div','card-actions');
+ actions.append(button('','捏捏',()=>{
+  change(()=>{state=cloneState(s);counter++});
+  showView('studio');
+  window.scrollTo(0,$('.workbench').getBoundingClientRect().top+window.scrollY-dockOffset());
+ }),button('','带走',()=>takeCreature(s)));
+ bottom.append(name,actions);c.append(top,bottom);return c;
+}
+function matches(s){
+ if(filter==='全部团子')return true;
+ if(filter==='新到表情')return FRESH_LOOKS.some(x=>compose(x.state)===compose(s));
+ const animal=ANIMALS.find(x=>x.name===filter),a=s.accessories||{};
+ if(animal)return animalForEar(s.ears)===animal.id;
+ if(filter==='小恶魔')return a.horns>0;
+ if(filter==='小天使')return a.wings>0;
+ return PARTS.eyes[s.eyes].mood===filter;
+}
+function renderGallery(){replaceContents($('#gallery'),...gallery.filter(matches).slice(0,12).map(card))}
 function newRandom(animalId=null,mood=null){const chosen=animalId||ANIMALS[Math.floor(Math.random()*ANIMALS.length)].id;const s=cloneState(randomAnimalState(chosen,mood));for(const k of Object.keys(ACCESSORIES))s.accessories[k]=k!=='horns'&&Math.random()<.2?1+Math.floor(Math.random()*(ACCESSORIES[k].length-1)):0;return s}
-function refreshGallery(){gallery=[...ANIMAL_LOOKS.map(x=>cloneState(x.state)),...FRESH_LOOKS.map(x=>cloneState(x.state)),...looks.map(x=>cloneState(x.state)),cloneState(DEFAULT),...ANIMALS.flatMap(x=>['开心','撒娇','困困','委屈'].map(m=>newRandom(x.id,m)))];const animal=ANIMALS.find(x=>x.name===filter),mood=['开心','撒娇','困困','委屈'].includes(filter)?filter:null;for(let i=0;i<24;i++){const s=newRandom(animal?.id||null,mood);if(filter==='小恶魔')s.accessories.horns=1+Math.floor(Math.random()*(ACCESSORIES.horns.length-1));if(filter==='小天使')s.accessories.wings=1+Math.floor(Math.random()*(ACCESSORIES.wings.length-1));gallery.push(s)}const seen=new Set();gallery=gallery.filter(s=>{const text=compose(s);if(seen.has(text))return false;seen.add(text);return true});renderGallery()}
-function renderFilters(){$('#filters').replaceChildren();categories.forEach(name=>{const b=button('filter',name,()=>{filter=name;renderFilters();refreshGallery()});b.setAttribute('aria-pressed',String(filter===name));$('#filters').append(b)})}
-function renderFavorites(){$('#favorite-grid').replaceChildren(...favorites.map(card));$('#empty-favorites').hidden=!!favorites.length}
+function refreshGallery(){
+ const moods=['开心','撒娇','困困','委屈'];
+ gallery=[...ANIMAL_LOOKS,...FRESH_LOOKS,...looks].map(look=>cloneState(look.state));
+ gallery.push(cloneState(DEFAULT));
+ ANIMALS.forEach(animal=>moods.forEach(mood=>gallery.push(newRandom(animal.id,mood))));
+ const animal=ANIMALS.find(x=>x.name===filter),mood=moods.includes(filter)?filter:null;
+ for(let i=0;i<24;i++){
+  const s=newRandom(animal?animal.id:null,mood);
+  if(filter==='小恶魔')s.accessories.horns=1+Math.floor(Math.random()*(ACCESSORIES.horns.length-1));
+  if(filter==='小天使')s.accessories.wings=1+Math.floor(Math.random()*(ACCESSORIES.wings.length-1));
+  gallery.push(s);
+ }
+ const seen=new Set();
+ gallery=gallery.filter(s=>{
+  const text=compose(s);
+  if(seen.has(text))return false;
+  seen.add(text);
+  return true;
+ });
+ renderGallery();
+}
+function renderFilters(){
+ replaceContents($('#filters'),...categories.map(name=>{
+  const b=button('filter',name,()=>{filter=name;renderFilters();refreshGallery()});
+  b.setAttribute('aria-pressed',String(filter===name));
+  return b;
+ }));
+}
+function renderFavorites(){
+ if($('#favorites').hidden)return;
+ replaceContents($('#favorite-grid'),...favorites.map(card));
+ $('#empty-favorites').hidden=loadingFavorites||!!favorites.length||!$('#favorites-storage-status').hidden;
+}
 function showView(view){$('#studio').hidden=view!=='studio';$('#favorites').hidden=view!=='favorites';$$('.nav-item').forEach(b=>{b.classList.toggle('active',b.dataset.view===view);if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});if(view==='favorites')renderFavorites()}
 $$('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
-$('.brand').addEventListener('click',e=>{e.preventDefault();showView('studio');window.scrollTo({top:0,behavior:'smooth'})});
+$('.brand').addEventListener('click',e=>{e.preventDefault();showView('studio');window.scrollTo(0,0)});
 $$('[data-jump]').forEach(b=>b.addEventListener('click',()=>jumpToPart(b.dataset.jump)));
-$('#copy').addEventListener('click',()=>copy(state));$('#save').addEventListener('click',()=>save(state));
-const compactCopy=$('#copy-compact');
-let copyFeedbackTimer;
-compactCopy.addEventListener('click',async()=>{
- const method=await copy(state);
- clearTimeout(copyFeedbackTimer);
- compactCopy.classList.toggle('is-copied',method!=='manual');
- if(method!=='manual')copyFeedbackTimer=setTimeout(()=>compactCopy.classList.remove('is-copied'),1400);
-});
+$('#copy').addEventListener('click',()=>takeCreature(state));
+$('#copy-compact').addEventListener('click',()=>takeCreature(state));
+$('#save').addEventListener('click',()=>save(state));
+$('#select-copy-text').addEventListener('click',selectText);
 $('#random').addEventListener('click',()=>{change(()=>{state=newRandom();counter++});toast('噗叽！一只字字兽诞生啦')});
 $('#reset').addEventListener('click',()=>{change(()=>state=clearFace(state),{remember:false});toast('搭配已清空，点一下撤回就能找回来')});
 $('#undo').addEventListener('click',()=>{if(history.length){state=history.pop();render();syncCustom()}});
 $('#more').addEventListener('click',()=>{refreshGallery();toast('新的一窝团子来啦')});$('#close-dialog').addEventListener('click',()=>$('#manual-copy').close());
-window.addEventListener('storage',e=>{if(e.key===LANGUAGE_KEY||e.key===null){language=readLanguage(storage);applyLanguage()}if(e.key==='puppy-factory:favorites'||e.key===null){favorites=readFavorites(storage);renderSaved();renderGallery();renderFavorites()}if(e.key===RECENT_KEY||e.key===null){recent=readRecent(storage);updateTrays()}});
 
 
 const mobileScreen=matchMedia('(max-width: 720px)');
 let dockFrame=0;let dockFullHeight=0;
+function dockOffset(){
+ return mobileScreen.matches?Math.max(0,parseFloat(getComputedStyle($('#preview-dock')).top)||0):0;
+}
 function updateDock(){
+ if($('#studio').hidden)return;
  const dock=$('#preview-dock'),workbench=$('.workbench');
- dock.classList.toggle('is-compact',compactDock({mobile:mobileScreen.matches,workbenchTop:workbench.getBoundingClientRect().top,wasCompact:dock.classList.contains('is-compact')}));
+ const top=dockOffset();
+ dock.classList.toggle('is-compact',compactDock({mobile:mobileScreen.matches,workbenchTop:workbench.getBoundingClientRect().top-top,wasCompact:dock.classList.contains('is-compact')}));
  // 2026-11-23 界：卡片收起后会矮一截，先用 margin 把少掉的高度垫上，下面的内容就不会被一下拽上来
  const compactNow=dock.classList.contains('is-compact');
  if(!compactNow){dock.style.marginBottom='';dockFullHeight=dock.getBoundingClientRect().height}
  else if(dockFullHeight){dock.style.marginBottom=Math.max(0,dockFullHeight-dock.getBoundingClientRect().height)+'px'}
- const height=dock.getBoundingClientRect().height;document.documentElement.style.setProperty('--puppy-dock-height',height+'px');
+ const height=dock.getBoundingClientRect().height+top;document.documentElement.style.setProperty('--puppy-dock-height',height+'px');
  const limit=mobileScreen.matches?height+18:36;let active=null;
  for(const id of ['eyes','mouth','accessories','ears-and-decor']){if($('#picker-'+id).getBoundingClientRect().top<=limit)active=id}
  $$('[data-jump]').forEach(b=>{if(b.dataset.jump===active)b.setAttribute('aria-current','location');else b.removeAttribute('aria-current')});
@@ -199,42 +321,71 @@ function jumpToPart(id){
   dock.classList.add('is-compact');
   if(dockFullHeight)dock.style.marginBottom=Math.max(0,dockFullHeight-dock.getBoundingClientRect().height)+'px';
  }
- const height=$('#preview-dock').getBoundingClientRect().height;
- window.scrollTo({top:anchorTop(target.getBoundingClientRect().top,window.scrollY,height,mobileScreen.matches),behavior:'auto'});
- target.tabIndex=-1;target.focus({preventScroll:true});queueDock();
+ const height=$('#preview-dock').getBoundingClientRect().height+dockOffset();
+ const scrollTop=anchorTop(target.getBoundingClientRect().top,window.scrollY,height,mobileScreen.matches);
+ target.tabIndex=-1;
+ target.focus();
+ window.scrollTo(0,scrollTop);
+ queueDock();
+}
+function applyWindowInfo(info){
+ const inset=topInset(info);
+ const style=document.documentElement.style;
+ if(inset)style.setProperty('--minitool-top',inset+'px');
+ else style.removeProperty('--minitool-top');
+ queueDock();
+}
+async function refreshWindowInfo(){
+ try{applyWindowInfo(await miniTool.call('getWindowInfo',9490))}
+ catch(error){}
 }
 function setupDock(){
- window.addEventListener('scroll',queueDock,{passive:true});window.addEventListener('resize',queueDock,{passive:true});mobileScreen.addEventListener('change',queueDock);
+ let resizeTimer;
+ window.addEventListener('scroll',queueDock,{passive:true});
+ window.addEventListener('resize',()=>{
+  queueDock();
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(refreshWindowInfo,160);
+ },{passive:true});
+ if(typeof mobileScreen.addEventListener==='function')mobileScreen.addEventListener('change',queueDock);
+ else mobileScreen.addListener(queueDock);
  if(typeof ResizeObserver!=='undefined')new ResizeObserver(queueDock).observe($('#preview-dock'));
- document.fonts?.ready.then(queueDock);updateDock();
+ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(queueDock);
+ const visual=window.visualViewport;
+ if(visual&&typeof visual.addEventListener==='function'){
+  visual.addEventListener('resize',()=>document.documentElement.style.setProperty('--visible-height',visual.height+'px'));
+ }
+ miniTool.launch.then(options=>{
+  const env=options&&options.miniToolEnv;
+  if(env&&env.windowInfo)applyWindowInfo(env.windowInfo);
+  refreshWindowInfo();
+ });
+ updateDock();
 }
-
-bindStaticText();buildControls();render();syncCustom();renderFilters();refreshGallery();showView('studio');setupDock();applyLanguage();
-$$('[data-language]').forEach(b=>b.addEventListener('click',()=>{language=b.dataset.language;writeLanguage(storage,language);applyLanguage()}));
 
 // 2026-11-23 界（拾提，照 Live2D 的思路）：「拆零件」。点颜文字，把它拆成一块块零件：
 // × 删掉这一块，点进去可以改字。删掉、改过的零件会一直保持，
 // 直到在下面重新选这个部件，才会被新部件覆盖。撤回照常可用。
 const slotOrder=[['prefix','前装饰'],['wingLeft','左翅膀','wings'],['left','左耳'],['hornLeft','左角','horns'],['blushLeft','左腮红'],['eyeLeft','左眼'],['mouth','嘴巴'],['eyeRight','右眼'],['blushRight','右腮红'],['hornRight','右角','horns'],['right','右耳'],['wingRight','右翅膀','wings'],['tail','尾巴','tail'],['suffix','后装饰']];
-function slotDefault(key){const v=values({...state,custom:{}}),a=state.accessories||{};
+function slotDefault(key){const v=values(Object.assign({},state,{custom:{}})),a=state.accessories||{};
  if(key==='hornLeft')return ACCESSORIES.horns[a.horns||0].v[0];if(key==='hornRight')return ACCESSORIES.horns[a.horns||0].v[1];
  if(key==='wingLeft')return ACCESSORIES.wings[a.wings||0].v[0];if(key==='wingRight')return ACCESSORIES.wings[a.wings||0].v[1];
- if(key==='tail')return ACCESSORIES.tail[a.tail||0].v;return v[key]??''}
-function slotValue(key){return Object.hasOwn(state.custom,key)?state.custom[key]:slotDefault(key)}
+ if(key==='tail')return ACCESSORIES.tail[a.tail||0].v;return v[key]||''}
+function slotValue(key){return hasOwn(state.custom,key)?state.custom[key]:slotDefault(key)}
 const cleanSlot=v=>Array.from(v.replace(/[\u0000-\u001f\u007f‪-‮⁦-⁩]/gu,'')).slice(0,16).join('');
 function earSlots(side){
- if(Object.hasOwn(state.custom,side))return null;
+ if(hasOwn(state.custom,side))return null;
  const segments=earSegments({},PARTS.ears[state.ears],side);
  if(segments[0][0]===side)return null;
- return segments.filter(([key,def])=>Object.hasOwn(state.custom,key)||def.trim()!=='')
+ return segments.filter(([key,def])=>hasOwn(state.custom,key)||def.trim()!=='')
   .map(([key,def])=>({key,label:names[key],def}));
 }
 function renderSlots(){
- const box=$('#slot-list');box.replaceChildren();
+ const box=$('#slot-list');box.textContent='';
  for(const [key,label,needs] of slotOrder){
   if(needs&&!state.accessories[needs])continue;
   if(key==='left'||key==='right'){const subs=earSlots(key);if(subs){subs.forEach(sub=>box.append(pieceChip(sub)));continue}}
-  const has=Object.hasOwn(state.custom,key),deleted=has&&state.custom[key]==='';
+  const has=hasOwn(state.custom,key),deleted=has&&state.custom[key]==='';
   if(!deleted&&!has&&slotDefault(key)==='')continue;
   const chip=el('div','slot-chip'+(deleted?' is-deleted':''));chip.append(el('small','',label));
   if(deleted){chip.append(button('slot-restore','↺ 恢复',()=>{delete state.custom[key];render();syncCustom();renderSlots()}))}
@@ -251,26 +402,75 @@ $('#slot-open').addEventListener('click',openSlots);
 $('#slot-open-compact').addEventListener('click',openSlots);
 $('#slot-done').addEventListener('click',()=>{$('#slot-edit').close();render();toast('拆好啦，删掉的零件会一直保持')});
 
-// 2026-11-23 界（拾提）：分享卡片，底下带网址和二维码。
-let shareBlobUrl='';
-async function openShare(){
- const canvas=document.createElement('canvas');
+let cardOpening=false,cardExporting=false;
+async function openShare(s){
+ if(cardOpening||$('#share-card').open)return;
+ const text=compose(s);
  const t=x=>translate(x,language);
- await drawShareCard(canvas,compose(state),t($('#puppy-caption').dataset.source||$('#puppy-caption').textContent),{brand:t('字字兽 · 颜文字团子工厂'),tagline:t('自由组合颜文字字符，随时组合你喜欢的颜文字，以及部分改动表情'),scan:t('扫码捏一只你的团子 →')});
- const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));if(!blob){toast('卡片生成失败了，再试一次吧');return}
- if(shareBlobUrl)URL.revokeObjectURL(shareBlobUrl);shareBlobUrl=URL.createObjectURL(blob);
- $('#share-img').src=shareBlobUrl;$('#share-download').href=shareBlobUrl;
- const file=new File([blob],'zizishou.png',{type:'image/png'});
- const canShare=!!(navigator.canShare&&navigator.canShare({files:[file]}));
- $('#share-native').hidden=!canShare;$('#share-native').onclick=async()=>{try{await navigator.share({files:[file],title:t('字字兽'),text:compose(state)+' '+SHARE_URL})}catch{}};
- $('#share-card').showModal();
+ const caption=s===state?$('#puppy-caption').textContent:t('这一只，是你的独家字字兽');
+ cardOpening=true;
+ try{
+  await drawShareCard($('#share-img'),text,caption,{
+   brand:t('字字兽 · 颜文字团子工厂'),
+   tagline:t('在小红书搜「字字兽」，捏一只你的团子')
+  });
+  const available=await Promise.all([
+   miniTool.supports('saveImageToPhotosAlbum',9420),
+   miniTool.supports('share',9530)
+  ]);
+  $('#share-save').hidden=!available[0];
+  $('#share-native').hidden=!available[1];
+  $('#share-unavailable').hidden=available[0]||available[1];
+  setText($('#share-action-status'),'');
+  $('#share-card').showModal();
+ }catch(error){
+  toast('卡片生成失败了，再试一次吧');
+ }finally{
+  cardOpening=false;
+ }
 }
-$('#share-open').addEventListener('click',openShare);
+async function exportCard(saveToAlbum){
+ if(cardExporting)return;
+ cardExporting=true;
+ const controls=[$('#share-save'),$('#share-native')];
+ controls.forEach(control=>control.disabled=true);
+ const status=$('#share-action-status');
+ setText(status,'');
+ try{
+  let image=$('#share-img').toDataURL('image/png');
+  const version=saveToAlbum?9420:9530;
+  if(image.length>138000&&await miniTool.supports('writeTempFile',version)){
+   const file=await miniTool.call('writeTempFile',version,{data:image});
+   if(typeof file.filePath==='string'&&file.filePath)image=file.filePath;
+  }
+  if(saveToAlbum){
+   await miniTool.call('saveImageToPhotosAlbum',9420,{filePath:image},15000);
+   setText(status,'已保存到相册');
+  }else{
+   await miniTool.call('share',9530,{type:'image',image_resource:image},15000);
+  }
+ }catch(error){
+  const message=saveToAlbum?'保存到相册未确认，请检查权限后再试'
+   :error&&error.errCode===15502?'请在小红书全屏打开后分享'
+   :'暂时无法分享，可以稍后再试';
+  setText(status,message);
+ }finally{
+  controls.forEach(control=>control.disabled=false);
+  cardExporting=false;
+ }
+}
+$('#share-open').addEventListener('click',()=>openShare(state));
+$('#text-card').addEventListener('click',()=>{
+ $('#manual-copy').close();
+ openShare(selectedOutput);
+});
+$('#share-save').addEventListener('click',()=>exportCard(true));
+$('#share-native').addEventListener('click',()=>exportCard(false));
 $('#share-close').addEventListener('click',()=>$('#share-card').close());
 
 // 拆开的耳朵块：保留原来那一块前后的空格，只换中间的字
 function pieceChip({key,label,def}){
- const has=Object.hasOwn(state.custom,key),deleted=has&&state.custom[key]==='';
+ const has=hasOwn(state.custom,key),deleted=has&&state.custom[key]==='';
  const lead=def.match(/^\s*/u)[0],trail=def.match(/\s*$/u)[0];
  const chip=el('div','slot-chip'+(deleted?' is-deleted':''));chip.append(el('small','',label));
  if(deleted){chip.append(button('slot-restore','↺ 恢复',()=>{delete state.custom[key];render();syncCustom();renderSlots()}));return chip}
@@ -278,3 +478,41 @@ function pieceChip({key,label,def}){
  input.addEventListener('input',()=>{const v=cleanSlot(input.value).trim();state.custom[key]=v?lead+v+trail:'';render();syncCustom()});
  const del=button('slot-delete','×',()=>{state.custom[key]='';render();syncCustom();renderSlots()});localizedAttr(del,'aria-label','删掉'+label);
  chip.append(input,del);return chip}
+
+async function loadLanguage(){
+ const record=await preferences.read(LANGUAGE_KEY,value=>value==='zh'||value==='en');
+ if(record.ok&&record.value&&!languageChanged){
+  language=record.value;
+  applyLanguage();
+ }
+ return record.ok;
+}
+function boot(){
+ bindStaticText();
+ buildControls();
+ render();
+ syncCustom();
+ showView('studio');
+ setupDock();
+ applyLanguage();
+ favoritesReady=loadFavorites();
+ recentReady=loadRecent();
+ const languageReady=loadLanguage();
+ $$('[data-language]').forEach(button=>button.addEventListener('click',async()=>{
+  const chosen=button.dataset.language;
+  languageChanged=true;
+  language=chosen;
+  applyLanguage();
+  const ready=await languageReady;
+  if(language===chosen&&(!ready||!await preferences.write(LANGUAGE_KEY,chosen))){
+   toast('本次语言已切换，偏好暂未保存');
+  }
+ }));
+ $$('[data-startup-control]').forEach(control=>control.disabled=false);
+ $('#startup-status').hidden=true;
+ requestAnimationFrame(()=>setTimeout(()=>{
+  renderFilters();
+  refreshGallery();
+ },0));
+}
+boot();
