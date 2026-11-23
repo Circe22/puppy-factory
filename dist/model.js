@@ -329,3 +329,26 @@ PARTS.ears[21].noRandom=true;PARTS.ears[PARTS.ears.length-1].noRandom=true;
 ['小u嘴|u','小v嘴|v','大A嘴|A','小a嘴|a'].forEach(x=>{const [name,v]=x.split('|');addPart('mouth',{name,v})});
 addPart('eyes',{name:'大O眼',v:['O','O'],mood:'日常'});
 addPart('eyes',{name:'U形眼',v:['U','U'],mood:'困困'});
+
+// 2026-11-24 00:42 拾发来一篮子新零件：可爱腮红、猫耳朵、右边装饰、眼镜、星星、蝴蝶结、四叶草。
+// 查过都不重复。冷门字（⪩⪨ ⎚ ᨓ ྀི 𖧧 ꕤ ࣪ 等）另外打了字体包 20 号起。写法保持 ES2017，方便合进小工具版。
+const earIndex=function(name){return PARTS.ears.findIndex(function(x){return x.name===name})};
+const cuteBlush=addPart('decor',{name:'可爱腮红',v:['','๑','๑','']});
+const dotMouth=addPart('mouth',{name:'小圆点嘴',v:'.'});
+addPart('ears',{name:'尖尖猫耳',v:['⪩ ',' ⪨'],animal:'cat'});
+addPart('decor',{name:'右边小撇撇',v:['','','','ˊˎ˗']});
+addPart('decor',{name:'星星点点',v:['✩.*˚ ','','','']});
+addPart('decor',{name:'四叶草',v:['','','',' ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ']});
+// 蝴蝶结 ྀི 是要贴在前一个字上的小符号，单独放会挂在空格上。照常见写法贴在脸框 ꒰ ꒱ 后面，做成一对耳朵。
+const bowEars=addPart('ears',{name:'蝴蝶结团耳',v:['꒰ྀི ',' ꒱ྀི'],animal:'hamster'});
+// 眼镜脸没有耳朵：做一个藏起来的「不带耳朵」，只给眼镜团子用，不进列表、不进随机。
+const noEars=addPart('ears',{name:'不带耳朵',v:['',''],spacing:'',hidden:true,noRandom:true});
+const squareGlasses=addPart('eyes',{name:'方框眼镜',v:['⎚','⎚'],mood:'日常'});
+const armGlasses=addPart('eyes',{name:'带腿眼镜',v:['ˋ⎚','⎚ˊ'],mood:'日常'});
+const glassesMouth=addPart('mouth',{name:'小波浪嘴',v:'ᨓ'});
+FRESH_LOOKS.push(
+ {name:'腮红团子',expected:'(๑• . •๑)',state:{ears:earIndex('紧凑圆脸'),eyes:0,mouth:dotMouth,decor:cuteBlush,spacing:' '}},
+ {name:'眼镜团子',expected:'⎚ᨓ⎚',state:{ears:noEars,eyes:squareGlasses,mouth:glassesMouth,decor:0}},
+ {name:'斯文团子',expected:'ˋ⎚⤚⎚ˊ',state:{ears:noEars,eyes:armGlasses,mouth:5,decor:0}},
+ {name:'蝴蝶结团子',expected:'꒰ྀི ˶• ᴗ •˶ ꒱ྀི',state:{ears:bowEars,eyes:0,mouth:2,decor:1}}
+);

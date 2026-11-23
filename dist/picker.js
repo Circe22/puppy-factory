@@ -1,5 +1,5 @@
-import {translate} from './i18n.js?v=30';
-import {PARTS, ACCESSORIES, NEW_PARTS, DEFAULT, cloneState} from './model.js?v=27';
+import {translate} from './i18n.js?v=31';
+import {PARTS, ACCESSORIES, NEW_PARTS, DEFAULT, cloneState} from './model.js?v=28';
 
 export const RECENT_KEY = 'puppy-factory:recent-parts';
 const OPTIONS = Object.assign({},PARTS,ACCESSORIES);
