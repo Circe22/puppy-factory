@@ -86,8 +86,16 @@ test('随机：耳朵里带手（如 ʕっ っʔ）时，不配带手的装饰�
 test('随机：外耳和内侧都是耳朵的 ૮(ᐢ ᐢ)ა 不会被随机出来，但手动能选', async () => {
   const {randomAnimalState, ANIMALS, PARTS, compose, cloneState, validState} = await import('../dist/model.js');
   const double = PARTS.ears.findIndex(e => e.v[0] === '૮(ᐢ ');
-  assert.ok(PARTS.ears[double].doubleEars);
+  assert.ok(PARTS.ears[double].noRandom);
   for (const a of ANIMALS) for (let i = 0; i < 400; i++) assert.notEqual(randomAnimalState(a.id).ears, double, a.id);
   const manual = cloneState({ears: double, eyes: 0, mouth: 0, decor: 0});
   assert.ok(validState(manual)); assert.ok(compose(manual).startsWith('૮(ᐢ'));
+});
+
+test('兔兔：默认和随机都用 ₍ᐢ ᐢ₎ 这类软团兔耳，不再随机出长耳', async () => {
+  const {randomAnimalState, ANIMALS, ANIMAL_LOOKS, PARTS, compose} = await import('../dist/model.js');
+  const rabbit = ANIMALS.find(a => a.id === 'rabbit');
+  assert.equal(PARTS.ears[rabbit.earIndex].v[0], '₍ᐢ ');
+  assert.ok(compose(ANIMAL_LOOKS.find(l => l.id === 'rabbit').state).startsWith('₍ᐢ'));
+  for (let i = 0; i < 400; i++) assert.ok(PARTS.ears[randomAnimalState('rabbit').ears].v[0].startsWith('₍ᐢ'));
 });
