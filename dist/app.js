@@ -11,7 +11,7 @@ function setText(node,value){const source=String(value);const literal=node.class
 function localizedAttr(node,name,value){const source=String(value);node.setAttribute(name,translate(source,language));if(!attributeBindings.has(node))attributeBindings.set(node,new Map());attributeBindings.get(node).set(name,source)}
 function bindStaticText(){
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
- while((node=walker.nextNode())){if(/\p{Script=Han}/u.test(node.data)&&!node.parentElement.closest('.kaomoji,script,style,[data-language]'))textBindings.set(node,node.data)}
+ while((node=walker.nextNode())){if(/\p{Script=Han}/u.test(node.data)&&!node.parentElement.closest('.kaomoji,.agent-text,script,style,[data-language]'))textBindings.set(node,node.data)}
  document.querySelectorAll('[aria-label],[placeholder],[title]').forEach(node=>{for(const name of ['aria-label','placeholder','title'])if(node.hasAttribute(name))localizedAttr(node,name,node.getAttribute(name))});
 }
 function applyLanguage(){

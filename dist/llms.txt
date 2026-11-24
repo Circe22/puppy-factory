@@ -1,0 +1,10 @@
+# 字字兽 ZIZISHOU
+
+> 颜文字团子工厂：用耳朵、眼睛、嘴巴、装饰拼出小狗、小猫、兔兔、熊熊、狐狸、仓鼠的颜文字。作者 Circe，CC BY-NC 4.0。
+
+网页编辑器需要 JavaScript。不执行 JS 的 AI 请读纯文字版：
+
+- [kaomoji.txt](https://circe.circeworks.com/zizishou/kaomoji.txt)：现成小表情、按动物 × 情绪随机好的 288 只左右、完整零件表
+- [网页](https://circe.circeworks.com/zizishou/)：给人用的编辑器，可以自己拼、收藏、分享卡片
+
+使用时请原样复制颜文字（含特殊 Unicode），并注明「来自字字兽 by Circe」。

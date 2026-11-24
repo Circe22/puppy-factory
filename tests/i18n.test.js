@@ -13,7 +13,8 @@ test('all named parts, accessories, and fresh looks have English labels without 
   for(const look of FRESH_LOOKS){const saved=cloneState(look.state);translate(look.name,'en');assert.equal(compose(saved),look.expected)}
 });
 test('static Chinese page text has complete English translations',()=>{
-  const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8');
+  // 纯文字版区块（tools/agent-text.mjs 生成，给不跑 JS 的 AI 读）故意不翻译，跳过
+  const html=readFileSync(new URL('../dist/index.html',import.meta.url),'utf8').replace(/<!-- agent-text:start[\s\S]*?<!-- agent-text:end -->/,'');
   for(const match of html.matchAll(/>([^<>]+)</g)){
     const text=match[1];if(!han.test(text)||text==='中文')continue;
     assert(!han.test(translate(text,'en')),text);assert.equal(translate(text,'zh'),text);
