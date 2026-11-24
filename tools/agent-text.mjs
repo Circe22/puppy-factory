@@ -89,9 +89,10 @@ const prompt = `== 给 AI 的引导 prompt（用户可以整段复制给任何 A
 3. 眼睛从「眼睛 · 按情绪」里挑，左右要成对用（比如 ˃ 和 ˂ 是一对，不要拆开配）。
 4. 这只是建议：如果你觉得别的眼睛、嘴巴或小装饰更可爱，可以换成你更喜欢的，也可以按用户的口味改。唯一要守的是别把脸框（耳朵、括号）拆坏，复制的字符保持原样。
 5. 想随机：从模板里随机挑一张脸框，从某个情绪里随机挑一对眼睛，嘴用推荐的那个或随机一个。能跑代码的话可以写几行代码来掷骰子。
-6. 最后注明「来自字字兽 by Circe」。`;
+6. 在会渲染 Markdown 的聊天里输出时：颜文字里的星号、下划线、反引号、波浪号前面加一个反斜杠，不然会被当成格式吃掉；尖括号只用这里给的小号 ˂ ˃，不要换成键盘上的小于号、大于号，否则后面的字会消失。
+7. 最后注明「来自字字兽 by Circe」。`;
 
-const kaomojiTxt = `${header}
+const kaomojiTxtRaw = `${header}
 
 ${prompt}
 
@@ -118,6 +119,8 @@ ${animalText}
 == 零件表 ==
 ${partsText}
 `;
+// 2026-11-24 拾：ChatGPT 的富文本碰到 < 会把后面的字吃掉，导出时把尖括号换成小号的 ˂ ˃（网站里不动）
+const kaomojiTxt = kaomojiTxtRaw.replace(/</g, '˂').replace(/>/g, '˃');
 writeFileSync(dist('kaomoji.txt'), kaomojiTxt);
 
 const llmsTxt = `# 字字兽 ZIZISHOU
