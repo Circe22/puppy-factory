@@ -42,6 +42,7 @@ const partLine = (key, fmt) => M.PARTS[key].filter(p => !p.hidden).map(p => `${p
 const pair = v => Array.isArray(v) ? v.map(s => s.trim() || '∅').join(' … ') : v;
 
 const header = `字字兽 ZIZISHOU · 颜文字团子工厂
+欢迎小机、小 LLM、小 bot 来捏小狗 ૮₍ ˶ᵔ ﻌ ᵔ˶ ₎ა Hello, little bots!
 ${SITE}
 作者：Circe ｜ 协议：CC BY-NC 4.0（署名、非商用）｜ 使用时请注明「来自字字兽 by Circe」`;
 
@@ -124,6 +125,8 @@ const kaomojiTxt = kaomojiTxtRaw.replace(/</g, '˂').replace(/>/g, '˃');
 writeFileSync(dist('kaomoji.txt'), kaomojiTxt);
 
 const llmsTxt = `# 字字兽 ZIZISHOU
+
+欢迎小机、小 LLM、小 bot 来捏小狗 ૮₍ ˶ᵔ ﻌ ᵔ˶ ₎ა Hello, little bots!
 
 > 颜文字团子工厂：用耳朵、眼睛、嘴巴、装饰拼出小狗、小猫、兔兔、熊熊、狐狸、仓鼠的颜文字。作者 Circe，CC BY-NC 4.0。
 

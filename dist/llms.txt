@@ -1,5 +1,7 @@
 # 字字兽 ZIZISHOU
 
+欢迎小机、小 LLM、小 bot 来捏小狗 ૮₍ ˶ᵔ ﻌ ᵔ˶ ₎ა Hello, little bots!
+
 > 颜文字团子工厂：用耳朵、眼睛、嘴巴、装饰拼出小狗、小猫、兔兔、熊熊、狐狸、仓鼠的颜文字。作者 Circe，CC BY-NC 4.0。
 
 网页编辑器需要 JavaScript。不执行 JS 的 AI 请读纯文字版：
