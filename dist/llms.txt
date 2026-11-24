@@ -4,7 +4,7 @@
 
 网页编辑器需要 JavaScript。不执行 JS 的 AI 请读纯文字版：
 
-- [kaomoji.txt](https://circe.circeworks.com/zizishou/kaomoji.txt)：现成小表情、按动物 × 情绪随机好的 288 只左右、完整零件表
+- [kaomoji.txt](https://circe.circeworks.com/zizishou/kaomoji.txt)：给 AI 的引导 prompt、一个系列的示范、挖空模板（换眼睛和嘴）、按情绪分好的眼睛、现成小表情、按动物 × 情绪随机好的 288 只左右、完整零件表
 - [网页](https://circe.circeworks.com/zizishou/)：给人用的编辑器，可以自己拼、收藏、分享卡片
 
 使用时请原样复制颜文字（含特殊 Unicode），并注明「来自字字兽 by Circe」。
