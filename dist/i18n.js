@@ -69,7 +69,7 @@ export const EN = {
   '＋ 塞一个自己的素材': '+ Add your own part', '塞进素材区': 'Add to my parts', '名字（可不填）': 'Name (optional)',
   '我的': 'Mine', '我的素材': 'My part', '删掉': 'Remove', '删掉啦': 'Removed',
   '先填一个零件再塞哦': 'Fill in at least one piece first', '这个素材已经在里面啦': 'That part is already saved',
-  '塞进去啦，在这一格最前面': 'Saved! It’s at the front of this row', '浏览器无法保存素材，请允许本地存储后再试': 'Your browser can’t save parts. Please allow local storage and try again.',
+  '塞进去啦，已经换上了': 'Saved and put on!', '浏览器无法保存素材，请允许本地存储后再试': 'Your browser can’t save parts. Please allow local storage and try again.',
 
   '眼睛心情': 'Eye moods', '常用': 'Popular', '开心': 'Happy', '困': 'Sleepy', '哭': 'Teary', '坏笑': 'Cheeky', '害羞': 'Shy',
   '搜名字或符号：≖、困困、眼泪…': 'Search names or symbols: ≖, sleepy, tears…',

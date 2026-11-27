@@ -1,7 +1,7 @@
 import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText,STASH_SLOTS,readMyParts,writeMyParts,addMyPart,removeMyPart,stashSample,applyMyPart,sprinkleMyParts} from './model.js?v=31';
 import {drawShareCard,SHARE_URL} from './share.js?v=4';
 import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=35';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=32';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=33';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -138,12 +138,12 @@ function buildStash(k){
   if(result==='duplicate'){toast('这个素材已经在里面啦');return}
   if(!saveMine(next))return;
   Object.values(inputs).forEach(x=>x.value='');nameInput.value='';
-  rememberPart(k,'m:'+result_entry.id);
+  change(()=>{state=applyMyPart(state,k,result_entry)});rememberPart(k,'m:'+result_entry.id);
   const t=trays.get(k);if(t){renderMine(t);t.grid.scrollLeft=0}
-  toast('塞进去啦，在这一格最前面');
+  toast('塞进去啦，已经换上了');
  });
  const list=el('div','stash-list');stashLists.set(k,list);
- details.append(grid,add,list);renderStashList(k);return details;
+ grid.append(add);details.append(grid,list);renderStashList(k);return details;
 }
 function syncCustom(){const v=values(state);$$('[data-custom]').forEach(input=>input.value=v[input.dataset.custom])}
 function updateTray(tray){
