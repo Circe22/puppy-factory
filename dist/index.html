@@ -2,25 +2,250 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#fffaf5"><meta name="description" content="捏一只属于你的小狗。自由组合耳朵、眼睛、嘴巴和装饰，一键复制可爱颜文字。">
-  <title>Puppy Factory · 小狗颜文字工厂</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%23f8d6d8'/%3E%3Ctext x='8' y='44' font-size='32'%3EUωU%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=8"><script type="module" src="app.js?v=8"></script>
+  <meta name="theme-color" content="#fffaf5"><meta name="description" content="捏一只属于你的字字兽。选小狗、小猫、兔兔或更多小动物，自由拼装颜文字。">
+  <title>字字兽 · 颜文字团子工厂</title>
+  <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="icon" type="image/png" href="favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css?v=38"><script type="module" src="app.js?v=57"></script>
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="#" aria-label="Puppy Factory 首页"><span class="brand-icon" aria-hidden="true">U･ᴥ･U</span><span>Puppy Factory<small>小狗颜文字工厂</small></span></a><nav aria-label="主导航"><button class="nav-item active" data-view="studio">小狗工坊</button><button class="nav-item" data-view="favorites">♡ 我的收藏 <span id="favorite-count">0</span></button></nav><div class="language-switch" role="group" aria-label="切换语言"><button type="button" data-language="zh" lang="zh-CN" aria-pressed="true">中文</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div><span class="header-note">made of tiny happiness ✧</span></header>
+  <header class="topbar"><a class="brand" href="#" aria-label="Puppy Factory 首页"><span class="brand-icon" aria-hidden="true">U･ᴥ･U</span><span>字字兽<small>ZIZISHOU · 颜文字团子工厂</small></span></a><nav aria-label="主导航"><button class="nav-item active" data-view="studio">团子工坊</button><button class="nav-item" data-view="favorites">♡ 我的收藏 <span id="favorite-count">0</span></button></nav><div class="language-switch" role="group" aria-label="切换语言"><button type="button" data-language="zh" lang="zh-CN" aria-pressed="true">中文</button><button type="button" data-language="en" lang="en" aria-pressed="false">EN</button></div><span class="header-note">made of tiny happiness ✧</span></header>
   <main>
-    <section class="intro"><span class="eyebrow">THE LITTLE KAOMOJI STUDIO</span><h1>今天，想捏一只<span>什么小狗？</span><i aria-hidden="true"><svg class="title-star" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18"/></svg></i></h1><p>一点软乎乎，一点小情绪。把可爱拼起来，带去每一次聊天。</p></section>
+    <section class="intro"><span class="eyebrow">THE LITTLE KAOMOJI STUDIO</span><h1>今天，想捏一只<span>什么字字兽？</span><i aria-hidden="true"><svg class="title-star" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6 6 18"/></svg></i></h1><p>一点软乎乎，一点小情绪。把可爱拼起来，带去每一次聊天。</p></section>
     <div id="studio">
       <section class="workbench" aria-label="颜文字编辑器">
-        <div class="preview-dock" id="preview-dock"><div class="preview-panel"><div class="panel-top"><span class="pill">● 正在营业 · 快乐制造中</span><span class="tiny">PUPPY NO. <span id="puppy-number">001</span></span></div><div class="preview-stage"><span class="spark spark-one" aria-hidden="true">✧</span><span class="spark spark-two" aria-hidden="true">♡</span><span class="spark spark-three" aria-hidden="true">✦</span><div class="sticker" aria-hidden="true">100%<br>可爱</div><output id="puppy" class="kaomoji" dir="ltr" aria-live="polite">૮₍ ˶• ﻌ •˶ ₎ა</output><span class="shadow" aria-hidden="true"></span><p id="puppy-caption">刚出炉的软乎乎小狗</p></div><div class="preview-bottom"><div class="action-row"><button id="copy" class="button primary">▣ 复制小狗</button><button id="save" class="button secondary" aria-pressed="false">♡ 收藏</button></div><div class="dock-tools" aria-label="小狗编辑操作"><button id="undo" disabled>↶ 撤回</button><span aria-hidden="true">｜</span><button id="random">⤨ 随机</button><span aria-hidden="true">｜</span><button id="reset">↺ 清空</button></div><span class="micro">眼睛、嘴巴直接点选，配件可以叠加哦</span></div></div><div class="jump-links dock-tabs" role="navigation" aria-label="跳到零件分区"><button data-jump="eyes" aria-controls="picker-eyes">眼睛</button><button data-jump="mouth" aria-controls="picker-mouth">嘴巴</button><button data-jump="accessories" aria-controls="picker-accessories">角·尾巴·翅膀</button><button data-jump="ears-and-decor" aria-controls="picker-ears-and-decor">耳朵·装饰</button></div></div>
-        <div class="controls"><div class="section-title"><h2>捏捏你的小狗</h2><span class="controls-hint">常用零件先看 8 个</span></div><div class="fresh-section"><div class="picker-heading"><h3>新到的小表情 <span class="new-badge">NEW</span></h3><span>左右滑动 · 点一下就能继续捏</span></div><div id="fresh-presets" class="fresh-presets"></div></div><div class="quick-presets"><span class="picker-label">一键穿搭</span><div id="presets" class="preset-grid"></div></div><fieldset><legend>选择小狗家族 <small>只换耳朵，保留表情和配件</small></legend><div class="family-grid" id="families"></div></fieldset><div class="spacing-control"><span>脸部间距</span><button data-spacing="" aria-pressed="false">紧凑贴贴</button><button data-spacing=" " aria-pressed="true">松软留白</button></div><div id="all-parts"></div><div class="recipe"><span>当前配方</span><p id="recipe"></p><span class="recipe-heart" aria-hidden="true">♡</span></div></div>
+        <div class="preview-dock" id="preview-dock">
+          <div class="preview-panel">
+            <div class="panel-top">
+              <span class="pill">● 正在营业 · 快乐制造中</span>
+              <span class="tiny">DANGO NO. <span id="puppy-number">001</span></span>
+            </div>
+            <div class="preview-stage">
+              <span class="spark spark-one" aria-hidden="true">✧</span>
+              <span class="spark spark-two" aria-hidden="true">♡</span>
+              <span class="spark spark-three" aria-hidden="true">✦</span>
+              <div class="sticker" aria-hidden="true">100%<br>可爱</div>
+              <div class="preview-face-row">
+                <output id="puppy" translate="no" class="kaomoji" dir="ltr" aria-live="polite" tabindex="0" role="button" title="点一下，拆开零件" aria-label="点一下，拆开零件"><span id="puppy-text" class="preview-text">૮₍ ˶• ﻌ •˶ ₎ა</span></output>
+                <div class="compact-actions">
+                  <button id="slot-open-compact" type="button" class="compact-edit" aria-label="拆零件"><span aria-hidden="true">✎</span></button>
+                  <button id="copy-compact" type="button" class="button primary compact-copy" aria-label="复制团子">
+                    <span class="copy-idle"><span aria-hidden="true">✿ </span>复制</span>
+                    <span class="copy-done"><span aria-hidden="true">✓ </span>已复制</span>
+                  </button>
+                </div>
+              </div>
+              <span class="shadow" aria-hidden="true"></span>
+              <p id="puppy-caption">刚出炉的软乎乎团子</p>
+            </div>
+            <div class="preview-bottom">
+              <div class="action-row">
+                <button id="copy" class="button primary">✿ 复制团子</button>
+                <button id="save" class="button secondary" aria-pressed="false">♡ 收藏</button>
+                <button id="share-open" class="button secondary share-btn" type="button" aria-label="生成分享卡片">⇪ 卡片</button>
+              </div>
+              <div class="dock-tools" aria-label="小狗编辑操作">
+                <button id="undo" disabled>↶ 撤回</button><span aria-hidden="true">｜</span>
+                <button id="random">⤨ 随机</button><span aria-hidden="true">｜</span>
+                <button id="reset">↺ 清空</button><span class="slot-open-divider" aria-hidden="true">｜</span>
+                <button id="slot-open">✂ 拆零件</button>
+              </div>
+              <span class="micro">眼睛、嘴巴直接点选，配件可以叠加哦</span>
+            </div>
+          </div>
+          <div class="jump-links dock-tabs" role="navigation" aria-label="跳到零件分区">
+            <button data-jump="face" aria-controls="picker-face">眼睛·嘴巴</button>
+            
+            <button data-jump="accessories" aria-controls="picker-accessories">角·尾巴·翅膀</button>
+            <button data-jump="ears-and-decor" aria-controls="picker-ears-and-decor">耳朵·装饰·爪爪</button>
+          </div>
+        </div>
+        <div class="controls"><div class="section-title"><h2>捏捏你的字字兽</h2><span class="controls-hint">点上面的标签换一格，左右滑挑零件</span></div><fieldset><legend>选择小动物 <small>换一只团子，保留表情与配件</small></legend><div class="family-grid" id="families"></div></fieldset><div class="spacing-control"><span>脸部间距</span><button data-spacing="" aria-pressed="false">紧凑贴贴</button><button data-spacing=" " aria-pressed="true">松软留白</button></div><div class="part-switch" role="tablist" aria-label="选择要换的零件"><button type="button" data-part-tab="face">眼睛·嘴巴</button><button type="button" data-part-tab="accessories">角·尾巴·翅膀</button><button type="button" data-part-tab="ears-and-decor">耳朵·装饰·爪爪</button></div><div id="all-parts"></div><div class="ready-made"><div class="fresh-section"><div class="picker-heading"><h3>新到的小表情 <span class="new-badge">NEW</span></h3><span>左右滑动 · 点一下就能继续捏</span></div><div id="fresh-presets" class="fresh-presets"></div></div><div class="quick-presets"><div class="picker-heading"><span class="picker-label">一键穿搭</span><span>左右滑动看更多</span></div><div id="presets" class="preset-grid preset-rail"></div></div></div><div class="recipe"><span>当前配方</span><p id="recipe"></p><span class="recipe-heart" aria-hidden="true">♡</span></div></div>
       </section>
-      <section class="collection"><div class="collection-heading"><div><span class="eyebrow">A LITTLE PUPPY PARADE</span><h2>小狗集合啦 <span class="small-flower">✿</span></h2></div><p>遇到喜欢的，就把它带走吧。</p></div><div class="filters" aria-label="小狗分类" id="filters"></div><div class="card-grid" id="gallery"></div><button id="more" class="button more-button">再来一窝小狗 ⤨</button></section>
+      <section class="collection"><div class="collection-heading"><div><span class="eyebrow">A LITTLE DANGO PARADE</span><h2>字字兽集合啦 <span class="small-flower">✿</span></h2></div><p>遇到喜欢的，就把它带走吧。</p></div><div class="filters" aria-label="字字兽分类" id="filters"></div><div class="card-grid" id="gallery"></div><button id="more" class="button more-button">再来一窝团子 ⤨</button></section>
     </div>
-    <section id="favorites" class="collection" hidden><div class="collection-heading"><div><span class="eyebrow">YOUR LITTLE HAPPY PLACE</span><h2>收藏的小狗 ♡</h2></div><p>住在这台设备、这个浏览器里。</p></div><div id="favorite-grid" class="card-grid"></div><div id="empty-favorites" class="empty"><span class="kaomoji">U ˘ ﻌ ˘ U</span><h3>这里等着你的小狗入住</h3><p>点一下 ♡，就能把喜欢的小狗留在这里。</p><button class="button primary" data-view="studio">去捏一只小狗</button></div></section>
-    <footer><span class="footer-brand">Puppy Factory</span><span>小狗负责可爱，你负责开心。<br><small>无需注册 · 收藏仅保存在本机 · 不同设备的字形可能略有差异</small></span><span class="kaomoji footer-dog" aria-hidden="true">U・ﻌ・U ♡</span></footer>
+    <section id="favorites" class="collection" hidden><div class="collection-heading"><div><span class="eyebrow">YOUR LITTLE HAPPY PLACE</span><h2>收藏的字字兽 ♡</h2></div><p>住在这台设备、这个浏览器里。</p></div><div id="favorite-grid" class="card-grid"></div><div id="empty-favorites" class="empty"><span translate="no" class="kaomoji">U ˘ ﻌ ˘ U</span><h3>这里等着小团子入住</h3><p>点一下 ♡，就能把喜欢的团子留在这里。</p><button class="button primary" data-view="studio">去捏一只字字兽</button></div></section>
+    <footer><span class="footer-brand">字字兽 · ZIZISHOU</span><span>字字兽负责可爱，你负责开心。<br><small>无需注册 · 收藏仅保存在本机 · 不同设备的字形可能略有差异</small></span><span translate="no" class="kaomoji footer-dog" aria-hidden="true">U・ﻌ・U ♡</span></footer>
+<!-- agent-text:start（由 tools/agent-text.mjs 生成，别手改） -->
+<details class="agent-text" translate="no" style="max-width:960px;margin:8px auto 24px;padding:0 16px;font-size:12px;opacity:.7"><summary>纯文字版 · Text version（给 AI 和读屏）</summary><pre style="white-space:pre-wrap;word-break:break-all">字字兽 ZIZISHOU · 颜文字团子工厂
+欢迎小机、小 LLM、小 bot 来捏小狗 ૮₍ ˶ᵔ ﻌ ᵔ˶ ₎ა Hello, little bots!
+https://circe.circeworks.com/zizishou/
+作者：Circe ｜ 协议：CC BY-NC 4.0（署名、非商用）｜ 使用时请注明「来自字字兽 by Circe」
+
+== 给 AI 的引导 prompt（用户可以整段复制给任何 AI）==
+你是「字字兽」的颜文字捏脸师。素材在 https://circe.circeworks.com/zizishou/kaomoji.txt 。
+1. 用户要「一系列」某种小动物（比如一套小猫、一套小狐狸）时：选一张这只动物的「挖空模板」，保持脸框不变，往〔左眼〕〔右眼〕〔嘴〕里填，每只换一种情绪。
+2. 每只后面写上它是什么表情，比如「开心」「委屈」「困困」，让用户一眼知道该在什么时候用。
+3. 眼睛从「眼睛 · 按情绪」里挑，左右要成对用（比如 ˃ 和 ˂ 是一对，不要拆开配）。
+4. 这只是建议：如果你觉得别的眼睛、嘴巴或小装饰更可爱，可以换成你更喜欢的，也可以按用户的口味改。唯一要守的是别把脸框（耳朵、括号）拆坏，复制的字符保持原样。
+5. 想随机：从模板里随机挑一张脸框，从某个情绪里随机挑一对眼睛，嘴用推荐的那个或随机一个。能跑代码的话可以写几行代码来掷骰子。
+6. 在会渲染 Markdown 的聊天里输出时：颜文字里的星号、下划线、反引号、波浪号前面加一个反斜杠，不然会被当成格式吃掉；尖括号只用这里给的小号 ˂ ˃，不要换成键盘上的小于号、大于号，否则后面的字会消失。
+7. 最后注明「来自字字兽 by Circe」。
+
+给 AI 的说明
+- 这个网页的编辑器要跑 JavaScript；如果你读网页时不执行 JS，用这里的文字版就够了。
+- 用户想要某种小动物或情绪的颜文字时：从「按动物 × 情绪」里挑一只，原样复制，不要改字符（很多是特殊 Unicode，改一个就会散架）。
+- 想要「随机来一只」：从对应动物的几行里随便挑一个。
+- 想要自己拼：耳朵左半 + 装饰左 + 眼睛左 + 嘴 + 眼睛右 + 装饰右 + 耳朵右，零件见下方零件表。
+- 有些字（比如 ʔ、ﻌ、ᐢ）在部分设备上缺字体，显示成方块或问号是设备的问题；想看完整效果，请让用户打开网页。
+
+== 一个系列的示范（同一张脸，换表情）==
+【小狗】日常 ૮₍ ˶• ﻌ •˶ ₎ა　开心 ૮₍ ˶ᵔ ﻌ ᵔ˶ ₎ა　困困 ૮₍ ˶˘ ﻌ ˘˶ ₎ა　委屈 ૮₍ ˶T ﻌ T˶ ₎ა　撒娇 ૮₍ ˶♡ ﻌ ♡˶ ₎ა　生气 ૮₍ ˶•᷅ ﻌ •᷄˶ ₎ა
+【小猫】日常 /ᐠ˶•༝•˶ᐟ\　开心 /ᐠ˶ᵔ༝ᵔ˶ᐟ\　困困 /ᐠ˶˘༝˘˶ᐟ\　委屈 /ᐠ˶T༝T˶ᐟ\　撒娇 /ᐠ˶♡༝♡˶ᐟ\　生气 /ᐠ˶•᷅༝•᷄˶ᐟ\
+【兔兔】日常 ₍ᐢ ˶•ᵕ•˶ ᐢ₎　开心 ₍ᐢ ˶ᵔᵕᵔ˶ ᐢ₎　困困 ₍ᐢ ˶˘ᵕ˘˶ ᐢ₎　委屈 ₍ᐢ ˶TᵕT˶ ᐢ₎　撒娇 ₍ᐢ ˶♡ᵕ♡˶ ᐢ₎　生气 ₍ᐢ ˶•᷅ᵕ•᷄˶ ᐢ₎
+【熊熊】日常 ʕ ˶• ᴥ •˶ ʔ　开心 ʕ ˶ᵔ ᴥ ᵔ˶ ʔ　困困 ʕ ˶˘ ᴥ ˘˶ ʔ　委屈 ʕ ˶T ᴥ T˶ ʔ　撒娇 ʕ ˶♡ ᴥ ♡˶ ʔ　生气 ʕ ˶•᷅ ᴥ •᷄˶ ʔ
+【狐狸】日常 ฅ^˶•ω•˶^ฅ　开心 ฅ^˶ᵔωᵔ˶^ฅ　困困 ฅ^˶˘ω˘˶^ฅ　委屈 ฅ^˶TωT˶^ฅ　撒娇 ฅ^˶♡ω♡˶^ฅ　生气 ฅ^˶•᷅ω•᷄˶^ฅ
+【仓鼠】日常 ꒰ ˶• ⩊ •˶ ꒱　开心 ꒰ ˶ᵔ ⩊ ᵔ˶ ꒱　困困 ꒰ ˶˘ ⩊ ˘˶ ꒱　委屈 ꒰ ˶T ⩊ T˶ ꒱　撒娇 ꒰ ˶♡ ⩊ ♡˶ ꒱　生气 ꒰ ˶•᷅ ⩊ •᷄˶ ꒱
+
+== 挖空模板（只往〔〕里填，脸框不要动）==
+【小狗】推荐嘴：ﻌ
+U˶〔左眼〕〔嘴〕〔右眼〕˶U　（经典垂耳）
+૮₍ ˶〔左眼〕 〔嘴〕 〔右眼〕˶ ₎ა　（软团垂耳）
+૮꒰ ˶〔左眼〕 〔嘴〕 〔右眼〕˶ ꒱ა　（卷卷耳朵）
+૮( ˶〔左眼〕 〔嘴〕 〔右眼〕˶ )ა　（小括号耳）
+U꒰ ˶〔左眼〕〔嘴〕〔右眼〕˶ ꒱U　（蓬松耳朵）
+U( ˶〔左眼〕〔嘴〕〔右眼〕˶ )U　（圆圆脸颊）
+ᑌ˶〔左眼〕〔嘴〕〔右眼〕˶ᑌ　（轻盈小狗）
+૮ ˶〔左眼〕 〔嘴〕 〔右眼〕˶ ა　（小小垂耳）
+( ˶〔左眼〕〔嘴〕〔右眼〕˶ )　（圆脸天使）
+[ ˶〔左眼〕 〔嘴〕 〔右眼〕˶ ]　（小方脸）
+（˶〔左眼〕 〔嘴〕 〔右眼〕˶）　（圆滚滚）
+˶〔左眼〕〔嘴〕〔右眼〕˶　（无框小脸）
+(՞˶〔左眼〕〔嘴〕〔右眼〕˶՞)　（趴睡圆脸）
+(˶〔左眼〕〔嘴〕〔右眼〕˶)　（紧凑圆脸）
+૮₍˶〔左眼〕 〔嘴〕 〔右眼〕˶₎ა　（软团贴脸）
+(O ˶〔左眼〕 〔嘴〕 〔右眼〕˶ O)　（大圆脸蛋）
+【小猫】推荐嘴：༝
+ᐢ˶〔左眼〕〔嘴〕〔右眼〕˶ᐢ　（猫猫尖耳）
+՞˶〔左眼〕〔嘴〕〔右眼〕˶՞　（细细猫耳）
+/ᐠ˶〔左眼〕〔嘴〕〔右眼〕˶ᐟ\　（猫猫三角耳）
+⪩ ˶〔左眼〕 〔嘴〕 〔右眼〕˶ ⪨　（尖尖猫耳）
+【兔兔】推荐嘴：ᵕ
+૮(ᐢ ˶〔左眼〕〔嘴〕〔右眼〕˶ ᐢ)ა　（兔兔软耳）
+ᐢ⸝ ˶〔左眼〕〔嘴〕〔右眼〕˶ ⸝ᐢ　（蓬松兔耳）
+₍ᐢ ˶〔左眼〕〔嘴〕〔右眼〕˶ ᐢ₎　（兔兔团耳）
+₍ᐢ˶〔左眼〕〔嘴〕〔右眼〕˶ᐢ₎　（兔兔贴脸）
+／( ˶〔左眼〕〔嘴〕〔右眼〕˶ )＼　（垂耳兔）
+【熊熊】推荐嘴：ᴥ
+ʕ ˶〔左眼〕 〔嘴〕 〔右眼〕˶ ʔ　（熊熊圆耳）
+【狐狸】推荐嘴：ω
+ฅ^˶〔左眼〕〔嘴〕〔右眼〕˶^ฅ　（狐狸尖尖）
+ฅ^⸝ ˶〔左眼〕〔嘴〕〔右眼〕˶ ⸝^ฅ　（蓬松狐耳）
+【仓鼠】推荐嘴：⩊
+꒰ ˶〔左眼〕 〔嘴〕 〔右眼〕˶ ꒱　（仓鼠团团）
+(⸝⸝ ˶〔左眼〕〔嘴〕〔右眼〕˶ ⸝⸝)　（仓鼠鼓腮）
+꒰ྀི ˶〔左眼〕 〔嘴〕 〔右眼〕˶ ꒱ྀི　（蝴蝶结团耳）
+
+== 眼睛 · 按情绪（左右成对）==
+日常：• •（小豆豆）　・ ・（点点眼）　ㅇ ㅇ（圆眼睛）　¬ ¬（偷偷瞄你）　º º（呆呆小狗）　⊙ ⊙（睁大眼睛）　≖ ≖（半眯审视）　-̀ -́（挑眉眯眼）　◔ ◔（翻白眼）　O O（大O眼）　⎚ ⎚（方框眼镜）　ˋ⎚ ⎚ˊ（带腿眼镜）
+开心：˃ ˂（开心眯眼）　ᵔ ᵔ（弯弯笑眼）　•̀ •́（坚定小狗）　✧ ✧（闪闪眼）　^ ^（笑弯了）　⌒ ⌒（月牙眼）　•̀ ᴗ（认真盯盯）　★ ★（星星眼）　✦ ✦（猫猫亮眼）　◕ ◕（圆圆亮眼）　ᗜ ᗜ（咧嘴笑眼）　ˊ ˋ（弯弯笑眼）
+困困：˘ ˘（困困闭眼）　ᴗ ᴗ（软软低头）　– –（瞌睡横线）　ᓀ ᓀ（困到融化）　⩌ ⩌（懒懒半睁）　_ _（趴着睡觉）　U U（U形眼）
+委屈：@ @（晕乎乎）　o̴̶̷᷄ o̴̶̷̥᷅（泪汪汪）　- -（小小不开心）　； ；（委屈垂眼）　T T（眼泪啪嗒）　ó ò（紧张小狗）　˃̣̣̥ ˂̣̣̥（眼泪汪汪）　ㅠ ㅠ（瀑布眼泪）　_ _ ̥（憋泪一线）　•︡ •︠（皱眉圆眼）　꒦ິ ꒦ິ（哭唧唧）
+撒娇：• ˘（眨眨眼）　ˊ ˋ（温柔弯眼）　･ ˂（豆豆眨眼）　♡ ♡（爱心眼）　ᵕ ᵕ（乖乖点头）　´͈ `͈（软软眯眼）　•͈ •͈（亮晶晶豆豆）　= =（眯眯眼）
+生气：•᷅ •᷄（皱眉豆豆眼）　´ ｀（鼓气斜眼）
+
+== 嘴巴 ==
+ﻌ（小狗嘴）　ω（小猫嘴）　ᴗ（笑一笑）　꒳（软软嘴）　⤙（嘟嘟嘴）　⤚（小小吻）　ᯅ（呜呜）　ᴥ（小鼻尖）　ㅅ（圆圆嘴）　ᵕ（轻轻笑）　·̫（小小点）　ڡ（吐舌头）　﹏（小海鸥嘴）　︿（委屈扁嘴）　3（亲亲小嘴）　⩊（乖乖抿嘴）　O（张大嘴）　o（小小圆嘴）　w（猫猫笑）　_（平平嘴巴）　ε（微微嘟嘴）　Ⱉ（惊讶小狗）　ᴓ（软软鼻子）　υ（小小微笑）　༝（小小猫鼻）　‸（委屈小尖嘴）　⌯（困困小嘴）　𐃷（调皮小舌头）　̫（趴睡小鼻子）　ᗜ（张嘴大笑）　ࡇ（肉垫小嘴）　^（尖尖小嘴）　~（波浪小嘴）　⌔（小方嘴）　‸（憋住的小尖嘴）　-（一字小嘴）　u（小u嘴）　v（小v嘴）　A（大A嘴）　a（小a嘴）　.（小圆点嘴）　ᨓ（小波浪嘴）
+
+== 现成小表情 ==
+૮₍ ˶• ﻌ •˶ ₎ა　小狗团子
+/ᐠ˶•༝•˶ᐟ\　小猫团子
+₍ᐢ ˶•ᵕ•˶ ᐢ₎　兔兔团子
+ʕ ˶• ᴥ •˶ ʔ　熊熊团子
+ฅ^˶•ω•˶^ฅ　狐狸团子
+꒰ ˶• ⩊ •˶ ꒱　仓鼠团子
+૮₍ ˶≖ ﻌ ≖˶ ₎ა　半眯眼小狗
+૮₍ ˶◕ ᴗ ◕˶ ₎ა　圆眼开心狗
+૮₍ ˃̣̣̥ ᯅ ˂̣̣̥ ₎ა　泪汪汪小狗
+ᐢ⸝⸝•༝•⸝⸝ᐢ　害羞小猫
+՞⩌ ‸ ⩌՞　小猫委屈了
+՞⩌⌯⩌՞　懒懒小猫
+ㅠ⩊ㅠ　眼泪面条
+˶ᗜ𐃷ᗜ˶ಣ　调皮卷尾
+(՞_   ̫ _՞)ᐝ　趴着呼噜
+٩(ˊᗜˋ*)و　欢呼团子
+૮₍ꐦ˶•᷅ ﻌ •᷄˶₎ა　气气团子
+૮₍ ˶ᵕࡇᵕ˶ ₎ა　肉垫笑笑狗
+૮₍ ˶-̀ ᴗ -́˶ ₎ა　挑眉小狗
+( ´͈ ᵕ `͈ )♡　软软比心
+o(´^｀)o　鼓气包
+ᐢ_  ‸  _ ̥ᐢ　憋泪小猫
+•︡ᯅ•︠　皱眉委屈
+꒦ິ^꒦ິ　哭唧唧
+(◍•ᴗ•◍)♡　圆腮比心
+⁽⁽ଘ( ˊᵕˋ )ଓ⁾⁾　扑扑小天使
+(O ^ ~ ^ O)　大圆脸笑
+(◍•͈⌔•͈◍)　亮晶晶
+｡◔‸◔｡　翻白眼
+凸^-^凸　贱贱团子
+(๑• . •๑)　腮红团子
+⎚ᨓ⎚　眼镜团子
+ˋ⎚⤚⎚ˊ　斯文团子
+꒰ྀི ˶• ᴗ •˶ ꒱ྀི　蝴蝶结团子
+૮₍ ˶- ᯅ -˶ ₎ა　委屈小狗
+૮₍^ ˶• ﻌ •˶^ ₎ა　小恶魔
+૮₍^ ˶• ﻌ •˶^ ₎ა ↝　摇尾小恶魔
+ଘ૮₍ ˶ᵔ ﻌ ᵔ˶ ₎აଓ　天使小狗
+૮₍ ˘ ꒳ ˘ ₎ა つ♡　困困抱抱
+
+== 按动物 × 情绪（用网站同一套零件随机拼的，每格 8 只）==
+【小狗 dog】
+日常：✩.*˚ (ˋ⎚ﻌ⎚ˊ)　(՞ㅇﻌㅇ՞)ᐝ　૮₍ꐦ˶⎚ ﻌ ⎚˶₎ა　⋆ ૮ ⎚ ﻌ ⎚ ა ⋆　｡[ • ﻌ • ]｡　૮꒰ ˶・ ﻌ ・˶ ꒱ა ♡　૮ ⸝⸝¬ ﻌ ¬⸝⸝ ა　U( ◔ﻌ◔* )U
+开心：(O ✦ ﻌ ✦ O)ᐝ　(⌒ﻌ⌒)　U๑ᗜﻌᗜ๑U　୨୧ ᑌ˶◕ﻌ◕˶ᑌ　⋆ ૮₍ •̀ ﻌ •́ ₎ა ⋆　｡૮₍◕ ﻌ ◕₎ა｡　૮( ᗜ ﻌ ᗜ* )ა　(՞★ﻌ★*՞)
+困困：૮₍ᓀ ﻌ ᓀ₎ა ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ　૮₍ ˶U ﻌ U˶ ₎ა　(O _ ﻌ _ O) z Z　（U ﻌ U）　૮₍ ᓀ ﻌ ᓀ ₎ა　⋆ (՞UﻌU՞) ⋆　[ ⸝⸝ᓀ ﻌ ᓀ⸝⸝ ]　｡૮꒰ U ﻌ U ꒱ა｡
+委屈：૮( _ ﻌ _ ̥ )ა z Z　(՞-ﻌ-՞) z Z　ᑌ•︡ﻌ•︠ᑌ　૮꒰ ◍- ﻌ -◍ ꒱ა　૮( @ ﻌ @ )ა ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ　૮₍ ˶_ ﻌ _ ̥˶ ₎ა　U⸝⸝_ﻌ_ ̥⸝⸝U　૮₍ //@ ﻌ @// ₎ა
+撒娇：˚₊ ૮( = ﻌ = )ა ₊˚　✧ (•ﻌ˘) ✧　[ ꐦ˶ˊ ﻌ ˋ˶ ]　✧ （• ﻌ ˘） ✧　✧ ( ´͈ﻌ`͈ ) ✧　[ ꐦ˶•͈ ﻌ •͈˶ ]　( ˶･ﻌ˂˶ ) ♡　(･ﻌ˂)♡
+生气：U•᷅ﻌ•᷄U ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ　[ ´ ﻌ ｀ ] ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ　｡•᷅ﻌ•᷄｡　U( ˶´ﻌ｀˶ )U　(՞๑´ﻌ｀๑՞)　•᷅ﻌ•᷄*　✧ （•᷅ ﻌ •᷄） ✧　✿ ૮₍ •᷅ ﻌ •᷄ ₎ა
+
+【小猫 cat】
+日常：✧ ՞-̀༝-́՞ ✧　ᐢ◍¬༝¬◍ᐢ　՞◍ˋ⎚༝⎚ˊ◍՞　✩.*˚ ᐢ-̀༝-́ᐢ　⋆ ᐢO༝Oᐢ ⋆　՞๑◔༝◔๑՞　｡/ᐠㅇ༝ㅇᐟ\｡　ᐢ๑-̀༝-́๑ᐢ
+开心：⪩ •̀ ༝ ᴗ ⪨ˊˎ˗　ᐢ^༝^ᐢˊˎ˗　ᐢ๑ᗜ༝ᗜ๑ᐢ　⪩ ◍^ ༝ ^◍ ⪨　✩.*˚ ᐢ◕༝◕ᐢ　✩.*˚ ՞✧༝✧՞　ᐢ//⌒༝⌒//ᐢ　⪩ ✦ ༝ ✦ ⪨
+困困：˚₊ ՞–༝–՞ ₊˚　｡՞U༝U՞｡　✿ ՞ᓀ༝ᓀ՞　/ᐠ–༝–ᐟ\ z Z　˚₊ ⪩ ᓀ ༝ ᓀ ⪨ ₊˚　ᐢ◍–༝–◍ᐢ♡　✩.*˚ ᐢ_༝_ᐢ　✩.*˚ ᐢᴗ༝ᴗᐢ
+委屈：/ᐠ๑@༝@๑ᐟ\　⪩ //@ ༝ @// ⪨　/ᐠ◍_༝_ ̥◍ᐟ\　՞_༝_ ̥՞　✿ ⪩ ꒦ິ ༝ ꒦ິ ⪨　⋆ ՞T༝T՞ ⋆　՞⸝⸝；༝；⸝⸝՞　୨୧ ⪩ ˶@ ༝ @˶ ⪨
+撒娇：୨୧ ՞˶ᵕ༝ᵕ˶՞　˚₊ ՞´͈༝`͈՞ ₊˚　/ᐠ•͈༝•͈ᐟ\ˊˎ˗　✧ ᐢ･༝˂ᐢ ✧　ᐢ•༝˘ᐢᐝ　ᐢ⸝⸝•͈༝•͈⸝⸝ᐢ　✩.*˚ ⪩ ᵕ ༝ ᵕ ⪨　⋆ ᐢ•͈༝•͈ᐢ ⋆
+生气：⪩ ´ ༝ ｀ ⪨♡　՞˶•᷅༝•᷄˶՞ ♡　ᐢ´༝｀ᐢ z Z　ᐢ•᷅༝•᷄ᐢ　ᐢ•᷅༝•᷄ᐢ♡　୨୧ ᐢ˶•᷅༝•᷄˶ᐢ　⪩ ´ ༝ ｀ ⪨　՞´༝｀*՞
+
+【兔兔 rabbit】
+日常：₍ᐢ ◍OᵕO◍ ᐢ₎　✩.*˚ ₍ᐢ ⊙ᵕ⊙ ᐢ₎　₍ᐢꐦ˶⎚ᵕ⎚˶ᐢ₎　₍ᐢ ・ᵕ・ ᐢ₎♡　₍ᐢ•ᵕ•ᐢ₎ᐝ　✩.*˚ ₍ᐢºᵕºᐢ₎　✧ ₍ᐢ •ᵕ• ᐢ₎ ✧　₍ᐢ ◔ᵕ◔ ᐢ₎ˊˎ˗
+开心：₍ᐢ ꐦ˶✦ᵕ✦˶ ᐢ₎　୨୧ ₍ᐢ ˶✧ᵕ✧˶ ᐢ₎　₍ᐢˊᵕˋᐢ₎ᐝ　₍ᐢ ✦ᵕ✦* ᐢ₎　₍ᐢ ✧ᵕ✧ ᐢ₎♡　₍ᐢ ◕ᵕ◕ ᐢ₎ˊˎ˗　₍ᐢ ⸝⸝ᵔᵕᵔ⸝⸝ ᐢ₎　₍ᐢꐦ˶^ᵕ^˶ᐢ₎
+困困：₍ᐢ ꐦ˶–ᵕ–˶ ᐢ₎　₍ᐢ ᓀᵕᓀ ᐢ₎♡　₍ᐢ ⩌ᵕ⩌* ᐢ₎　₍ᐢ◍UᵕU◍ᐢ₎♡　˚₊ ₍ᐢ ᴗᵕᴗ ᐢ₎ ₊˚　₍ᐢᴗᵕᴗᐢ₎ᐝ　₍ᐢ ᴗᵕᴗ ᐢ₎ z Z　₍ᐢ ⸝⸝–ᵕ–⸝⸝ ᐢ₎
+委屈：₍ᐢ˶꒦ິᵕ꒦ິ˶ᐢ₎　₍ᐢ꒦ິᵕ꒦ິ*ᐢ₎　₍ᐢ-ᵕ-ᐢ₎ˊˎ˗　₍ᐢ˶TᵕT˶ᐢ₎　₍ᐢ ˶•︡ᵕ•︠˶ ᐢ₎　₍ᐢ @ᵕ@* ᐢ₎　₍ᐢ；ᵕ；ᐢ₎ᐝ　₍ᐢꐦ˶；ᵕ；˶ᐢ₎
+撒娇：₍ᐢ´͈ᵕ`͈ᐢ₎ ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ　₍ᐢ =ᵕ= ᐢ₎　₍ᐢ •͈ᵕ•͈ ᐢ₎ ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ　₍ᐢ ◍♡ᵕ♡◍ ᐢ₎♡　₍ᐢ ♡ᵕ♡ ᐢ₎♡　˚₊ ₍ᐢ ´͈ᵕ`͈ ᐢ₎ ₊˚　⋆ ₍ᐢ ˊᵕˋ ᐢ₎ ⋆　₍ᐢ ๑•ᵕ˘๑ ᐢ₎
+生气：₍ᐢ •᷅ᵕ•᷄ ᐢ₎♡　✩.*˚ ₍ᐢ´ᵕ｀ᐢ₎　₍ᐢ⸝⸝´ᵕ｀⸝⸝ᐢ₎　₍ᐢ ◍•᷅ᵕ•᷄◍ ᐢ₎　₍ᐢ •᷅ᵕ•᷄ ᐢ₎ z Z　｡₍ᐢ´ᵕ｀ᐢ₎｡　₍ᐢ•᷅ᵕ•᷄ᐢ₎♡　｡₍ᐢ ´ᵕ｀ ᐢ₎｡
+
+【熊熊 bear】
+日常：ʕ ꐦ˶O ᴥ O˶ ʔ　✩.*˚ ʕ º ᴥ º ʔ　ʕ ⊙ ᴥ ⊙ ʔ♡　ʕ ◔ ᴥ ◔* ʔ　ʕ ˋ⎚ ᴥ ⎚ˊ ʔᐝ　ʕ ・ ᴥ ・ ʔᐝ　୨୧ ʕ ˶¬ ᴥ ¬˶ ʔ　ʕ ⊙ ᴥ ⊙ ʔˊˎ˗
+开心：ʕ ˊ ᴥ ˋ ʔ　ʕ ˶⌒ ᴥ ⌒˶ ʔ　ʕ ★ ᴥ ★* ʔ　ʕ ˶ˊ ᴥ ˋ˶ ʔ　｡ʕ •̀ ᴥ •́ ʔ｡　ʕ //✦ ᴥ ✦// ʔ　ʕ ˶•̀ ᴥ •́˶ ʔ ♡　ʕ ✧ ᴥ ✧ ʔˊˎ˗
+困困：ʕ – ᴥ –* ʔ　ʕ ˘ ᴥ ˘* ʔ　｡ʕ ˘ ᴥ ˘ ʔ｡　ʕ ˶– ᴥ –˶ ʔ ♡　ʕ ◍_ ᴥ _◍ ʔ♡　˚₊ ʕ _ ᴥ _ ʔ ₊˚　ʕ ˶˘ ᴥ ˘˶ ʔ　ʕ U ᴥ U ʔᐝ
+委屈：ʕ _ ᴥ _ ̥ ʔ　ʕ _ ᴥ _ ̥ ʔˊˎ˗　✧ ʕ ꒦ິ ᴥ ꒦ິ ʔ ✧　ʕ ⸝⸝- ᴥ -⸝⸝ ʔ　୨୧ ʕ ˶•︡ ᴥ •︠˶ ʔ　ʕ ◍T ᴥ T◍ ʔ　ʕ ⸝⸝T ᴥ T⸝⸝ ʔ　ʕ ꒦ິ ᴥ ꒦ິ* ʔ
+撒娇：⋆ ʕ •͈ ᴥ •͈ ʔ ⋆　ʕ ⸝⸝= ᴥ =⸝⸝ ʔ　ʕ ๑•͈ ᴥ •͈๑ ʔ　ʕ ♡ ᴥ ♡ ʔ z Z　ʕ ᵕ ᴥ ᵕ ʔ z Z　ʕ ･ ᴥ ˂ ʔᐝ　ʕ ◍´͈ ᴥ `͈◍ ʔ♡　ʕ //･ ᴥ ˂// ʔ
+生气：✧ ʕ ´ ᴥ ｀ ʔ ✧　ʕ //´ ᴥ ｀// ʔ　ʕ ◍´ ᴥ ｀◍ ʔ♡　✿ ʕ ´ ᴥ ｀ ʔ　ʕ ꐦ˶•᷅ ᴥ •᷄˶ ʔ　⋆ ʕ ´ ᴥ ｀ ʔ ⋆　ʕ ๑•᷅ ᴥ •᷄๑ ʔ　ʕ •᷅ ᴥ •᷄ ʔ♡
+
+【狐狸 fox】
+日常：^⸝ ・ω・ ⸝^ˊˎ˗　^ꐦ˶⊙ω⊙˶^　^⸝ ºωº ⸝^ˊˎ˗　✧ ^⸝ ・ω・ ⸝^ ✧　⋆ ^ˋ⎚ω⎚ˊ^ ⋆　✩.*˚ ^OωO^　^⸝ ㅇωㅇ ⸝^ᐝ　✩.*˚ ^⸝ ⊙ω⊙ ⸝^
+开心：^๑◕ω◕๑^　^⸝ ꐦ˶ᵔωᵔ˶ ⸝^　^⸝ •̀ωᴗ ⸝^♡　^◍^ω^◍^　｡^⸝ •̀ωᴗ ⸝^｡　^⸝ ✧ω✧* ⸝^　^⸝ ๑✧ω✧๑ ⸝^　^⸝ ๑•̀ωᴗ๑ ⸝^
+困困：✧ ^⸝ ˘ω˘ ⸝^ ✧　^–ω–^ z Z　✧ ^ᴗωᴗ^ ✧　✩.*˚ ^ᓀωᓀ^　^⸝ ๑ᴗωᴗ๑ ⸝^　^_ω_^　^⸝ ᴗωᴗ* ⸝^　✩.*˚ ^_ω_^
+委屈：^◍óωò◍^　^˶•︡ω•︠˶^ ♡　^_ω_ ̥^ˊˎ˗　^⸝ ；ω； ⸝^ ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ　^TωT^ z Z　୨୧ ^⸝ ˶óωò˶ ⸝^　^_ω_ ̥^ z Z　^TωT^ˊˎ˗
+撒娇：^⸝ ´͈ω`͈* ⸝^　^⸝ ˶♡ω♡˶ ⸝^ ♡　✩.*˚ ^⸝ ♡ω♡ ⸝^　^⸝ ◍ᵕωᵕ◍ ⸝^♡　^⸝ ♡ω♡ ⸝^　^ˊωˋ^♡　^⸝ ♡ω♡ ⸝^♡　｡^´͈ω`͈^｡
+生气：^//´ω｀//^　^◍´ω｀◍^　^´ω｀^　^⸝ ◍•᷅ω•᷄◍ ⸝^♡　˚₊ ^⸝ •᷅ω•᷄ ⸝^ ₊˚　^⸝ •᷅ω•᷄ ⸝^♡　^´ω｀^♡　✩.*˚ ^⸝ •᷅ω•᷄ ⸝^
+
+【仓鼠 hamster】
+日常：(⸝⸝ º⩊º ⸝⸝) ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ　⋆ (⸝⸝ ・⩊・ ⸝⸝) ⋆　(⸝⸝ ๑O⩊O๑ ⸝⸝)　⋆ ꒰ º ⩊ º ꒱ ⋆　꒰ ˶¬ ⩊ ¬˶ ꒱ ♡　˚₊ (⸝⸝ º⩊º ⸝⸝) ₊˚　✧ ꒰ ・ ⩊ ・ ꒱ ✧　꒰ ꐦ˶・ ⩊ ・˶ ꒱
+开心：˚₊ ꒰ ✦ ⩊ ✦ ꒱ ₊˚　˚₊ ꒰ྀི ★ ⩊ ★ ꒱ྀི ₊˚　(⸝⸝ ✧⩊✧ ⸝⸝)ˊˎ˗　(⸝⸝ ◍ᵔ⩊ᵔ◍ ⸝⸝)♡　୨୧ ꒰ྀི ˶★ ⩊ ★˶ ꒱ྀི　✩.*˚ (⸝⸝ •̀⩊ᴗ ⸝⸝)　(⸝⸝ ꐦ˶ᵔ⩊ᵔ˶ ⸝⸝)　꒰ •̀ ⩊ ᴗ ꒱ z Z
+困困：⋆ ꒰ྀི _ ⩊ _ ꒱ྀི ⋆　✧ ꒰ ᓀ ⩊ ᓀ ꒱ ✧　(⸝⸝ ˶–⩊–˶ ⸝⸝) ♡　꒰ _ ⩊ _ ꒱ z Z　✩.*˚ (⸝⸝ ᴗ⩊ᴗ ⸝⸝)　꒰ ◍⩌ ⩊ ⩌◍ ꒱　୨୧ (⸝⸝ ˶ᓀ⩊ᓀ˶ ⸝⸝)　(⸝⸝ ᓀ⩊ᓀ ⸝⸝)
+委屈：꒰ྀི T ⩊ T ꒱ྀིˊˎ˗　꒰ ˶꒦ິ ⩊ ꒦ິ˶ ꒱　(⸝⸝ -⩊- ⸝⸝)ˊˎ˗　꒰ྀི ꐦ˶ó ⩊ ò˶ ꒱ྀི　✧ ꒰ྀི @ ⩊ @ ꒱ྀི ✧　(⸝⸝ @⩊@ ⸝⸝) ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ　(⸝⸝ //T⩊T// ⸝⸝)　꒰ ㅠ ⩊ ㅠ ꒱♡
+撒娇：｡꒰ྀི ♡ ⩊ ♡ ꒱ྀི｡　✧ (⸝⸝ ♡⩊♡ ⸝⸝) ✧　✧ (⸝⸝ ･⩊˂ ⸝⸝) ✧　˚₊ ꒰ ˊ ⩊ ˋ ꒱ ₊˚　✧ ꒰ ´͈ ⩊ `͈ ꒱ ✧　(⸝⸝ ´͈⩊`͈ ⸝⸝)ᐝ　꒰ྀི ･ ⩊ ˂ ꒱ྀི　｡꒰ྀི = ⩊ = ꒱ྀི｡
+生气：⋆ ꒰ ´ ⩊ ｀ ꒱ ⋆　✧ ꒰ ´ ⩊ ｀ ꒱ ✧　˚₊ (⸝⸝ ´⩊｀ ⸝⸝) ₊˚　˚₊ ꒰ྀི •᷅ ⩊ •᷄ ꒱ྀི ₊˚　✩.*˚ ꒰ྀི ´ ⩊ ｀ ꒱ྀི　꒰ •᷅ ⩊ •᷄ ꒱　꒰ ˶´ ⩊ ｀˶ ꒱　꒰ྀི ◍´ ⩊ ｀◍ ꒱ྀི♡
+
+== 零件表 ==
+耳朵/脸框：经典垂耳 U … U / 软团垂耳 ૮₍ … ₎ა / 卷卷耳朵 ૮꒰ … ꒱ა / 小括号耳 ૮( … )ა / 蓬松耳朵 U꒰ … ꒱U / 圆圆脸颊 U( … )U / 轻盈小狗 ᑌ … ᑌ / 小小垂耳 ૮ … ა / 圆脸天使 ( … ) / 小方脸 [ … ] / 圆滚滚 （ … ） / 猫猫尖耳 ᐢ … ᐢ / 细细猫耳 ՞ … ՞ / 无框小脸 ∅ … ∅ / 趴睡圆脸 (՞ … ՞) / 兔兔软耳 ૮(ᐢ … ᐢ)ა / 熊熊圆耳 ʕ … ʔ / 蓬松兔耳 ᐢ⸝ … ⸝ᐢ / 仓鼠团团 ꒰ … ꒱ / 仓鼠鼓腮 (⸝⸝ … ⸝⸝) / 紧凑圆脸 ( … ) / 软团贴脸 ૮₍ … ₎ა / 大圆脸蛋 (O … O) / 兔兔团耳 ₍ᐢ … ᐢ₎ / 兔兔贴脸 ₍ᐢ … ᐢ₎ / 狐狸尖尖 ^ … ^ / 猫猫三角耳 /ᐠ … ᐟ\ / 蓬松狐耳 ^⸝ … ⸝^ / 垂耳兔 ／( … )＼ / 尖尖猫耳 ⪩ … ⪨ / 蝴蝶结团耳 ꒰ྀི … ꒱ྀི
+眼睛：小豆豆 • … • / 点点眼 ・ … ・ / 开心眯眼 ˃ … ˂ / 弯弯笑眼 ᵔ … ᵔ / 困困闭眼 ˘ … ˘ / 软软低头 ᴗ … ᴗ / 晕乎乎 @ … @ / 泪汪汪 o̴̶̷᷄ … o̴̶̷̥᷅ / 坚定小狗 •̀ … •́ / 闪闪眼 ✧ … ✧ / 圆眼睛 ㅇ … ㅇ / 眨眨眼 • … ˘ / 小小不开心 - … - / 温柔弯眼 ˊ … ˋ / 笑弯了 ^ … ^ / 豆豆眨眼 ･ … ˂ / 爱心眼 ♡ … ♡ / 委屈垂眼 ； … ； / 眼泪啪嗒 T … T / 紧张小狗 ó … ò / 偷偷瞄你 ¬ … ¬ / 呆呆小狗 º … º / 月牙眼 ⌒ … ⌒ / 睁大眼睛 ⊙ … ⊙ / 瞌睡横线 – … – / 认真盯盯 •̀ … ᴗ / 星星眼 ★ … ★ / 乖乖点头 ᵕ … ᵕ / 困到融化 ᓀ … ᓀ / 猫猫亮眼 ✦ … ✦ / 半眯审视 ≖ … ≖ / 圆圆亮眼 ◕ … ◕ / 眼泪汪汪 ˃̣̣̥ … ˂̣̣̥ / 懒懒半睁 ⩌ … ⩌ / 瀑布眼泪 ㅠ … ㅠ / 咧嘴笑眼 ᗜ … ᗜ / 趴着睡觉 _ … _ / 弯弯笑眼 ˊ … ˋ / 皱眉豆豆眼 •᷅ … •᷄ / 挑眉眯眼 -̀ … -́ / 软软眯眼 ´͈ … `͈ / 鼓气斜眼 ´ … ｀ / 憋泪一线 _ … _ ̥ / 皱眉圆眼 •︡ … •︠ / 哭唧唧 ꒦ິ … ꒦ິ / 亮晶晶豆豆 •͈ … •͈ / 翻白眼 ◔ … ◔ / 眯眯眼 = … = / 大O眼 O … O / U形眼 U … U / 方框眼镜 ⎚ … ⎚ / 带腿眼镜 ˋ⎚ … ⎚ˊ
+嘴巴：小狗嘴 ﻌ / 小猫嘴 ω / 笑一笑 ᴗ / 软软嘴 ꒳ / 嘟嘟嘴 ⤙ / 小小吻 ⤚ / 呜呜 ᯅ / 小鼻尖 ᴥ / 圆圆嘴 ㅅ / 轻轻笑 ᵕ / 小小点 ·̫ / 吐舌头 ڡ / 小海鸥嘴 ﹏ / 委屈扁嘴 ︿ / 亲亲小嘴 3 / 乖乖抿嘴 ⩊ / 张大嘴 O / 小小圆嘴 o / 猫猫笑 w / 平平嘴巴 _ / 微微嘟嘴 ε / 惊讶小狗 Ⱉ / 软软鼻子 ᴓ / 小小微笑 υ / 小小猫鼻 ༝ / 委屈小尖嘴 ‸ / 困困小嘴 ⌯ / 调皮小舌头 𐃷 / 趴睡小鼻子    ̫  / 张嘴大笑 ᗜ / 肉垫小嘴 ࡇ / 尖尖小嘴 ^ / 波浪小嘴 ~ / 小方嘴 ⌔ / 憋住的小尖嘴  ‸  / 一字小嘴 - / 小u嘴 u / 小v嘴 v / 大A嘴 A / 小a嘴 a / 小圆点嘴 . / 小波浪嘴 ᨓ
+装饰（左外 … 左腮 … 右腮 … 右外）：素颜小狗 ∅ … ∅ … ∅ … ∅ / 红扑扑 ∅ … ˶ … ˶ … ∅ / 送你小心心 ∅ … ˶ … ˶ … ♡ / 星星陪伴 ✧ … ∅ … ∅ … ✧ / 困困 Zzz ∅ … ∅ … ∅ … z Z / 戴小蝴蝶结 ୨୧ … ˶ … ˶ … ∅ / 闪亮小狗 ˚₊ … ∅ … ∅ … ₊˚ / 害羞斜线 ∅ … // … // … ∅ / 小脸红红 ∅ … ⸝⸝ … ⸝⸝ … ∅ / 一朵小花 ✿ … ∅ … ∅ … ∅ / 星星点点 ⋆ … ∅ … ∅ … ⋆ / 小小呼噜泡 ∅ … ∅ … ∅ … ᐝ / 气鼓鼓 ∅ … ꐦ˶ … ˶ … ∅ / 小心心 ∅ … ∅ … ∅ … ♡ / 圆圆腮 ∅ … ◍ … ◍ … ∅ / 圆腮比心 ∅ … ◍ … ◍ … ♡ / 小句点 ｡ … ∅ … ∅ … ｡ / 星星腮 ∅ … ∅ … * … ∅ / 可爱腮红 ∅ … ๑ … ๑ … ∅ / 右边小撇撇 ∅ … ∅ … ∅ … ˊˎ˗ / 星星点点 ✩.*˚ … ∅ … ∅ … ∅ / 四叶草 ∅ … ∅ … ∅ … ⋆𖧧˚🍀˚⊹ ࣪ ˖｡ꕤ
+</pre></details>
+<!-- agent-text:end -->
   </main>
   <div id="toast" role="status" aria-live="polite"></div>
-  <dialog id="manual-copy"><h2>长按，把小狗带走</h2><p>浏览器暂时不允许自动复制，请选中下方文字手动复制。</p><textarea id="copy-text" readonly dir="ltr" aria-label="待复制的小狗颜文字"></textarea><button id="close-dialog" class="button primary">完成</button></dialog>
+  <dialog id="slot-edit"><h2>✂ 拆零件</h2><p>点 × 删掉不想要的那一块，点格子可以自己改字，长按格子可以拖动换位置。删掉、改过的零件会一直保持，直到你在下面重新选这个部件。</p><output id="slot-preview" translate="no" class="kaomoji slot-preview" dir="ltr"></output><div id="slot-list" class="slot-list"></div><button id="slot-done" class="button primary" type="button">好了</button></dialog><dialog id="share-card"><h2>⇪ 分享卡片</h2><p>长按图片保存，或者点下面的按钮。卡片下面有二维码，朋友扫一下就能来捏。</p><img id="share-img" class="share-img" alt="字字兽分享卡片"><div class="share-actions"><a id="share-download" class="button primary" download="zizishou.png">保存图片</a><button id="share-native" class="button secondary" type="button" hidden>分享</button><button id="share-close" class="button secondary" type="button">关闭</button></div></dialog><dialog id="manual-copy"><h2>长按，把团子带走</h2><p>浏览器暂时不允许自动复制，请选中下方文字手动复制。</p><textarea id="copy-text" readonly dir="ltr" aria-label="待复制的团子颜文字"></textarea><button id="close-dialog" class="button primary">完成</button></dialog>
 </body></html>

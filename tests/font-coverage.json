@@ -140,9 +140,12 @@
     "source": "NotoSansYi.ttf",
     "codepoints": [
       12539,
+      42022,
+      42150,
       42160,
       42161,
       42163,
+      65377,
       65381
     ]
   },
@@ -222,6 +225,109 @@
     "codepoints": [
       10826,
       10828
+    ]
+  },
+  {
+    "file": "puppy-unicode-16.woff",
+    "source": "DejaVuSans.ttf",
+    "codepoints": [
+      840,
+      3764,
+      9677,
+      9684,
+      65056,
+      65057
+    ]
+  },
+  {
+    "file": "puppy-unicode-17.woff",
+    "source": "NotoSansMandaic-Regular.ttf",
+    "codepoints": [
+      2119
+    ]
+  },
+  {
+    "file": "puppy-unicode-18.woff",
+    "source": "NotoSansSymbols-Regular.ttf",
+    "codepoints": [
+      8980
+    ]
+  },
+  {
+    "file": "puppy-unicode-19.woff",
+    "source": "DejaVuSans.ttf",
+    "codepoints": [
+      5151,
+      5152
+    ]
+  },
+  {
+    "file": "puppy-unicode-20.woff",
+    "source": "DejaVuSans.ttf",
+    "codepoints": [
+      718,
+      726,
+      727,
+      8889,
+      10025
+    ]
+  },
+  {
+    "file": "puppy-unicode-21.woff",
+    "source": "NotoSansArabic-Regular.ttf",
+    "codepoints": [
+      2282
+    ]
+  },
+  {
+    "file": "puppy-unicode-22.woff",
+    "source": "NotoSansThai-Regular.ttf",
+    "codepoints": [
+      3665
+    ]
+  },
+  {
+    "file": "puppy-unicode-23.woff",
+    "source": "NotoSerifTibetan-Regular.ttf",
+    "codepoints": [
+      3954,
+      3968
+    ]
+  },
+  {
+    "file": "puppy-unicode-24.woff",
+    "source": "NotoSansBuginese-Regular.ttf",
+    "codepoints": [
+      6675
+    ]
+  },
+  {
+    "file": "puppy-unicode-25.woff",
+    "source": "NotoSansSymbols-Regular.ttf",
+    "codepoints": [
+      9114
+    ]
+  },
+  {
+    "file": "puppy-unicode-26.woff",
+    "source": "NotoSansMath-Regular.ttf",
+    "codepoints": [
+      10920,
+      10921
+    ]
+  },
+  {
+    "file": "puppy-unicode-27.woff",
+    "source": "NotoSansVai-Regular.ttf",
+    "codepoints": [
+      42340
+    ]
+  },
+  {
+    "file": "puppy-unicode-28.woff",
+    "source": "NotoSansBamum-Regular.ttf",
+    "codepoints": [
+      92647
     ]
   }
 ]

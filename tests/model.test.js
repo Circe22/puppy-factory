@@ -22,7 +22,7 @@ test('all accessory layers combine independently and preserve Unicode',()=>{
  const t=cloneState(s);t.accessories.tail=0;assert.equal(s.accessories.tail,1);assert(!compose(t).includes('↝'));assert(compose(t).includes('^'));assert(compose(t).includes('ଘ'));
 });
 test('version 1 favorites retain exact face and upgrade accessory defaults',()=>{
- const old={ears:1,eyes:7,mouth:0,decor:2,custom:{}};const storage={getItem:()=>JSON.stringify([old])};const list=readFavorites(storage);assert.equal(list.length,1);assert.equal(compose(list[0]),compose(old));assert.deepEqual(list[0].accessories,{horns:0,tail:0,wings:0});
+ const old={ears:1,eyes:7,mouth:0,decor:2,custom:{}};const storage={getItem:()=>JSON.stringify([old])};const list=readFavorites(storage);assert.equal(list.length,1);assert.equal(compose(list[0]),compose(old));assert.deepEqual(list[0].accessories,{horns:0,tail:0,wings:0,hands:0});
  assert(!validState({...old,accessories:{horns:99}}));assert(!validState({...old,accessories:{wings:-1}}));assert(!validState({...old,accessories:{unknown:1}}));
 });
 test('layered accessories and old favorites survive storage and exact clipboard copying',async()=>{

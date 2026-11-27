@@ -41,6 +41,13 @@ The mobile editing dock contains copy/save and a single undo/random/clear row. I
 
 已保留原有卡片描边和收缩补位，并补齐分类跳转时的高度计算。CSS、应用与依赖模块缓存键统一为 v8。新增 `dist/i18n.js` 与翻译覆盖测试，当前 27 项测试全部通过。浏览器已验证语言切换、刷新后记忆、状态保留与实际剪贴板复制；手机宽度的收缩补位仍待实机验证。
 
+
+## 字字兽 Zizishou
+
+六类字字兽：小狗、小猫、兔兔、熊熊、狐狸、仓鼠；保留原有收藏键名和零件编号。正式网站 https://circe.circeworks.com/zizishou/ 部署的就是 `dist/`。
+
+后来加的：每一格都能「塞一个自己的素材」（存在浏览器里，和现成零件一起排序、一起随机）；单边装饰和尾巴点一下换左右；「拆零件」里长按拖动排顺序；网站小图标。
+
 ## 授权 License
 
 字字兽的代码、零件系统、分类与界面设计以 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.zh-hans) 授权，署名 **Circe**。非商业使用请署名并附上本仓库链接；商业使用请先联系作者。

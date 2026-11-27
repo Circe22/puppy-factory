@@ -1,5 +1,5 @@
-import {translate} from './i18n.js?v=8';
-import {PARTS, ACCESSORIES, NEW_PARTS, DEFAULT, cloneState} from './model.js?v=8';
+import {translate} from './i18n.js?v=36';
+import {PARTS, ACCESSORIES, NEW_PARTS, DEFAULT, cloneState} from './model.js?v=35';
 
 export const RECENT_KEY = 'puppy-factory:recent-parts';
 const OPTIONS = {...PARTS, ...ACCESSORIES};
@@ -17,6 +17,8 @@ const COMMON = {
   decor: [1, 0, 2, 3, 6, 9, 11, 14],
 };
 function validIndex(key, value) {
+  // 2026-11-28：自己塞的素材在「最近用过」里记成 'm:<id>'，和现成零件一起排先后。
+  if (typeof value === 'string') return Object.hasOwn(OPTIONS, key) && /^m:[a-z0-9]{4,20}$/.test(value);
   return Number.isInteger(value) && value >= 0 && value < (OPTIONS[key]?.length || 0);
 }
 export function cleanRecent(data) {
@@ -45,9 +47,10 @@ export function partTray(key, {recent = {}, expanded = false, query = '', mood =
   const order = [...new Set([
     ...(cleanRecent(recent)[key] || []), ...(COMMON[key] || []), ...(NEW_PARTS[key] || []),
     ...items.map((_, i) => i),
-  ])].filter(i => validIndex(key, i));
+  ])].filter(i => Number.isInteger(i) && validIndex(key, i));
   const q = query.trim().toLowerCase();
   const candidates = order.filter(i => {
+    if (items[i].hidden) return false;
     if (q) return (items[i].name + ' ' + translate(items[i].name,'en') + ' ' + (Array.isArray(items[i].v) ? items[i].v.join(' ') : items[i].v)).toLowerCase().includes(q);
     return key !== 'eyes' || mood === '常用' || (EYE_MOODS[mood] || []).includes(i);
   });
