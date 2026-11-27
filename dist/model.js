@@ -346,3 +346,62 @@ FRESH_LOOKS.push(
  {name:'斯文团子',expected:'ˋ⎚⤚⎚ˊ',state:{ears:noEars,eyes:armGlasses,mouth:5,decor:0}},
  {name:'蝴蝶结团子',expected:'꒰ྀི ˶• ᴗ •˶ ꒱ྀི',state:{ears:bowEars,eyes:0,mouth:2,decor:1}}
 );
+
+// 2026-11-28 界（拾：「给所有的小部件都加一个可以自己塞素材的地方……只有用户主动往塞素材的地方塞素材，才会被留下来」）
+// 「自己输入」仍是一次性的小修改；只有点了「塞进素材区」的才存进浏览器（localStorage），出现在那一格最前面，随机也会抽到。
+export const MY_PARTS_KEY='zizishou:my-parts';
+export const STASH_SLOTS={eyes:['eyeLeft','eyeRight'],mouth:['mouth'],ears:['left','right'],decor:['prefix','blushLeft','blushRight','suffix'],hands:['handLeft','handRight'],horns:['hornLeft','hornRight'],tail:['tail'],wings:['wingLeft','wingRight']};
+const STASH_CLEARS={eyes:['eyeLeft','eyeRight'],mouth:['mouth'],ears:['left','right','leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter'],decor:['prefix','suffix','blushLeft','blushRight'],hands:['handLeft','handRight'],horns:['hornLeft','hornRight'],tail:['tail'],wings:['wingLeft','wingRight']};
+export const MY_PARTS_MAX=24;
+const STASH_BAD=/[\u0000-\u001f\u007f‪-‮⁦-⁩]/gu;
+export function cleanStash(text,max=16){return Array.from(String(text??'').replace(STASH_BAD,'')).slice(0,max).join('')}
+export function newStashId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function validEntry(kind,e){
+  if(!e||typeof e!=='object'||!e.v||typeof e.v!=='object')return null;
+  const v={};
+  for(const slot of STASH_SLOTS[kind]){const x=e.v[slot];if(typeof x==='string'){const c=cleanStash(x);if(c.trim())v[slot]=c}}
+  if(!Object.keys(v).length)return null;
+  return {id:/^[a-z0-9]{4,20}$/.test(e.id||'')?e.id:newStashId(),v,name:cleanStash(e.name,12).trim()};
+}
+export function emptyMyParts(){return Object.fromEntries(Object.keys(STASH_SLOTS).map(k=>[k,[]]))}
+export function readMyParts(storage){
+  const mine=emptyMyParts();
+  try{
+    const raw=JSON.parse(storage?.getItem(MY_PARTS_KEY)||'{}');
+    for(const kind of Object.keys(STASH_SLOTS)){
+      if(!Array.isArray(raw?.[kind]))continue;
+      mine[kind]=raw[kind].map(e=>validEntry(kind,e)).filter(Boolean).slice(0,MY_PARTS_MAX);
+    }
+  }catch{}
+  return mine;
+}
+export function writeMyParts(storage,mine){try{storage.setItem(MY_PARTS_KEY,JSON.stringify(mine));return true}catch{return false}}
+const entryKey=v=>JSON.stringify(Object.keys(v).sort().map(k=>[k,v[k]]));
+export function addMyPart(mine,kind,values,name=''){
+  const entry=validEntry(kind,{v:values,name});
+  if(!entry)return {mine,result:'empty'};
+  const list=mine[kind]||[];
+  if(list.some(e=>entryKey(e.v)===entryKey(entry.v)))return {mine,result:'duplicate'};
+  return {mine:{...mine,[kind]:[entry,...list].slice(0,MY_PARTS_MAX)},result:'added',entry};
+}
+export function removeMyPart(mine,kind,index){return {...mine,[kind]:(mine[kind]||[]).filter((_,i)=>i!==index)}}
+export function stashSample(kind,v){const parts=STASH_SLOTS[kind].map(slot=>v[slot]).filter(x=>x!==undefined);return parts.join(kind==='ears'||Object.hasOwn(ACCESSORIES,kind)?'‎ ◦ ‎':' ')}
+export function applyMyPart(s,kind,entry){
+  const next=cloneState(s);
+  for(const slot of STASH_CLEARS[kind])delete next.custom[slot];
+  Object.assign(next.custom,entry.v);
+  if(Object.hasOwn(ACCESSORIES,kind)&&!next.accessories[kind]){
+    const items=ACCESSORIES[kind];
+    let i=items.findIndex((x,j)=>j>0&&x.pos!=='in');if(i<0)i=1;
+    next.accessories[kind]=i;
+  }
+  return next;
+}
+// 随机（拾 01:06：「权重就跟里面的素材一样」）：自己塞的素材和现成零件一起抽签，一视同仁。
+// 配件只有在随机戴上时才参与抽签（角本来就不随机戴）。
+export function sprinkleMyParts(s,mine,rng=Math.random){
+  let next=s;
+  for(const kind of ['eyes','mouth','ears','decor']){const list=mine?.[kind]||[];if(!list.length)continue;const m=PARTS[kind].filter(x=>!x.hidden).length;if(rng()<list.length/(list.length+m))next=applyMyPart(next,kind,list[Math.floor(rng()*list.length)])}
+  for(const kind of ['hands','tail','wings']){const list=mine?.[kind]||[];if(!list.length||!next.accessories?.[kind])continue;const m=ACCESSORIES[kind].length-1;if(rng()<list.length/(list.length+m))next=applyMyPart(next,kind,list[Math.floor(rng()*list.length)])}
+  return next;
+}
