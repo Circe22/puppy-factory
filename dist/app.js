@@ -1,7 +1,7 @@
-import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText,STASH_SLOTS,readMyParts,writeMyParts,addMyPart,removeMyPart,stashSample,applyMyPart,sprinkleMyParts} from './model.js?v=31';
+import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText,STASH_SLOTS,readMyParts,writeMyParts,addMyPart,removeMyPart,stashSample,applyMyPart,sprinkleMyParts,randomSides,flipSide,currentSide,decorSideOf} from './model.js?v=32';
 import {drawShareCard,SHARE_URL} from './share.js?v=4';
-import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=35';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=34';
+import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=36';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=35';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -108,6 +108,9 @@ function buildFamilies(){ANIMALS.forEach(animal=>{const look=ANIMAL_LOOKS.find(x
 function buildCustom(k){const details=el('details','custom-editor');details.append(el('summary','','自己输入'+(k==='decor'?'前后装饰':labels[k].replace('选择','').replace('换一对小',''))));const grid=el('div','custom-fields');(k==='ears'?['left','right']:customKeys[k]).forEach(key=>{const label=el('label','',names[key]);const input=el('input');input.type='text';input.dir='ltr';input.dataset.custom=key;localizedAttr(input,'aria-label',names[key]+'自定义');input.autocomplete='off';input.spellcheck=false;input.addEventListener('focus',checkpoint);input.addEventListener('input',()=>{state.custom[key]=Array.from(input.value.replace(/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/gu,'')).slice(0,16).join('');render()});label.append(input);grid.append(label)});details.append(grid);return details}
 // 2026-11-28 拾：每一格都有一个「塞素材」的地方。只有点了「塞进素材区」才留下来，排在那一格最前面，随机也会抽到。
 const stashLists=new Map();
+// 2026-11-28 拾：单边的装饰和尾巴，选中后再点一下＝换左右（其他零件仍是「再点一下回到上一个」）。
+function doFlip(kind){const f=flipSide(state,kind);if(!f)return false;change(()=>{state=f},{remember:false});toast(currentSide(state,kind)==='left'?'换到左边啦':'换到右边啦');return true}
+function flipHint(kind){if(currentSide(state,kind))toast('再点一下，可以换到另一边')}
 // 拾 01:16：单边的零件在名字后面用括号写清楚放在哪一边
 const STASH_LABELS={tail:'尾巴（后）',prefix:'前面的小装饰（左）',suffix:'后面的小装饰（右）'};
 function saveMine(next){if(!writeMyParts(storage,next)){toast('浏览器无法保存素材，请允许本地存储后再试');return false}mine=next;return true}
@@ -116,7 +119,7 @@ function renderMine(tray){
  for(const key of [...tray.buttons.keys()])if(typeof key==='string'){tray.buttons.get(key).remove();tray.buttons.delete(key)}
  (mine[k]||[]).forEach(entry=>{
   const id='m:'+entry.id;
-  const b=button('choice my-choice','',()=>{change(()=>{state=applyMyPart(state,k,entry)});rememberPart(k,id)});
+  const b=button('choice my-choice','',()=>{const on=Object.entries(entry.v).every(([x,v])=>state.custom[x]===v)&&(k!=='tail'||!!state.accessories.tail);if(on&&(k==='decor'||k==='tail')&&doFlip(k))return;change(()=>{state=applyMyPart(state,k,entry);if(k==='decor'&&state.sides)delete state.sides.decor});rememberPart(k,id);if(k==='decor'||k==='tail')flipHint(k)});
   const face=el('span','kaomoji',stashSample(k,entry.v));const tag=el('small','','我的');if(entry.name)tag.append(document.createTextNode(' · '+entry.name));
   localizedAttr(b,'aria-label','我的素材');b.title=entry.name||stashSample(k,entry.v);b.append(face,tag);tray.buttons.set(id,b);
  });
@@ -179,7 +182,7 @@ function buildPart(k,open=true){
   search.addEventListener('input',()=>{tray.query=search.value;tray.expanded=false;updateTray(tray)});tray.search=search;section.append(search);
  }
  PARTS[k].forEach((x,i)=>{
-  const b=button('choice'+(k==='decor'&&i===0?' none-choice':''),'',()=>{const cur=state[k];if(cur===i&&prevPick[k]===undefined)return;change(()=>{if(cur===i){state[k]=prevPick[k];delete prevPick[k]}else{prevPick[k]=cur;state[k]=i}customKeys[k].forEach(key=>delete state.custom[key]);rememberPart(k,state[k])})});
+  const b=button('choice'+(k==='decor'&&i===0?' none-choice':''),'',()=>{const cur=state[k];if(k==='decor'&&cur===i&&!customKeys.decor.some(x=>Object.hasOwn(state.custom,x))&&doFlip('decor'))return;if(cur===i&&prevPick[k]===undefined)return;change(()=>{if(cur===i){state[k]=prevPick[k];delete prevPick[k]}else{prevPick[k]=cur;state[k]=i}customKeys[k].forEach(key=>delete state.custom[key]);if(k==='decor'&&state.sides)delete state.sides.decor;rememberPart(k,state[k])});if(k==='decor'&&cur!==i)flipHint('decor')});
   b.dataset.choice=k;b.dataset.index=i;localizedAttr(b,'aria-label',labels[k]+'：'+x.name);b.append(el('span','kaomoji',sample(k,x)),el('small','',x.name));tray.buttons.set(i,b);
  });
  tray.toggle=button('expand-parts','展开全部 ▾',()=>{tray.expanded=!tray.expanded;updateTray(tray)});tray.toggle.setAttribute('aria-controls',grid.id);
@@ -191,7 +194,7 @@ function buildAccessories(rows=[['horns','小恶魔角'],['tail','小尾巴'],['
   const row=el('fieldset','accessory-row'),legend=el('legend','',label),count=el('span','accessory-count');legend.append(count);row.append(legend);
   const grid=el('div','accessory-choices part-rail');grid.id='choices-'+key;const empty=el('p','part-empty');empty.hidden=true;
   const tray={key,grid,count,empty,expanded:false,rail:true,query:'',mood:'常用',buttons:new Map(),items:ACCESSORIES[key]};
-  ACCESSORIES[key].forEach((x,i)=>{const b=button('choice accessory-choice'+(i===0?' none-choice':''),'',()=>{const cur=state.accessories[key]||0;let selected;if(cur===i){if(prevPick[key]===undefined&&i===0)return;selected=prevPick[key]??0;delete prevPick[key]}else{prevPick[key]=cur;selected=i}if(key==='hands')autoHands=0;change(()=>{state.accessories[key]=selected;accessorySlots[key].forEach(slot=>delete state.custom[slot]);rememberPart(key,selected)})});b.dataset.accessory=key;b.dataset.index=i;localizedAttr(b,'aria-label',x.name);b.append(el('span','kaomoji',i===0?'—':Array.isArray(x.v)?x.v.join('\u200e ◦ \u200e'):x.v.trim()),el('small','',x.name));tray.buttons.set(i,b)});
+  ACCESSORIES[key].forEach((x,i)=>{const b=button('choice accessory-choice'+(i===0?' none-choice':''),'',()=>{const cur=state.accessories[key]||0;if(key==='tail'&&i!==0&&cur===i&&!Object.hasOwn(state.custom,'tail')&&doFlip('tail'))return;if(key==='tail'&&i!==0&&cur!==i)setTimeout(()=>flipHint('tail'));let selected;if(cur===i){if(prevPick[key]===undefined&&i===0)return;selected=prevPick[key]??0;delete prevPick[key]}else{prevPick[key]=cur;selected=i}if(key==='hands')autoHands=0;change(()=>{state.accessories[key]=selected;accessorySlots[key].forEach(slot=>delete state.custom[slot]);rememberPart(key,selected)})});b.dataset.accessory=key;b.dataset.index=i;localizedAttr(b,'aria-label',x.name);b.append(el('span','kaomoji',i===0?'—':Array.isArray(x.v)?x.v.join('\u200e ◦ \u200e'):x.v.trim()),el('small','',x.name));tray.buttons.set(i,b)});
   tray.toggle=button('expand-parts','展开全部 ▾',()=>{tray.expanded=!tray.expanded;updateTray(tray)});tray.toggle.setAttribute('aria-controls',grid.id);trays.set(key,tray);row.append(grid,tray.toggle,buildStash(key));renderMine(tray);section.append(row);
  }
  return section;
@@ -212,7 +215,7 @@ document.querySelectorAll('[data-part-tab]').forEach(b=>{b.setAttribute('role','
 function card(s){const text=compose(s),saved=hasSaved(s),animal=ANIMALS.find(x=>x.id===animalForEar(s.ears));const c=el('article','puppy-card'),top=el('div','card-portrait');const saveBtn=button('card-save',saved?'♥':'♡',()=>save(s));localizedAttr(saveBtn,'aria-label',(saved?'取消收藏 ':'收藏 ')+text);saveBtn.setAttribute('aria-pressed',String(saved));const face=el('span','kaomoji card-puppy',text);face.dir='ltr';if(Array.from(text).length>25)face.style.fontSize='16px';top.append(face,saveBtn);const bottom=el('div','card-bottom'),animalName=animal?.name||'团子';const name=el('span','card-name',s.accessories?.wings?'天使'+animalName:s.accessories?.horns?'恶魔'+animalName:PARTS.eyes[s.eyes].mood+animalName);name.append(el('small','',PARTS.ears[s.ears].name));const actions=el('div','card-actions');actions.append(button('','捏捏',()=>{quietFace=true;change(()=>{state=cloneState(s);counter++});showView('studio');$('.workbench').scrollIntoView({behavior:'smooth',block:'start'})}),button('','复制',()=>copy(s)));bottom.append(name,actions);c.append(top,bottom);return c}
 function matches(s){if(filter==='全部团子')return true;if(filter==='新到表情')return FRESH_LOOKS.some(x=>compose(x.state)===compose(s));const animal=ANIMALS.find(x=>x.name===filter);if(animal)return animalForEar(s.ears)===animal.id;if(filter==='小恶魔')return (s.accessories?.horns||0)>0;if(filter==='小天使')return (s.accessories?.wings||0)>0;return PARTS.eyes[s.eyes].mood===filter}
 function renderGallery(){$('#gallery').replaceChildren(...gallery.filter(matches).slice(0,12).map(card))}
-function newRandom(animalId=null,mood=null){const chosen=animalId||ANIMALS[Math.floor(Math.random()*ANIMALS.length)].id;const s=cloneState(randomAnimalState(chosen,mood));for(const k of Object.keys(ACCESSORIES))s.accessories[k]=k!=='horns'&&Math.random()<.2?1+Math.floor(Math.random()*(ACCESSORIES[k].length-1)):0;return sprinkleMyParts(s,mine)}
+function newRandom(animalId=null,mood=null){const chosen=animalId||ANIMALS[Math.floor(Math.random()*ANIMALS.length)].id;const s=cloneState(randomAnimalState(chosen,mood));for(const k of Object.keys(ACCESSORIES))s.accessories[k]=k!=='horns'&&Math.random()<.2?1+Math.floor(Math.random()*(ACCESSORIES[k].length-1)):0;return randomSides(sprinkleMyParts(s,mine))}
 function refreshGallery(){gallery=[...ANIMAL_LOOKS.map(x=>cloneState(x.state)),...FRESH_LOOKS.map(x=>cloneState(x.state)),...looks.map(x=>cloneState(x.state)),cloneState(DEFAULT),...ANIMALS.flatMap(x=>['开心','撒娇','困困','委屈'].map(m=>newRandom(x.id,m)))];const animal=ANIMALS.find(x=>x.name===filter),mood=['开心','撒娇','困困','委屈'].includes(filter)?filter:null;for(let i=0;i<24;i++){const s=newRandom(animal?.id||null,mood);if(filter==='小恶魔')s.accessories.horns=1+Math.floor(Math.random()*(ACCESSORIES.horns.length-1));if(filter==='小天使')s.accessories.wings=1+Math.floor(Math.random()*(ACCESSORIES.wings.length-1));gallery.push(s)}const seen=new Set();gallery=gallery.filter(s=>{const text=compose(s);if(seen.has(text))return false;seen.add(text);return true});renderGallery()}
 function renderFilters(){$('#filters').replaceChildren();categories.forEach(name=>{const b=button('filter',name,()=>{filter=name;renderFilters();refreshGallery()});b.setAttribute('aria-pressed',String(filter===name));$('#filters').append(b)})}
 function renderFavorites(){$('#favorite-grid').replaceChildren(...favorites.map(card));$('#empty-favorites').hidden=!!favorites.length}

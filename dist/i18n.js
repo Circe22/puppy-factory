@@ -66,7 +66,7 @@ export const EN = {
   '自己输入耳朵': 'Type your own ears', '自己输入前后装饰': 'Type your own prefix or suffix',
   '没有找到，试试换个名字，或展开下方自定义。': 'No matches. Try another name or type your own below.',
   '没有找到，试试换个名字，或者在下面塞一个自己的素材。': 'No matches. Try another name, or add your own part below.',
-  '＋ 塞一个自己的素材': '+ Add your own part', '尾巴（后）': 'Tail (after)', '前面的小装饰（左）': 'Prefix (left)', '后面的小装饰（右）': 'Suffix (right)', '塞进素材区': 'Add to my parts', '名字（可不填）': 'Name (optional)',
+  '＋ 塞一个自己的素材': '+ Add your own part', '换到左边啦': 'Moved to the left', '换到右边啦': 'Moved to the right', '再点一下，可以换到另一边': 'Tap again to move it to the other side', '尾巴（后）': 'Tail (after)', '前面的小装饰（左）': 'Prefix (left)', '后面的小装饰（右）': 'Suffix (right)', '塞进素材区': 'Add to my parts', '名字（可不填）': 'Name (optional)',
   '我的': 'Mine', '我的素材': 'My part', '删掉': 'Remove', '删掉啦': 'Removed',
   '先填一个零件再塞哦': 'Fill in at least one piece first', '这个素材已经在里面啦': 'That part is already saved',
   '塞进去啦，已经换上了': 'Saved and put on!', '浏览器无法保存素材，请允许本地存储后再试': 'Your browser can’t save parts. Please allow local storage and try again.',

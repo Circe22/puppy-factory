@@ -60,7 +60,7 @@ export function animalForEar(index){
   return PARTS.ears[index].animal||([11,12,13].includes(index)?'cat':'dog');
 }
 export const DEFAULT={ears:1,eyes:0,mouth:0,decor:1,custom:{},accessories:{horns:0,tail:0,wings:0,hands:0}};
-export function cloneState(s){return {...s,custom:{...s.custom},accessories:{horns:0,tail:0,wings:0,hands:0,...s.accessories}}}
+export function cloneState(s){const out={...s,custom:{...s.custom},accessories:{horns:0,tail:0,wings:0,hands:0,...s.accessories}};if(s.sides)out.sides={...s.sides};else delete out.sides;return out}
 // 2026-11-23 界（拾提）：带脸框的耳朵（如 ૮(ᐢ ）拆成三块：外耳、脸边、内侧，可以只删里面的小耳朵
 export const EAR_FRAMES=new Set(['(',')','₍','₎','꒰','꒱','[',']','（','）','ʕ','ʔ']);
 export function earPieces(str,side){const chars=Array.from(str);const i=side==='left'?chars.findIndex(ch=>EAR_FRAMES.has(ch)):chars.findLastIndex(ch=>EAR_FRAMES.has(ch));if(i<0)return null;const before=chars.slice(0,i).join(''),frame=chars[i],after=chars.slice(i+1).join('');return side==='left'?{outer:before,frame,inner:after}:{inner:before,frame,outer:after}}
@@ -118,6 +118,11 @@ function insertInside(segments,hand,side){
   else if(side==='left')segments.push(hand);
   else segments.unshift(hand);
 }
+// 单边：只有前装饰或只有后装饰（腮红不算）。返回它本来在哪边。
+export function oneSide(prefix,suffix){const p=!!(prefix||'').trim(),q=!!(suffix||'').trim();return p&&!q?'left':q&&!p?'right':null}
+// 挪到另一边时，把贴着脸那一侧的空格也翻过去：' っ' → 'っ '，'✿ ' → ' ✿'
+function moveLeft(text){const m=/^(\s*)([\s\S]*?)(\s*)$/u.exec(text);return m[2]+m[1]+m[3]}
+function moveRight(text){const m=/^(\s*)([\s\S]*?)(\s*)$/u.exec(text);return m[1]+m[3]+m[2]}
 export function composeParts(s){
   const custom=s.custom||{};
   const accessories=s.accessories||{};
@@ -136,8 +141,18 @@ export function composeParts(s){
     trimEarEdge(left,'end');
     trimEarEdge(right,'start');
   }
+  // 2026-11-28 拾：单边的装饰和尾巴可以换左右（state.sides）。只挪位置，字形不镜像。
+  const sides=s.sides||{};
+  let prefix=face.prefix,suffix=face.suffix;
+  const decorSide=oneSide(prefix,suffix);
+  if(decorSide&&sides.decor&&sides.decor!==decorSide){
+    if(decorSide==='left'){suffix=moveRight(prefix);prefix=''}else{prefix=moveLeft(suffix);suffix=''}
+  }
+  const tailText=accessories.tail?(custom.tail??tail):'';
+  const tailLeft=!!tailText.trim()&&sides.tail==='left';
   return fixBidiSegments([
-    ['prefix',face.prefix],
+    ['prefix',prefix],
+    ...(tailLeft?[['tail',moveLeft(tailText)]]:[]),
     ['wingLeft',accessories.wings?(custom.wingLeft??wings[0]):''],
     ...(hand.outside?[['handLeft',hand.left]]:[]),
     ...left,
@@ -153,8 +168,8 @@ export function composeParts(s){
     ...right,
     ...(hand.outside?[['handRight',hand.right]]:[]),
     ['wingRight',accessories.wings?(custom.wingRight??wings[1]):''],
-    ['tail',accessories.tail?(custom.tail??tail):''],
-    ['suffix',face.suffix]
+    ...(tailLeft?[]:[['tail',tailText]]),
+    ['suffix',suffix]
   ]);
 }
 // 2026-11-28 界（拾报 bug：自己输入眼睛 0 0，显示成「0 0ﻌ」）：ﻌ、ڡ 是阿拉伯字母（从右往左），
@@ -198,7 +213,7 @@ export const ANIMAL_LOOKS=ANIMALS.map(animal=>({
   id:animal.id,name:animal.name+'团子',
   state:{...cloneState(DEFAULT),ears:animal.earIndex,mouth:animal.mouthIndex}
 }));
-export function validState(s){return !!s&&(s.spacing===undefined||s.spacing===''||s.spacing===' ')&&['ears','eyes','mouth','decor'].every(k=>Number.isInteger(s[k])&&s[k]>=0&&s[k]<PARTS[k].length)&&(!s.accessories||(typeof s.accessories==='object'&&Object.entries(s.accessories).every(([k,v])=>Object.hasOwn(ACCESSORIES,k)&&Number.isInteger(v)&&v>=0&&v<ACCESSORIES[k].length)))&&(!s.custom||Object.entries(s.custom).every(([k,v])=>['left','right','eyeLeft','eyeRight','mouth','prefix','suffix','blushLeft','blushRight','hornLeft','hornRight','wingLeft','wingRight','tail','leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter','handLeft','handRight'].includes(k)&&typeof v==='string'&&Array.from(v).length<=16&&!/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(v)))}
+export function validState(s){return !!s&&(!s.sides||(typeof s.sides==='object'&&Object.entries(s.sides).every(([k,v])=>['decor','tail'].includes(k)&&['left','right'].includes(v))))&&(s.spacing===undefined||s.spacing===''||s.spacing===' ')&&['ears','eyes','mouth','decor'].every(k=>Number.isInteger(s[k])&&s[k]>=0&&s[k]<PARTS[k].length)&&(!s.accessories||(typeof s.accessories==='object'&&Object.entries(s.accessories).every(([k,v])=>Object.hasOwn(ACCESSORIES,k)&&Number.isInteger(v)&&v>=0&&v<ACCESSORIES[k].length)))&&(!s.custom||Object.entries(s.custom).every(([k,v])=>['left','right','eyeLeft','eyeRight','mouth','prefix','suffix','blushLeft','blushRight','hornLeft','hornRight','wingLeft','wingRight','tail','leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter','handLeft','handRight'].includes(k)&&typeof v==='string'&&Array.from(v).length<=16&&!/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(v)))}
 export function readFavorites(storage){try{const data=JSON.parse(storage.getItem('puppy-factory:favorites')||'[]');return Array.isArray(data)?data.filter(validState).slice(0,500).map(cloneState):[]}catch{return []}}
 export function writeFavorites(storage,list){try{storage.setItem('puppy-factory:favorites',JSON.stringify(list));return true}catch{return false}}
 export async function copyText(text,nav,doc){try{if(nav.clipboard?.writeText){await nav.clipboard.writeText(text);return 'clipboard'}}catch{}const active=doc.activeElement;const input=doc.createElement('textarea');input.value=text;input.setAttribute('readonly','');input.setAttribute('dir','ltr');input.style.cssText='position:fixed;top:0;left:0;opacity:0;font-size:16px';doc.body.append(input);input.focus();input.select();input.setSelectionRange(0,text.length);let copied=false;try{copied=doc.execCommand('copy')}catch{}finally{input.remove();active?.focus?.()}return copied?'fallback':'manual'}
@@ -405,3 +420,24 @@ export function sprinkleMyParts(s,mine,rng=Math.random){
   for(const kind of ['hands','tail','wings']){const list=mine?.[kind]||[];if(!list.length||!next.accessories?.[kind])continue;const m=ACCESSORIES[kind].length-1;if(rng()<list.length/(list.length+m))next=applyMyPart(next,kind,list[Math.floor(rng()*list.length)])}
   return next;
 }
+
+// 2026-11-28 拾：「随机的时候是可以左右都放的。尾巴默认放右边」——随机出来的单边装饰、尾巴各一半机会换到另一边。
+export function decorSideOf(s){const v=values(s);return oneSide(v.prefix,v.suffix)}
+export function randomSides(s,rng=Math.random){
+  const next=cloneState(s);const sides={};
+  const native=decorSideOf(next);
+  if(native&&rng()<.5)sides.decor=native==='left'?'right':'left';
+  if(next.accessories?.tail&&rng()<.5)sides.tail='left';
+  if(Object.keys(sides).length)next.sides=sides;else delete next.sides;
+  return next;
+}
+// 点一下换边：返回换好边的新状态；不是单边的返回 null
+export function flipSide(s,kind){
+  const next=cloneState(s);const sides={...(next.sides||{})};
+  if(kind==='decor'){const native=decorSideOf(next);if(!native)return null;const cur=sides.decor||native;sides.decor=cur==='left'?'right':'left';if(sides.decor===native)delete sides.decor}
+  else if(kind==='tail'){if(!next.accessories?.tail)return null;if(sides.tail==='left')delete sides.tail;else sides.tail='left'}
+  else return null;
+  if(Object.keys(sides).length)next.sides=sides;else delete next.sides;
+  return next;
+}
+export function currentSide(s,kind){if(kind==='tail')return s.sides?.tail==='left'?'left':'right';const n=decorSideOf(s);return n?(s.sides?.decor||n):null}
