@@ -453,7 +453,7 @@ export function randomSides(s,rng=Math.random){
   const next=cloneState(s);const sides={};
   const native=decorSideOf(next);
   if(native&&rng()<.5)sides.decor=native==='left'?'right':'left';
-  if(next.accessories?.tail&&rng()<.5)sides.tail='left';
+  // 拾 01:37：尾巴放左边接不上，随机时一律在右边；只有用户自己点才换到左边
   if(Object.keys(sides).length)next.sides=sides;else delete next.sides;
   return next;
 }
