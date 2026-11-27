@@ -18,7 +18,7 @@ export const EN = {
   '小爱心尾': 'Little heart tail', '小翘线尾': 'Tiny flick tail', '招手尾巴': 'Waving tail',
   '扫码捏一只你的团子 →': 'Scan to make your own →', '卡片生成失败了，再试一次吧': 'Could not make the card. Please try again.', '字字兽': 'ZiZiShou',
   '好了': 'Done', '拆零件': 'Edit parts', '✂ 拆零件': '✂ Edit parts', '点一下，拆开零件': 'Tap to edit parts',
-  '点 × 删掉不想要的那一块，点格子可以自己改字。删掉、改过的零件会一直保持，直到你在下面重新选这个部件。': 'Tap × to remove a piece, or tap a box to type your own. Removed and edited pieces stay until you pick that part again below.',
+  '点 × 删掉不想要的那一块，点格子可以自己改字，长按格子可以拖动换位置。删掉、改过的零件会一直保持，直到你在下面重新选这个部件。': 'Tap × to remove a piece, tap a box to type your own, or press and hold a box to drag it somewhere else. Removed and edited pieces stay until you pick that part again below.',
   '拆好啦，删掉的零件会一直保持': 'Done! Removed pieces will stay removed.', '↺ 恢复': '↺ Restore',
   '前装饰': 'Front deco', '后装饰': 'Back deco', '左翅膀': 'Left wing', '右翅膀': 'Right wing', '左耳': 'Left ear', '右耳': 'Right ear',
   '左角': 'Left horn', '右角': 'Right horn', '左腮红': 'Left blush', '右腮红': 'Right blush', '左眼': 'Left eye', '右眼': 'Right eye', '嘴巴': 'Mouth', '尾巴': 'Tail',

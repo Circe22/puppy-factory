@@ -1,7 +1,7 @@
-import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText,STASH_SLOTS,readMyParts,writeMyParts,addMyPart,removeMyPart,stashSample,applyMyPart,sprinkleMyParts,randomSides,flipSide,currentSide,decorSideOf} from './model.js?v=32';
+import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText,STASH_SLOTS,readMyParts,writeMyParts,addMyPart,removeMyPart,stashSample,applyMyPart,sprinkleMyParts,randomSides,flipSide,currentSide,decorSideOf,reorderVisible} from './model.js?v=33';
 import {drawShareCard,SHARE_URL} from './share.js?v=4';
-import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=36';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=35';
+import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=37';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=36';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -60,13 +60,14 @@ async function copy(s){
  return method;
 }
 function renderSaved(){$('#favorite-count').textContent=favorites.length;$('#save').setAttribute('aria-pressed',String(hasSaved(state)));setText($('#save'),hasSaved(state)?'♥ 已收藏':'♡ 收藏');$$('.nav-item').forEach(b=>{if(b.dataset.view==='favorites')localizedAttr(b,'aria-label',`我的收藏，${favorites.length}只团子`)})}
-let renderedFaceParts,highlightTimer;
+let renderedFaceParts,renderedFaceKeys,highlightTimer;
 // 拾 11-23：随机、一键穿搭、新到的小表情、集合里的「捏捏」、清空，都是整只换掉，不需要标出哪里变了，所以跳过强调。
 let quietFace=false;
 function renderFace(){
  const quiet=quietFace;quietFace=false;
  const parts=composeParts(state);
- if(renderedFaceParts?.size===parts.length&&parts.every(([key,text])=>renderedFaceParts.get(key)===text))return;
+ const partKeys=parts.map(([k])=>k).join();/* 拖动只换顺序、字不变时也要重画 */
+ if(renderedFaceParts?.size===parts.length&&renderedFaceKeys===partKeys&&parts.every(([key,text])=>renderedFaceParts.get(key)===text))return;
 
  const preview=document.createDocumentFragment();
  for(const [key,text] of parts){
@@ -83,7 +84,7 @@ function renderFace(){
  face.replaceChildren(preview.cloneNode(true));
  $('#slot-preview').replaceChildren(preview);
  $('#puppy').classList.toggle('long-puppy',Array.from(face.textContent).length>27);
- renderedFaceParts=new Map(parts);
+ renderedFaceParts=new Map(parts);renderedFaceKeys=partKeys;
 
  clearTimeout(highlightTimer);
  if(face.querySelector('.preview-change')){
@@ -104,7 +105,7 @@ function render(){
  updateTrays();renderSaved();
 }
 function sample(k,x){if(k==='ears')return x.v[0]+'◦'+x.v[1];if(k==='eyes')return x.v[0]+' '+x.v[1];if(k==='mouth')return x.v;return x.v.join('')||'—'}
-function buildFamilies(){ANIMALS.forEach(animal=>{const look=ANIMAL_LOOKS.find(x=>x.id===animal.id);const b=button('family-option','',()=>change(()=>{state.ears=animal.earIndex;customKeys.ears.forEach(k=>delete state.custom[k]);rememberPart('ears',state.ears);/* 狐狸自带爪爪：没戴手时自动配上；换走时只撤掉自动配的那副 */const a=state.accessories;if(autoHands&&a.hands===autoHands&&animal.hands!==autoHands){a.hands=0;autoHands=0}if(animal.hands&&!a.hands){a.hands=animal.hands;autoHands=animal.hands;accessorySlots.hands.forEach(s=>delete state.custom[s])}}));b.dataset.animal=animal.id;localizedAttr(b,'aria-label','捏一只'+animal.name);b.append(el('span','kaomoji',compose(look.state)),el('small','',animal.name));$('#families').append(b)})}
+function buildFamilies(){ANIMALS.forEach(animal=>{const look=ANIMAL_LOOKS.find(x=>x.id===animal.id);const b=button('family-option','',()=>change(()=>{state.ears=animal.earIndex;delete state.order;customKeys.ears.forEach(k=>delete state.custom[k]);rememberPart('ears',state.ears);/* 狐狸自带爪爪：没戴手时自动配上；换走时只撤掉自动配的那副 */const a=state.accessories;if(autoHands&&a.hands===autoHands&&animal.hands!==autoHands){a.hands=0;autoHands=0}if(animal.hands&&!a.hands){a.hands=animal.hands;autoHands=animal.hands;accessorySlots.hands.forEach(s=>delete state.custom[s])}}));b.dataset.animal=animal.id;localizedAttr(b,'aria-label','捏一只'+animal.name);b.append(el('span','kaomoji',compose(look.state)),el('small','',animal.name));$('#families').append(b)})}
 function buildCustom(k){const details=el('details','custom-editor');details.append(el('summary','','自己输入'+(k==='decor'?'前后装饰':labels[k].replace('选择','').replace('换一对小',''))));const grid=el('div','custom-fields');(k==='ears'?['left','right']:customKeys[k]).forEach(key=>{const label=el('label','',names[key]);const input=el('input');input.type='text';input.dir='ltr';input.dataset.custom=key;localizedAttr(input,'aria-label',names[key]+'自定义');input.autocomplete='off';input.spellcheck=false;input.addEventListener('focus',checkpoint);input.addEventListener('input',()=>{state.custom[key]=Array.from(input.value.replace(/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/gu,'')).slice(0,16).join('');render()});label.append(input);grid.append(label)});details.append(grid);return details}
 // 2026-11-28 拾：每一格都有一个「塞素材」的地方。只有点了「塞进素材区」才留下来，排在那一格最前面，随机也会抽到。
 const stashLists=new Map();
@@ -293,14 +294,20 @@ function earSlots(side){
  return segments.filter(([key,def])=>Object.hasOwn(state.custom,key)||def.trim()!=='')
   .map(([key,def])=>({key,label:names[key],def}));
 }
+// 2026-11-28 拾：拆零件里的格子按颜文字里真实的先后排；长按一块拖到别的位置，颜文字跟着换顺序。
+const EAR_PIECES=new Set(['leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter']);
+const slotLabels=Object.fromEntries(slotOrder.map(([k,l,n])=>[k,[l,n]]));
+function earPieceDefault(key){const side=key.startsWith('left')?'left':'right';const seg=earSegments({},PARTS.ears[state.ears],side).find(([k])=>k===key);return seg?seg[1]:''}
 function renderSlots(){
  const box=$('#slot-list');box.replaceChildren();
- for(const [key,label,needs] of slotOrder){
+ for(const [key] of composeParts(state)){
+  if(key==='leftGap'||key==='rightGap')continue;
+  if(EAR_PIECES.has(key)){const def=earPieceDefault(key);if(Object.hasOwn(state.custom,key)||def.trim()!==''){const c=pieceChip({key,label:names[key],def});c.dataset.key=key;box.append(c)}continue}
+  const [label,needs]=slotLabels[key]||[names[key]||key];
   if(needs&&!state.accessories[needs])continue;
-  if(key==='left'||key==='right'){const subs=earSlots(key);if(subs){subs.forEach(sub=>box.append(pieceChip(sub)));continue}}
   const has=Object.hasOwn(state.custom,key),deleted=has&&state.custom[key]==='';
   if(!deleted&&!has&&slotDefault(key)==='')continue;
-  const chip=el('div','slot-chip'+(deleted?' is-deleted':''));chip.append(el('small','',label));
+  const chip=el('div','slot-chip'+(deleted?' is-deleted':''));chip.dataset.key=key;chip.append(el('small','',label));
   if(deleted){chip.append(button('slot-restore','↺ 恢复',()=>{delete state.custom[key];render();syncCustom();renderSlots()}))}
   else{const input=el('input');input.type='text';input.dir='ltr';input.value=slotValue(key);input.spellcheck=false;input.autocomplete='off';localizedAttr(input,'aria-label',label);
    input.addEventListener('input',()=>{state.custom[key]=cleanSlot(input.value);render();syncCustom()});
@@ -308,6 +315,37 @@ function renderSlots(){
    chip.append(input,del)}
   box.append(chip)}
 }
+// 长按拖动：按住格子（输入框和 × 以外的地方）约 0.35 秒，格子浮起来，拖到想去的位置松手。
+(function setupSlotDrag(){
+ const box=$('#slot-list'),dialog=$('#slot-edit');let timer=0,startX=0,startY=0,pending=null,drag=null;
+ const clear=()=>{clearTimeout(timer);timer=0;pending=null};
+ function begin(chip,x,y){
+  clear();const r=chip.getBoundingClientRect();const ghost=chip.cloneNode(true);ghost.classList.add('drag-ghost');ghost.style.width=r.width+'px';ghost.style.height=r.height+'px';dialog.append(ghost);
+  drag={chip,ghost,dx:x-r.left,dy:y-r.top,before:[...box.children].map(c=>c.dataset.key).join()};chip.classList.add('is-dragging');document.body.classList.add('slot-dragging');navigator.vibrate?.(12);move(x,y);
+ }
+ function move(x,y){
+  if(!drag)return;drag.ghost.style.left=(x-drag.dx)+'px';drag.ghost.style.top=(y-drag.dy)+'px';
+  const target=document.elementFromPoint(x,y)?.closest('.slot-chip');
+  if(!target||target===drag.chip||!box.contains(target))return;
+  const r=target.getBoundingClientRect();const after=x>r.left+r.width/2;
+  if(after){if(target.nextSibling!==drag.chip)target.after(drag.chip)}else if(target.previousSibling!==drag.chip)target.before(drag.chip);
+ }
+ function end(){
+  if(!drag){clear();return}
+  const {chip,ghost,before}=drag;drag=null;ghost.remove();chip.classList.remove('is-dragging');document.body.classList.remove('slot-dragging');
+  const keys=[...box.children].map(c=>c.dataset.key).filter(Boolean);
+  if(keys.join()===before)return;
+  checkpoint();state=reorderVisible(state,keys);render();syncCustom();renderSlots();
+ }
+ const startable=e=>{const chip=e.target.closest('.slot-chip');if(!chip||!box.contains(chip)||e.target.closest('button,input'))return null;return chip};
+ box.addEventListener('touchstart',e=>{const chip=startable(e);if(!chip||e.touches.length>1)return;const t=e.touches[0];startX=t.clientX;startY=t.clientY;pending=chip;timer=setTimeout(()=>begin(chip,startX,startY),350)},{passive:true});
+ box.addEventListener('touchmove',e=>{const t=e.touches[0];if(drag){e.preventDefault();move(t.clientX,t.clientY)}else if(pending&&Math.hypot(t.clientX-startX,t.clientY-startY)>8)clear()},{passive:false});
+ box.addEventListener('touchend',end);box.addEventListener('touchcancel',end);
+ box.addEventListener('mousedown',e=>{if(e.button!==0)return;const chip=startable(e);if(!chip)return;e.preventDefault();startX=e.clientX;startY=e.clientY;pending=chip;timer=setTimeout(()=>begin(chip,startX,startY),250)});
+ addEventListener('mousemove',e=>{if(drag)move(e.clientX,e.clientY);else if(pending&&Math.hypot(e.clientX-startX,e.clientY-startY)>4)begin(pending,e.clientX,e.clientY)});
+ addEventListener('mouseup',end);
+ box.addEventListener('contextmenu',e=>{if(drag||pending)e.preventDefault()});
+})();
 function openSlots(){checkpoint();render();renderSlots();$('#slot-edit').showModal()}
 $('#puppy').addEventListener('click',openSlots);
 $('#puppy').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSlots()}});

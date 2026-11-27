@@ -60,7 +60,7 @@ export function animalForEar(index){
   return PARTS.ears[index].animal||([11,12,13].includes(index)?'cat':'dog');
 }
 export const DEFAULT={ears:1,eyes:0,mouth:0,decor:1,custom:{},accessories:{horns:0,tail:0,wings:0,hands:0}};
-export function cloneState(s){const out={...s,custom:{...s.custom},accessories:{horns:0,tail:0,wings:0,hands:0,...s.accessories}};if(s.sides)out.sides={...s.sides};else delete out.sides;return out}
+export function cloneState(s){const out={...s,custom:{...s.custom},accessories:{horns:0,tail:0,wings:0,hands:0,...s.accessories}};if(s.sides)out.sides={...s.sides};else delete out.sides;if(Array.isArray(s.order))out.order=[...s.order];else delete out.order;return out}
 // 2026-11-23 界（拾提）：带脸框的耳朵（如 ૮(ᐢ ）拆成三块：外耳、脸边、内侧，可以只删里面的小耳朵
 export const EAR_FRAMES=new Set(['(',')','₍','₎','꒰','꒱','[',']','（','）','ʕ','ʔ']);
 export function earPieces(str,side){const chars=Array.from(str);const i=side==='left'?chars.findIndex(ch=>EAR_FRAMES.has(ch)):chars.findLastIndex(ch=>EAR_FRAMES.has(ch));if(i<0)return null;const before=chars.slice(0,i).join(''),frame=chars[i],after=chars.slice(i+1).join('');return side==='left'?{outer:before,frame,inner:after}:{inner:before,frame,outer:after}}
@@ -123,6 +123,32 @@ export function oneSide(prefix,suffix){const p=!!(prefix||'').trim(),q=!!(suffix
 // 挪到另一边时，把贴着脸那一侧的空格也翻过去：' っ' → 'っ '，'✿ ' → ' ✿'
 function moveLeft(text){const m=/^(\s*)([\s\S]*?)(\s*)$/u.exec(text);return m[2]+m[1]+m[3]}
 function moveRight(text){const m=/^(\s*)([\s\S]*?)(\s*)$/u.exec(text);return m[1]+m[3]+m[2]}
+// 2026-11-28 拾：「拆零件」里长按拖动排顺序。state.order 记一串零件名，按它重排；
+// 没在 order 里的零件（比如后来才戴上的翅膀）跟在它原来前面那一块后面。
+export const ORDER_KEYS=['prefix','wingLeft','handLeft','leftOuter','leftFrame','leftInner','left','hornLeft','blushLeft','eyeLeft','leftGap','mouth','rightGap','eyeRight','blushRight','hornRight','rightInner','rightFrame','rightOuter','right','handRight','wingRight','tail','suffix'];
+function applyOrder(order,segments){
+  if(!Array.isArray(order)||!order.length)return segments;
+  const byKey=new Map(segments.map(x=>[x[0],x]));
+  const out=order.filter(k=>byKey.has(k)).map(k=>byKey.get(k));
+  const placed=new Set(out.map(x=>x[0]));
+  // 脸左半边的零件贴着它前面那一块，右半边的贴着它后面那一块（比如右内侧的空格跟着右脸边走）
+  const mid=segments.findIndex(x=>x[0]==='mouth');
+  const pending=segments.map((seg,i)=>[seg,i]).filter(([seg])=>!placed.has(seg[0]));
+  for(const [seg,i] of pending){
+    let at=-1;
+    if(i>mid){for(let j=i+1;j<segments.length;j++){const idx=out.findIndex(x=>x[0]===segments[j][0]);if(idx>=0){at=idx;break}}}
+    if(at<0){at=0;for(let j=i-1;j>=0;j--){const idx=out.findIndex(x=>x[0]===segments[j][0]);if(idx>=0){at=idx+1;break}}}
+    out.splice(at,0,seg);placed.add(seg[0]);
+  }
+  return out;
+}
+// 拖动：只记看得见的那几块的先后；嘴巴两边的空格跟着嘴巴走，
+// 纯空格、空着的零件不记，交给 applyOrder 跟在原来前面那一块后面。
+export function reorderVisible(s,visibleKeys){
+  const out=cloneState(s);
+  out.order=visibleKeys.flatMap(k=>k==='mouth'?['leftGap','mouth','rightGap']:[k]).filter(k=>ORDER_KEYS.includes(k));
+  return out;
+}
 export function composeParts(s){
   const custom=s.custom||{};
   const accessories=s.accessories||{};
@@ -150,7 +176,7 @@ export function composeParts(s){
   }
   const tailText=accessories.tail?(custom.tail??tail):'';
   const tailLeft=!!tailText.trim()&&sides.tail==='left';
-  return fixBidiSegments([
+  return fixBidiSegments(applyOrder(s.order,[
     ['prefix',prefix],
     ...(tailLeft?[['tail',moveLeft(tailText)]]:[]),
     ['wingLeft',accessories.wings?(custom.wingLeft??wings[0]):''],
@@ -170,7 +196,7 @@ export function composeParts(s){
     ['wingRight',accessories.wings?(custom.wingRight??wings[1]):''],
     ...(tailLeft?[]:[['tail',tailText]]),
     ['suffix',suffix]
-  ]);
+  ]));
 }
 // 2026-11-28 界（拾报 bug：自己输入眼睛 0 0，显示成「0 0ﻌ」）：ﻌ、ڡ 是阿拉伯字母（从右往左），
 // 紧跟在它后面的数字会被浏览器当成阿拉伯数字一起倒排，右眼就跑到嘴巴前面去了。
@@ -213,7 +239,7 @@ export const ANIMAL_LOOKS=ANIMALS.map(animal=>({
   id:animal.id,name:animal.name+'团子',
   state:{...cloneState(DEFAULT),ears:animal.earIndex,mouth:animal.mouthIndex}
 }));
-export function validState(s){return !!s&&(!s.sides||(typeof s.sides==='object'&&Object.entries(s.sides).every(([k,v])=>['decor','tail'].includes(k)&&['left','right'].includes(v))))&&(s.spacing===undefined||s.spacing===''||s.spacing===' ')&&['ears','eyes','mouth','decor'].every(k=>Number.isInteger(s[k])&&s[k]>=0&&s[k]<PARTS[k].length)&&(!s.accessories||(typeof s.accessories==='object'&&Object.entries(s.accessories).every(([k,v])=>Object.hasOwn(ACCESSORIES,k)&&Number.isInteger(v)&&v>=0&&v<ACCESSORIES[k].length)))&&(!s.custom||Object.entries(s.custom).every(([k,v])=>['left','right','eyeLeft','eyeRight','mouth','prefix','suffix','blushLeft','blushRight','hornLeft','hornRight','wingLeft','wingRight','tail','leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter','handLeft','handRight'].includes(k)&&typeof v==='string'&&Array.from(v).length<=16&&!/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(v)))}
+export function validState(s){return !!s&&(!s.order||(Array.isArray(s.order)&&s.order.length<=40&&s.order.every(k=>ORDER_KEYS.includes(k))))&&(!s.sides||(typeof s.sides==='object'&&Object.entries(s.sides).every(([k,v])=>['decor','tail'].includes(k)&&['left','right'].includes(v))))&&(s.spacing===undefined||s.spacing===''||s.spacing===' ')&&['ears','eyes','mouth','decor'].every(k=>Number.isInteger(s[k])&&s[k]>=0&&s[k]<PARTS[k].length)&&(!s.accessories||(typeof s.accessories==='object'&&Object.entries(s.accessories).every(([k,v])=>Object.hasOwn(ACCESSORIES,k)&&Number.isInteger(v)&&v>=0&&v<ACCESSORIES[k].length)))&&(!s.custom||Object.entries(s.custom).every(([k,v])=>['left','right','eyeLeft','eyeRight','mouth','prefix','suffix','blushLeft','blushRight','hornLeft','hornRight','wingLeft','wingRight','tail','leftOuter','leftFrame','leftInner','rightInner','rightFrame','rightOuter','handLeft','handRight'].includes(k)&&typeof v==='string'&&Array.from(v).length<=16&&!/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(v)))}
 export function readFavorites(storage){try{const data=JSON.parse(storage.getItem('puppy-factory:favorites')||'[]');return Array.isArray(data)?data.filter(validState).slice(0,500).map(cloneState):[]}catch{return []}}
 export function writeFavorites(storage,list){try{storage.setItem('puppy-factory:favorites',JSON.stringify(list));return true}catch{return false}}
 export async function copyText(text,nav,doc){try{if(nav.clipboard?.writeText){await nav.clipboard.writeText(text);return 'clipboard'}}catch{}const active=doc.activeElement;const input=doc.createElement('textarea');input.value=text;input.setAttribute('readonly','');input.setAttribute('dir','ltr');input.style.cssText='position:fixed;top:0;left:0;opacity:0;font-size:16px';doc.body.append(input);input.focus();input.select();input.setSelectionRange(0,text.length);let copied=false;try{copied=doc.execCommand('copy')}catch{}finally{input.remove();active?.focus?.()}return copied?'fallback':'manual'}
@@ -435,7 +461,8 @@ export function randomSides(s,rng=Math.random){
 export function flipSide(s,kind){
   const next=cloneState(s);const sides={...(next.sides||{})};
   if(kind==='decor'){const native=decorSideOf(next);if(!native)return null;const cur=sides.decor||native;sides.decor=cur==='left'?'right':'left';if(sides.decor===native)delete sides.decor}
-  else if(kind==='tail'){if(!next.accessories?.tail)return null;if(sides.tail==='left')delete sides.tail;else sides.tail='left'}
+  else if(kind==='tail'){if(!next.accessories?.tail)return null;if(sides.tail==='left')delete sides.tail;else sides.tail='left';
+    if(Array.isArray(next.order)){const o=next.order.filter(k=>k!=='tail');if(sides.tail==='left'){const i=o.indexOf('prefix');o.splice(i+1,0,'tail')}else{const i=o.indexOf('suffix');o.splice(i<0?o.length:i,0,'tail')}next.order=o}}
   else return null;
   if(Object.keys(sides).length)next.sides=sides;else delete next.sides;
   return next;
