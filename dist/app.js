@@ -1,7 +1,7 @@
 import {earSegments,PARTS,ACCESSORIES,NEW_PARTS,FRESH_LOOKS,ANIMALS,ANIMAL_LOOKS,animalForEar,randomAnimalState,DEFAULT,cloneState,values,composeParts,compose,readFavorites,writeFavorites,copyText,STASH_SLOTS,readMyParts,writeMyParts,addMyPart,removeMyPart,stashSample,applyMyPart,sprinkleMyParts} from './model.js?v=31';
 import {drawShareCard,SHARE_URL} from './share.js?v=4';
 import {RECENT_KEY,EYE_MOODS,readRecent,usePart,writeRecent,partTray,clearFace,compactDock,anchorTop} from './picker.js?v=35';
-import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=33';
+import {LANGUAGE_KEY,translate,readLanguage,writeLanguage} from './i18n.js?v=34';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 let state=cloneState(DEFAULT),filter='全部团子',counter=1,toastTimer,gallery=[],history=[],storage;
 try{storage=localStorage}catch{}
@@ -41,7 +41,7 @@ const looks=[
 ];
 function el(tag,cls,text){const n=document.createElement(tag);if(cls)n.className=cls;/* 拾 11-23：浏览器翻译会把 ó ò 翻成「哦」，颜文字一律不让翻 */if(cls&&/\bkaomoji\b|card-puppy/.test(cls))n.translate=false;if(text!==undefined)setText(n,text);return n}
 function button(cls,text,fn){const b=el('button',cls,text);b.type='button';b.addEventListener('click',fn);return b}
-function toast(message){setText($('#toast'),message);$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),2400)}
+function toast(message,tone=''){setText($('#toast'),message);$('#toast').classList.toggle('toast-pink',tone==='pink');$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),2400)}
 function checkpoint(){history.push(cloneState(state));if(history.length>40)history.shift()}
 function rememberPart(key,index){recent=usePart(recent,key,index);writeRecent(storage,recent)}
 function change(fn,{remember=true}={}){const previous=cloneState(state);checkpoint();fn();if(remember){for(const k of Object.keys(PARTS))if(previous[k]!==state[k])rememberPart(k,state[k]);for(const k of Object.keys(ACCESSORIES))if(previous.accessories[k]!==state.accessories[k])rememberPart(k,state.accessories[k])}render();syncCustom()}
@@ -108,6 +108,8 @@ function buildFamilies(){ANIMALS.forEach(animal=>{const look=ANIMAL_LOOKS.find(x
 function buildCustom(k){const details=el('details','custom-editor');details.append(el('summary','','自己输入'+(k==='decor'?'前后装饰':labels[k].replace('选择','').replace('换一对小',''))));const grid=el('div','custom-fields');(k==='ears'?['left','right']:customKeys[k]).forEach(key=>{const label=el('label','',names[key]);const input=el('input');input.type='text';input.dir='ltr';input.dataset.custom=key;localizedAttr(input,'aria-label',names[key]+'自定义');input.autocomplete='off';input.spellcheck=false;input.addEventListener('focus',checkpoint);input.addEventListener('input',()=>{state.custom[key]=Array.from(input.value.replace(/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/gu,'')).slice(0,16).join('');render()});label.append(input);grid.append(label)});details.append(grid);return details}
 // 2026-11-28 拾：每一格都有一个「塞素材」的地方。只有点了「塞进素材区」才留下来，排在那一格最前面，随机也会抽到。
 const stashLists=new Map();
+// 拾 01:16：单边的零件在名字后面用括号写清楚放在哪一边
+const STASH_LABELS={tail:'尾巴（后）',prefix:'前面的小装饰（左）',suffix:'后面的小装饰（右）'};
 function saveMine(next){if(!writeMyParts(storage,next)){toast('浏览器无法保存素材，请允许本地存储后再试');return false}mine=next;return true}
 function renderMine(tray){
  const k=tray.key;
@@ -129,7 +131,7 @@ function renderStashList(k){
 function buildStash(k){
  const details=el('details','custom-editor stash-editor');details.append(el('summary','','＋ 塞一个自己的素材'));
  const grid=el('div','custom-fields');const inputs={};
- STASH_SLOTS[k].forEach(slot=>{const label=el('label','',names[slot]);const input=el('input');input.type='text';input.dir='ltr';input.autocomplete='off';input.spellcheck=false;localizedAttr(input,'aria-label',names[slot]);inputs[slot]=input;label.append(input);grid.append(label)});
+ STASH_SLOTS[k].forEach(slot=>{const label=el('label','',STASH_LABELS[slot]||names[slot]);const input=el('input');input.type='text';input.dir='ltr';input.autocomplete='off';input.spellcheck=false;localizedAttr(input,'aria-label',names[slot]);inputs[slot]=input;label.append(input);grid.append(label)});
  const nameLabel=el('label','','名字（可不填）');const nameInput=el('input','stash-name');nameInput.type='text';nameInput.autocomplete='off';nameInput.maxLength=12;nameLabel.append(nameInput);grid.append(nameLabel);
  const add=button('stash-add','塞进素材区',()=>{
   const values={};for(const [slot,input]of Object.entries(inputs))values[slot]=input.value;
@@ -140,7 +142,7 @@ function buildStash(k){
   Object.values(inputs).forEach(x=>x.value='');nameInput.value='';
   change(()=>{state=applyMyPart(state,k,result_entry)});rememberPart(k,'m:'+result_entry.id);
   const t=trays.get(k);if(t){renderMine(t);t.grid.scrollLeft=0}
-  toast('塞进去啦，已经换上了');
+  toast('塞进去啦，已经换上了','pink');
  });
  const list=el('div','stash-list');stashLists.set(k,list);
  grid.append(add);details.append(grid,list);renderStashList(k);return details;
