@@ -136,7 +136,7 @@ export function composeParts(s){
     trimEarEdge(left,'end');
     trimEarEdge(right,'start');
   }
-  return [
+  return fixBidiSegments([
     ['prefix',face.prefix],
     ['wingLeft',accessories.wings?(custom.wingLeft??wings[0]):''],
     ...(hand.outside?[['handLeft',hand.left]]:[]),
@@ -155,7 +155,24 @@ export function composeParts(s){
     ['wingRight',accessories.wings?(custom.wingRight??wings[1]):''],
     ['tail',accessories.tail?(custom.tail??tail):''],
     ['suffix',face.suffix]
-  ];
+  ]);
+}
+// 2026-11-28 界（拾报 bug：自己输入眼睛 0 0，显示成「0 0ﻌ」）：ﻌ、ڡ 是阿拉伯字母（从右往左），
+// 紧跟在它后面的数字会被浏览器当成阿拉伯数字一起倒排，右眼就跑到嘴巴前面去了。
+// 只在「从右往左的字 + 空格 + 数字」这种组合时，在中间塞一个看不见的 LRM（U+200E），平时输出不变。
+const RTL_THEN_DIGIT=/([\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFC])(\s*)(?=[0-9\u00B2\u00B3\u00B9\u2070\u2074-\u2079\u2080-\u2089\u0660-\u0669\u06F0-\u06F9\uFF10-\uFF19])/gu;
+export function fixBidi(text){return text.replace(RTL_THEN_DIGIT,'$1\u200e$2')}
+const RTL_END=/[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFC]\s*$/u, DIGIT_START=/^\s*[0-9\u00B2\u00B3\u00B9\u2070\u2074-\u2079\u2080-\u2089\u0660-\u0669\u06F0-\u06F9\uFF10-\uFF19]/u;
+// 分段版：预览是按零件一段段画的，所以在「从右往左的那一段」末尾补 LRM，而不是改整串。
+function fixBidiSegments(segments){
+  for(let i=0;i<segments.length;i++){
+    const [key,text]=segments[i];
+    if(!text||!RTL_END.test(text))continue;
+    let rest='';
+    for(let j=i+1;j<segments.length&&!rest.trim();j++)rest+=segments[j][1]||'';
+    if(DIGIT_START.test(rest))segments[i]=[key,text+'\u200e'];
+  }
+  return segments;
 }
 export function compose(s){return joinSegments(composeParts(s))}
 export function randomState(family=null,mood=null,rng=Math.random){const pick=a=>a[Math.floor(rng()*a.length)];const indexes=(key,fn)=>PARTS[key].map((v,i)=>({v,i})).filter(x=>!x.v.hidden&&(!fn||fn(x.v))).map(x=>x.i);return {ears:pick(indexes('ears',family?v=>v.family===family:null)),eyes:pick(indexes('eyes',mood?v=>v.mood===mood:null)),mouth:pick(indexes('mouth')),decor:pick(indexes('decor')),custom:{}}}
